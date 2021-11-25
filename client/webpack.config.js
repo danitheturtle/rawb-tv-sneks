@@ -193,12 +193,11 @@ module.exports = function config(envArg) {
       '/api': {
         target: `${process.env.SERVER_ORIGIN}:${process.env.SERVER_PORT}`,
         secure: false,
-        changeOrigin: true,
-        // onProxyReq: proxyReq => {
-        //   if (proxyReq.getHeader('origin')) {
-        //     proxyReq.setHeader('origin', 'http://localhost:3000')
-        //   }
-        // }
+        changeOrigin: true
+      },
+      '/socket.io': {
+        target: `ws://localhost:4000`,
+        ws: true
       }
     },
   };

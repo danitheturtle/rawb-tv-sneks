@@ -16,7 +16,6 @@ module.exports.loadEnv = function loadEnv(envName) {
     dotenv.config({ path: resolve(`.env`) }).parsed,
     dotenv.config({ path: resolve(`.env.${envName}`) }).parsed
   ].reduce((acc, parsed) => ({ ...acc, ...parsed }), {});
-
   // Default application version
   if (!env.VERSION) {
     env.VERSION = os.userInfo().username;

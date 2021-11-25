@@ -13,10 +13,11 @@
   "dependencies": {
     "core-js": "^3.10.1",
     "engine": "workspace:*",
-    "env": "workspace:*",
+    "env": "workspace:env",
     "express": "^4.17.1",
     "nanoid": "^3.1.25",
     "pretty-error": "^3.0.3",
+    "socket.io": "^4.4.0",
     "validator": "^13.6.0"
   },
   "devDependencies": {
