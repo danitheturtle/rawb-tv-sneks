@@ -12,8 +12,8 @@
   "author": "danitheturtle",
   "dependencies": {
     "core-js": "^3.10.1",
-    "env": "workspace:*",
     "engine": "workspace:*",
+    "env": "workspace:*",
     "express": "^4.17.1",
     "nanoid": "^3.1.25",
     "pretty-error": "^3.0.3",
