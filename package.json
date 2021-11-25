@@ -1,0 +1,36 @@
+{
+  "name": "rawb-tv-snek",
+  "version": "0.0.1",
+  "packageManager": "yarn@3.0.0",
+  "description": "slither.io clone with 100% more memes",
+  "private": true,
+  "workspaces": [
+    "env",
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "start": "yarn workspaces foreach -ip run start",
+    "build": "yarn workspaces foreach -p run build"
+  },
+  "keywords": [],
+  "author": "danitheturtle",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/cli": "^7.14.5",
+    "@babel/core": "^7.14.6",
+    "@babel/plugin-syntax-jsx": "^7.14.5",
+    "@babel/preset-env": "^7.14.7",
+    "@babel/preset-react": "^7.14.5",
+    "@babel/runtime": "^7.14.8",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "babel-plugin-import": "^1.13.3"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "maintained node versions"
+  ]
+}
