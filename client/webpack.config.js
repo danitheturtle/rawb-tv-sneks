@@ -172,7 +172,6 @@ module.exports = function config(envArg) {
         fileName: "assets.json",
         publicPath: "/",
       }),
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     ].filter(Boolean),
   };
 

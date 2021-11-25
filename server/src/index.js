@@ -1,5 +1,6 @@
 import express from 'express';
 import http from 'http';
+import path from 'path';
 // import socketIO from 'socket.io';
 import router from './router';
 //Game Modules
@@ -15,6 +16,8 @@ let server = http.Server(app);
 
 //Hook in the app router
 app.use(router);
+
+app.use(express.static(path.resolve(__dirname, "../../dist/web")))
 
 //On a new player connection
 // io.on('connection', (socket) => {
