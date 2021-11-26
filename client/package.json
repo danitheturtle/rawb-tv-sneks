@@ -1,21 +1,23 @@
 {
-  "name": "web",
+  "name": "client",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "webpack serve --env=development --history-api-fallback",
+    "start": "webpack serve --env=development",
     "build": "rm -rf ../dist/web && webpack --env=production"
   },
   "keywords": [],
   "author": "danitheturtle",
   "dependencies": {
     "@babel/runtime": "^7.14.8",
-    "env": "workspace:env",
+    "engine": "*",
+    "env": "*",
     "pnp-webpack-plugin": "^1.7.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "socket.io-client": "^4.4.0"
+    "socket.io-client": "^4.4.0",
+    "victor": "^1.1.0"
   },
   "browserslist": [
     "defaults",
@@ -27,7 +29,6 @@
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-react": "^7.14.5",
     "babel-loader": "^8.2.2",
-    "babel-plugin-import": "^1.13.3",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "html-webpack-plugin": "^5.3.2",
@@ -35,7 +36,7 @@
     "style-loader": "^3.0.0",
     "terser-webpack-plugin": "^5.1.1",
     "url-loader": "^4.1.1",
-    "webpack": "^5.42.0",
+    "webpack": "^5.47.0",
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^4.0.0-rc.0",
     "webpack-manifest-plugin": "^3.1.1"

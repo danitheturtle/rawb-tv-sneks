@@ -33,6 +33,7 @@ node_modules/
 
 # Built javascript
 **/build/**
+**/dist/**
 
 # Optional npm cache directory
 .npm

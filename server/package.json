@@ -1,24 +1,25 @@
 {
-  "name": "api",
+  "name": "server",
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "start:compiled": "node ../dist/api/server.js",
+    "start:compiled": "node ../dist/server/index.js",
     "start": "nodemon --watch ./src ./src/index.js --exec babel-node",
     "debug": "nodemon --inspect --watch ./src ./src/index.js --exec babel-node --env=development",
-    "build": "rm -rf ../dist/api && babel ./src --out-dir ../dist/api"
+    "build": "rm -rf ../dist/server && babel ./src --out-dir ../dist/server"
   },
   "keywords": [],
   "author": "danitheturtle",
   "dependencies": {
     "core-js": "^3.10.1",
-    "engine": "workspace:*",
-    "env": "workspace:env",
+    "engine": "*",
+    "env": "*",
     "express": "^4.17.1",
     "nanoid": "^3.1.25",
     "pretty-error": "^3.0.3",
     "socket.io": "^4.4.0",
-    "validator": "^13.6.0"
+    "validator": "^13.6.0",
+    "victor": "^1.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",

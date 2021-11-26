@@ -1,6 +1,6 @@
-const baseConfig = require('../babel.config.js');
+import baseConfig from '../babel.config.js';
 
-module.exports = function config(api) {
+export default config(api) {
   const baseConfigResult = baseConfig(api);
   return {
     ...baseConfigResult,
