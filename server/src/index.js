@@ -1,4 +1,4 @@
-import('env')
+require('env');
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -47,6 +47,7 @@ server.listen(port, () => {
   console.log("Server listening on " + server.address().port);
   //Initialize the game.  Pass in our socket server instance
   game.init(io);
+  game.start();
   //Start the game loop
   game.updateGame();
   //Start the network loop

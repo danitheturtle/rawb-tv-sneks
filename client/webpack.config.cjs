@@ -107,6 +107,10 @@ module.exports = function config(envArg) {
           }
         },
         {
+          test: /\.json$/i,
+          use: 'json-loader'
+        },
+        {
           test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
           type: 'asset/resource'
         },

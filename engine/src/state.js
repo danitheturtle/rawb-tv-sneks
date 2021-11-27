@@ -6,12 +6,17 @@ export const GAME_STATES = {
   GAME_RESETTING: 2004
 };
 
+export const GLOBALS = {
+  gameLength: 180,
+  endscreenLength: 10,
+  startCountdownLength: 15
+};
+
 export class State {
-  constructor() {
+  constructor(_io) {
+    this.io = _io;
     //Game state
     this.game = {
-      //Last player to connect.  Every client gets a unique player ID
-      lastPlayerID: 0,
       //Track the game state
       gameState: GAME_STATES.GAME_WAITING_FOR_PLAYERS,
       //Store all player objects
@@ -20,13 +25,7 @@ export class State {
     //Score state
     this.score = {
       //Who won the game
-      winner: undefined,
-      //How long is a game
-      gameLength: 180,
-      //How long does the game over screen last before a new game begins
-      endscreenLength: 10,
-      //How long does the game wait before starting
-      startCountdownLength: 15
+      winners: undefined
     };
     //Physics state
     this.physics = {

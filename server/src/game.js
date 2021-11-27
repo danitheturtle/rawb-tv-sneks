@@ -1,13 +1,13 @@
 import engine from 'engine';
-
+import Victor from 'victor';
+import { ServerState, SERVER_STATES } from './state';
+const Vector = Victor;
 const {
-  State,
   scoring,
   time,
   utils,
   physics,
   levelLoader,
-  GAME_STATES,
   BoxCollider,
   CircleCollider,
   GameObject,
@@ -16,7 +16,6 @@ const {
 
 // ref variables so I can type quicker
 let state;
-let io;
 let players;
 let sp, st, sg;
 
@@ -24,16 +23,17 @@ let sp, st, sg;
  * Used to initialize the game.  It initializes other modules and gets shorthand variables
  */
 export const init = (_io) => {
-  state = new State();
+  state = new ServerState(_io);
   time.init(state);
   physics.init(state);
   levelLoader.init(state);
-  io = _io;
   players = state.game.players;
   sp = state.physics;
   st = state.time;
   sg = state.game;
+}
 
+export const start = () => {
   physics.start();
   levelLoader.start();
 }
@@ -67,11 +67,11 @@ export const updateNetwork = () => {
   //Grab player data to send to clients
   let playerData = {};
   for (const i in players) {
-    let curData = playerData[players[i].id] = players[i].getData();
-    curData.serverTime = st.clientTimers[players[i].id];
+    let curData = playerData[players[i].clientId] = players[i].getData();
+    curData.serverTime = st.clientTimers[players[i].clientId];
   }
   //Emit the full player list to the new client
-  io.emit('allPlayers', playerData);
+  state.io.emit('allPlayers', playerData);
 
   //Get game state data
   let updatedGameState = {
@@ -81,7 +81,7 @@ export const updateNetwork = () => {
     gameOverTimer: st.timers.gameOverTimer
   };
   //Emit up-to-date game state to all clients
-  io.emit('updateGameState', updatedGameState);
+  state.io.emit('updateGameState', updatedGameState);
 }
 
 /**
@@ -89,7 +89,7 @@ export const updateNetwork = () => {
  * their game client.
  */
 export const updatePlayerFromClient = (socket, data) => {
-  players[data.id].setData(data);
+  players[data.clientId].setData(data);
 }
 
 /**
@@ -98,39 +98,32 @@ export const updatePlayerFromClient = (socket, data) => {
 
 export const addNewPlayer = (socket) => {
   //Create an ID for this player
-  let id = sg.lastPlayerID++;
+  let clientId = sg.lastPlayerID++;
 
   //Create a new player object and store it in the array
-  players[id] = new Player(id, utils.randomInt(5, 70), utils.randomInt(5, 60));
-  players[id].gameObject.hasGravity = true;
-  time.startClientTimer(id, 0);
+  players[clientId] = new Player(state, clientId, new Vector(utils.randomInt(5, 70), utils.randomInt(5, 60)));
+  time.startClientTimer(clientId, 0);
 
   //Emit the new player's id to their client
-  socket.emit('setClientID', id);
+  socket.emit('setClientID', clientId);
 
   //Add server time to the response
-  let newPlayerData = players[id].getData();
-  newPlayerData.time = st.clientTimers[id];
+  let newPlayerData = players[clientId].getData();
+  newPlayerData.time = st.clientTimers[clientId];
   //Emit the new player to all connected clients
-  io.emit('newPlayer', newPlayerData);
+  state.io.emit('newPlayer', newPlayerData);
 
   //Return the new player's ID
-  return id;
+  return clientId;
 }
 
-export const disconnectPlayer = (id) => {
+export const disconnectPlayer = (clientId) => {
   //Remove the player's Game Object
-  delete sp.gameObjects[players[id].gameObject.id];
+  delete sp.gameObjects[players[clientId].id];
   //Remove the player's timer
-  delete st.clientTimers[id];
+  delete st.clientTimers[clientId];
   //Remove the player's data in the player array
-  delete players[id];
-
-  //If that player was the attacker
-  if (state.score.attackingPlayerID == id) {
-    //Force the scoring module to pick a new attacking player
-    state.score.attackingPlayerID = undefined;
-  }
+  delete players[clientId];
   //Emit that a player disconnected
-  io.emit('removePlayer', id);
+  state.io.emit('removePlayer', clientId);
 }

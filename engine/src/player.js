@@ -1,4 +1,5 @@
 import Victor from 'victor';
+import * as physics from './physics';
 import { GameObject } from './physicsObjects';
 const Vector = Victor;
 
@@ -7,18 +8,19 @@ export class Player extends GameObject {
     super(_gameStateRef, _pos, _collider, _vel, _accel)
     //Store their ID
     this.clientId = _clientId;
-    //Create a rigid body for the player
-    this.gameObject = physics.getGameObject(_x, _y, 1, 1.3158);
 
     //Player input tracking.  Everything is false by default
     this.moveLeft = false;
     this.moveRight = false;
     this.sprint = false;
+    
+    //custom spritesheet support for meme potential
+    this.customSpritesheetURL = null;
   }
 
   update() {
     super.update();
-    const sp = gameStateRef.physics;
+    const sp = this.gameStateRef.physics;
     //Set the hor velocity to zero
     this.vel.x = 0;
     //If moving left, move left
@@ -35,23 +37,32 @@ export class Player extends GameObject {
     }
   }
   
+  setCustomSpritesheet(spritesheetURL) {
+    this.customSpritesheetURL = spritesheetURL
+  }
+  
   getData() {
     return {
       ...super.getData(),
-      time: st.clientTimers[this.id],
+      time: this.gameStateRef.time.clientTimers[this.clientId],
       moveLeft: this.moveLeft,
       moveRight: this.moveRight,
-      sprint: this.sprint
+      sprint: this.sprint,
+      customSpritesheetURL: this.customSpritesheetURL
     };
   }
 
   setData(data) {
-    super.setData(data);
+    super.setData(data, this.gameStateRef.time.clientTimers[data.clientId] - data.time);
+    this.clientId = data.clientId;
     this.moveLeft = data.moveLeft;
     this.moveRight = data.moveRight;
     this.sprint = data.sprint;
-    let timer = this.gameStateRef.time.clientTimers[data.id];
-    this.gameObject.setData(data.gameObject, timer - data.time);
-    this.gameStateRef.time.clientTimers[data.id] = data.time;
+    this.customSpritesheetURL = data.customSpritesheetURL;
+    this.gameStateRef.time.clientTimers[data.clientId] = data.time;
+  }
+  
+  setClientData(data) {
+    this.gameStateRef.time.clientTimers[data.clientId] = data.time;
   }
 }

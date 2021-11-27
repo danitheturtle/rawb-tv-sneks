@@ -1,6 +1,6 @@
 import Victor from 'victor';
-import time from './time';
-import physics from './index';
+import * as time from './time';
+import * as physics from './index';
 const Vector = Victor;
 
 export class Manifold {
@@ -33,9 +33,6 @@ export class CircleCollider extends Collider {
     super();
     this.radius = _radius;
     this.type = "circle";
-  }
-  get radius() {
-    return this.radius;
   }
 
   getData() {
@@ -113,7 +110,7 @@ export class BoxCollider extends Collider {
 }
 
 export class GameObject {
-  constructor(_gameStateRef, _pos, _collider, _vel = new Vector(0.0, 0.0), _accel = new Vector(0.0, 0.0)) {
+  constructor(_gameStateRef, _pos, _collider = new CircleCollider(2), _vel = new Vector(0.0, 0.0), _accel = new Vector(0.0, 0.0)) {
     this.gameStateRef = _gameStateRef;
     this.id = this.gameStateRef.physics.lastGameObjectID++;
     this.pos = _pos;
@@ -122,6 +119,7 @@ export class GameObject {
     this.hasCollisions = true;
     this.collider = _collider;
     this.collider.parent = this;
+    this.gameStateRef.physics.gameObjects[this.id] = this;
   }
 
   update() {
@@ -133,6 +131,8 @@ export class GameObject {
     //Reset acceleration
     this.accel = new Vector(0.0, 0.0);
   }
+  
+  draw() {}
 
   applyCollisions(otherObjects) {
     if (!this.hasCollisions) return;
@@ -150,6 +150,8 @@ export class GameObject {
       y: this.pos.y,
       velX: this.vel.x,
       velY: this.vel.y,
+      accelX: this.accel.x,
+      accelY: this.accel.y,
       hasCollisions: this.hasCollisions,
       collider: this.collider.getData()
     }
@@ -159,7 +161,6 @@ export class GameObject {
     let newPos = new Vector(data.x + data.velX * timeDelta, data.y + data.velY * timeDelta);
     //If the changed distance is less than 1gu, lerp it
     if (newPos.distanceSq(this.pos) < 1) {
-      index
       this.pos = new Vector(data.x + data.velX * timeDelta, data.y + data.velY * timeDelta).mix(this.pos, 0.5);
       //Otherwise, just set the position
     } else {
@@ -167,6 +168,8 @@ export class GameObject {
     }
     this.vel.x = data.velX;
     this.vel.y = data.velY;
+    this.accel.x = data.accelX;
+    this.accel.y = data.accelY;
     this.hasCollisions = data.hasCollisions;
     switch (data.collider.type) {
       case 'circle':

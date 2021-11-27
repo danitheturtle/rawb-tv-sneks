@@ -28,12 +28,6 @@ export const update = () => {
   }
 }
 
-export const getGameObject = (_x, _y, _width, _height, _vel = new Vector(0.0, 0.0)) => {
-  let go = new GameObject(_x, _y, _width, _height, _vel);
-  sp.gameObjects[go.id] = go;
-  return go;
-}
-
 export const CircleCircle = (col1, col2) => {
   let m = new Manifold();
 
