@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import engine from 'engine';
 import { io } from 'socket.io-client';
-import { ClientState } from './state';
+import { ClientState, CLIENT_STATES } from './clientState';
+import { View } from './drawing/view';
 import * as keys from './keys';
 import * as socket from './socket';
 import * as view from './drawing/view';
 import * as drawing from './drawing';
+import * as game from './game';
+import * as levelLoader from './clientLevelLoader';
 const { time, physics } = engine;
 
 // useEffect(() => {
@@ -89,16 +92,19 @@ const App = () => {
   useEffect(() => {
     if (!connected) return;
     //Initialize all modules in no particular order
+    game.init(gameState);
     keys.init(gameState);
     time.init(gameState);
     physics.init(gameState);
     socket.init(gameState);
     drawing.init(gameState);
     view.init(gameState);
+    levelLoader.init(gameState);
     // scoring.init();
     // playerUpdates.init();
-    // levelLoader.init();
     // audio.init();
+    window.addEventListener("resize", gameState.resize);
+    return () => { window.removeEventListener("resize", gameState.resize); }
   }, [gameState, connected]);
   
   //Start
@@ -110,6 +116,33 @@ const App = () => {
     physics.start();
     socket.start();
     drawing.start();
+    levelLoader.start();
+    gameState.view.active = new View(0, 0, 100, 100);
+    gameState.game.numAssetsLoading = gameState.game.loading.length;
+    
+    //Bind blur/focus events to pause
+    const handleBlurPause = () => {
+      if (gameState.game.clientState === CLIENT_STATES.PLAYING) {
+        gameState.game.clientState = CLIENT_STATES.PAUSED;
+      }
+    };
+    const handleFocusPlay = () => {
+      if (gameState.game.clientState === CLIENT_STATES.PAUSED) {
+        gameState.game.clientState = CLIENT_STATES.PLAYING;
+      }
+    }
+    window.addEventListener('blur', handleBlurPause);
+    window.addEventListener('focus', handleFocusPlay);
+    
+    
+    //Finally, start the game loop
+    game.start();
+    
+    //unbind events on unmount
+    return () => {
+      window.removeEventListener('blur', handleBlurPause);
+      window.removeEventListener('focus', handleFocusPlay);
+    }
   }, [canvasRef.current, connected])
 
   if (connectionError) return (<div>{connectionError.message}</div>);

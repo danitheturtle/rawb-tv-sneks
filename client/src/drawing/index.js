@@ -1,24 +1,32 @@
 import { Spritesheet } from './spritesheet';
 import { Background } from './background';
-let s, sg, si, sv;
+import engine from 'engine';
+const { utils } = engine;
+let s, sg, si, sv, sp;
+let layers = [];
 
 export const init = (_state) => {
   s = _state;
   sg = s.game;
   si = s.image;
   sv = s.view;
+  sp = s.physics;
 
   //load assets
-  si.tilesheetNames.forEach(sheetName => {
-    si.tilesheets[sheetName] = new Spritesheet(s, './assets/spritesheets/' + sheetName + '.json');
+  Object.entries(si.tilesheetAssets).forEach(([sheetName, tilesheet]) => {
+    si.tilesheets[sheetName] = new Spritesheet(s, tilesheet[0], tilesheet[1]);
     sg.loading.push(si.tilesheets[sheetName].load());
   });
-  si.spritesheetNames.forEach(sheetName => {
-    si.spritesheets[sheetName] = new Spritesheet(s, './assets/spritesheets/' + sheetName + '.json');
+  Object.entries(si.spritesheetAssets).forEach(([sheetName, spritesheet]) => {
+    si.spritesheets[sheetName] = new Spritesheet(s, spritesheet[0], spritesheet[1]);
     sg.loading.push(si.spritesheets[sheetName].load());
   });
+  Object.entries(si.backgroundAssets).forEach(([bgName, bgFile]) => {
+    si.backgrounds[bgName] = new Background(bgName, bgFile[0], bgFile[1]);
+    sg.loading.push(si.backgrounds[bgName].load());
+  })
 
-  si.tutorialImg = new Background('tutorial.png');
+  si.tutorialImg = new Background('tutorialImg', si.tutorialImg[0], si.tutorialImg[1]);
   sg.loading.push(si.tutorialImg.load());
 }
 
@@ -32,7 +40,7 @@ export const draw = () => {
     const dy = sv.active.yMin() * back.parallaxSpeed[1];
     const dHeight = 75 * sg.gu;
     const dWidth = dHeight * back.whRatio;
-    s.ctx.drawImage(back.img, dx, dy, dWidth, dHeight);
+    s.ctx.drawImage(back.image, dx, dy, dWidth, dHeight);
   }
   //draw tilesheets
   for (let l = 0; l < layers.length; l++) {
@@ -80,9 +88,9 @@ export const draw = () => {
     }
   }
   //draw game objects
-  for (const go in sp.gameObjects) {
-    go.draw();
-  }
+  // for (const go in sp.gameObjects) {
+  //   go.draw();
+  // }
 }
 
 export const createTileLayer = (layerData) => {
@@ -157,7 +165,7 @@ export const drawProgressBar = (x, y, width, height, backColor, frontColor, val,
   c.fillStyle = backColor;
   c.fillRect(x, y, width, height);
   c.fillStyle = frontColor;
-  let frontWidth = a.utils.map(val, minVal, maxVal, 0, width);
+  let frontWidth = utils.map(val, minVal, maxVal, 0, width);
   c.fillRect(x, y, frontWidth, height);
   c.restore();
 }

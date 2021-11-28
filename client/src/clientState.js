@@ -1,13 +1,14 @@
 import engine from 'engine';
 import { getViewport } from './clientUtils';
+import assets from './assets';
 const { State, GAME_STATES } = engine;
 
 export const CLIENT_STATES = {
-  LOADING: 1000,
-  TUTORIAL_SCREEN: 1001,
-  START_SCREEN: 1002,
-  CONNECTING: 1003,
-  PLAYING: 1004,
+  LOADING: 'LOADING',
+  TUTORIAL_SCREEN: 'TUTORIAL_SCREEN',
+  START_SCREEN: 'START_SCREEN',
+  CONNECTING: 'CONNECTING',
+  PLAYING: 'PLAYING',
   ...GAME_STATES
 };
 
@@ -25,10 +26,14 @@ export class ClientState extends State {
       clientState: CLIENT_STATES.LOADING,
       //Player ID of the client
       clientID: undefined,
-      //Is the player joining a game
+      //Is the player connecting to a socket
       connecting: false,
+      //Has the player joined the game
+      joinedGame: false,
       //array of promises for asset loading progress bar
-      loading: []
+      loading: [],
+      //How many total assets are loading at runtime?
+      numAssetsLoading: 0
     };
     
     this.player = {
@@ -49,14 +54,17 @@ export class ClientState extends State {
     };
     
     this.image = {
-      tilesheetNames: [
-        "core_spritesheet"
-      ],
-      spritesheetNames: [
-        "p1_spritesheet", "p2_spritesheet"
-      ],
-      backgroundNames: ["bg_grasslands.png"],
-      tutorialImg: undefined,
+      raw: assets,
+      tilesheetAssets: {
+        coreTilesheet: assets.images.coreTilesheet
+      },
+      spritesheetAssets: {
+        p1Spritesheet: assets.images.p1Spritesheet
+      },
+      backgroundAssets: {
+        defaultBackground: assets.images.defaultBackground
+      },
+      tutorialImg: assets.images.tutorialBackground,
       tilesheets: {},
       spritesheets: {},
       sprites: {},

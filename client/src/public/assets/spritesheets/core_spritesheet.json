@@ -1,9 +1,0 @@
-{
-	"name": "core_spritesheet",
-	"tileWidth": 70,
-	"tileHeight": 70,
-	"spacing": 2,
-	"tileCount": 156,
-	"columns": 12,
-	"spritesheet": "./assets/spritesheets/core_spritesheet.png"
-}

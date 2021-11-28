@@ -1,6 +1,7 @@
 import engine from 'engine';
 import Victor from 'victor';
-import { CLIENT_STATES } from './state';
+import { CLIENT_STATES } from './clientState';
+import * as levelLoader from './clientLevelLoader';
 const Vector = Victor;
 const { Player, CircleCollider, time } = engine;
 let s, sg, sp, st, socket;
@@ -51,13 +52,19 @@ export const init = (_state) => {
     //Reset client-specific game state to the defaults
     s.game.gameState = CLIENT_STATES.GAME_WAITING_FOR_PLAYERS;
   });
+  
+  socket.on('loadLevel', (levelName) => {
+    levelLoader.loadLevel(levelName);
+  });
 
   //Listen for the server sending this client its ID
   socket.on('setClientID', (id) => {
     //Set our id
     sg.clientID = id;
-    //Set the game state to playing now that the connection has been established
-    sg.clientState = CLIENT_STATES.PLAYING;
+    //getting an ID means game has been joined
+    sg.joinedGame = true;
+    //update game state to move on from connecting
+    sg.clientState = CLIENT_STATES.PLAYING
   });
 
   socket.on('allPlayers', function(data) {
@@ -90,6 +97,9 @@ export const init = (_state) => {
 
 
 export const start = () => {
+}
+
+export const createNewPlayer = () => {
   //notify server there is a new player
   socket.emit('createNewPlayer');
 }

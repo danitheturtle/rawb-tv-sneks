@@ -32,9 +32,9 @@ export class View {
 
     //Limits
     this.xLimitMin = 0;
-    this.xLimitMax = 100;
+    this.xLimitMax = sg.activeLevel?.guWidth ? sg.activeLevel.guWidth : 100;
     this.yLimitMin = 0;
-    this.yLimitMax = 100;
+    this.yLimitMax = sg.activeLevel?.guHeight ? sg.activeLevel.guHeight : 100;
 
     //Buffer
     this.xBuffer = 0.25;
@@ -159,7 +159,12 @@ export class View {
   rescaleGU() {
     sg.gu = Math.round(Math.max(this.width, this.height) / sv.viewScale);
     //Re-define position limits for the view
-    sv.active.setLimitsGU(0, 75, 0, 75);
+    sv.active.setLimitsGU(
+      0, 
+      sg.activeLevel?.guWidth ? sg.activeLevel.guWidth : 100,
+      0, 
+      sg.activeLevel?.guHeight ? sg.activeLevel.guHeight : 100
+    );
     //Make sure they didn't zoom out past the world border
     sv.active.xMin(sv.active.xMin());
     sv.active.xMax(sv.active.xMax());

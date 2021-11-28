@@ -1,9 +1,9 @@
 export const GAME_STATES = {
-  GAME_WAITING_FOR_PLAYERS: 2000,
-  GAME_STARTING_SOON: 2001,
-  GAME_PLAYING: 2002,
-  GAME_OVER: 2003,
-  GAME_RESETTING: 2004
+  GAME_WAITING_FOR_PLAYERS: 'GAME_WAITING_FOR_PLAYERS',
+  GAME_STARTING_SOON: 'GAME_STARTING_SOON',
+  GAME_PLAYING: 'GAME_PLAYING',
+  GAME_OVER: 'GAME_OVER',
+  GAME_RESETTING: 'GAME_RESETTING'
 };
 
 export const GLOBALS = {
@@ -20,7 +20,8 @@ export class State {
       //Track the game state
       gameState: GAME_STATES.GAME_WAITING_FOR_PLAYERS,
       //Store all player objects
-      players: {}
+      players: {},
+      activeLevel: undefined
     };
     //Score state
     this.score = {

@@ -4,7 +4,8 @@ import * as state from './state';
 import * as physics from './physics';
 import * as time from './time';
 import * as utils from './utils';
-import levelLoader from './levelLoader';
+import * as levels from './levels';
+import * as levelLoader from './levelLoader';
 import scoring from './scoring';
 
 export default {
@@ -13,6 +14,7 @@ export default {
   utils,
   physics,
   levelLoader,
+  levels,
   ...state,
   ...physicsObjects,
   ...player

@@ -1,37 +1,35 @@
 export class Background {
-  constructor(_name) {
+  constructor(_name, _imageSrc, _data) {
     this.ready = false;
-    this.img = undefined;
+    this.src = _imageSrc;
+    this.image = undefined;
     this.name = _name;
-    this.width = 0;
-    this.height = 0;
-    this.whRatio = undefined;
-    this.hwRatio = undefined;
     this.parallaxSpeed = [-0.5, -0.4];
   }
-  
+
   load() {
-    const back = this;
     return new Promise((res, rej) => {
       try {
         //Load the Image
-        back.img = new Image();
-        back.img.onload = () => {
+        this.image = new Image();
+        this.image.onload = () => {
           //Set the sheet to ready
-          back.ready = true;
+          this.ready = true;
           //Get the height/width of the source image
-          back.width = back.img.width;
-          back.height = back.img.height;
+          this.width = this.image.width;
+          this.height = this.image.height;
           //Get ratios so we can keep them constant
-          back.whRatio = back.width / back.height;
-          back.hwRatio = back.height / back.width;
+          this.whRatio = this.width / this.height;
+          this.hwRatio = this.height / this.width;
           //Resolve the promise once loaded
-          res(back);
+          res(this);
         }
-        back.img.src = "../public/assets/backgrounds/" + back.name;
-      } catch (e) {
-        rej(e);
+        this.image.src = this.src;
+      } catch (error) {
+        rej(error);
       }
-    })
+    }).catch(err => {
+      console.err(err);
+    });
   }
 }

@@ -1,21 +1,23 @@
 import { Sprite } from './sprite';
 
 export class Spritesheet {
-  constructor(_stateRef, _jsonFilepath) {
+  constructor(_stateRef, _imageSrc, _stylesheetData) {
     this.stateRef = _stateRef;
     //Is the spritesheet ready?
     this.ready = false;
-    this.img = undefined;
-    this.name = "";
-    this.tileWidth = 0;
-    this.tileHeight = 0;
-    this.spacing = 0;
-    this.tileCount = 0;
-    this.columns = 0;
-    this.jsonFilepath = _jsonFilepath;
-
-    //Sprite data (if any) from this sheet
-    this.sprites = undefined;
+    this.src = _imageSrc;
+    this.image = undefined;
+    this.name = _stylesheetData.name;
+    this.tileWidth = _stylesheetData.tileWidth;
+    this.tileHeight = _stylesheetData.tileHeight;
+    this.spacing = _stylesheetData.spacing;
+    this.tileCount = _stylesheetData.tileCount;
+    this.columns = _stylesheetData.columns;
+    if (_stylesheetData.sprites) {
+      this.sprites = _stylesheetData.sprites;
+    } else {
+      this.sprites = undefined;
+    }
 
     //This will be used as the starting index for tiles in this sheet.
     this.tileStart;
@@ -23,41 +25,26 @@ export class Spritesheet {
     //Cached data about tiles
     this.tiles = {};
   }
-
+  
   load() {
-    let sheet = this;
-    //Return a promise that resolves once the spritesheet has been fully loaded
-    return new Promise(async (res, rej) => {
+    return new Promise((res, rej) => {
       try {
-        let sheetData = await import(/* webpackMode: "eager" */'./assets/spritesheets/core_spritesheet.json');
-        console.dir(sheetData);
-        //Store sheet data in the object
-        sheet.name = sheetData.name;
-        sheet.tileWidth = sheetData.tileWidth;
-        sheet.tileHeight = sheetData.tileHeight;
-        sheet.spacing = sheetData.spacing;
-        sheet.tileCount = sheetData.tileCount;
-        sheet.columns = sheetData.columns;
-
-        if (sheetData.sprites) {
-          sheet.sprites = sheetData.sprites;
+        this.image = new Image();
+        this.image.onload = () => {
+          this.ready = true;
+          this.cacheTiles();
+          this.makeSprites();
+          res(this);
         }
-
-        //Load the Image
-        sheet.img = await import(sheetData.spritesheet)
-        //Set the sheet to ready
-        sheet.ready = true;
-        //Pre-cache tile coordinates
-        sheet.cacheTiles();
-        sheet.makeSprites();
-        //Resolve the promise once loaded
-        res(sheet);
+        this.image.src = this.src;
       } catch (e) {
         rej(e);
       }
+    }).catch(err => {
+      console.err(err);
     });
   }
-
+  
   cacheTiles() {
     for (let t = 0; t < this.tileCount; t++) {
       let tileID = t;

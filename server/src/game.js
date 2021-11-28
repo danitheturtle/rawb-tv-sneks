@@ -1,5 +1,6 @@
 import engine from 'engine';
 import Victor from 'victor';
+import * as levelLoader from './serverLevelLoader';
 import { ServerState, SERVER_STATES } from './state';
 const Vector = Victor;
 const {
@@ -7,7 +8,6 @@ const {
   time,
   utils,
   physics,
-  levelLoader,
   BoxCollider,
   CircleCollider,
   GameObject,
@@ -106,6 +106,10 @@ export const addNewPlayer = (socket) => {
 
   //Emit the new player's id to their client
   socket.emit('setClientID', clientId);
+  //Load the active level on the client, if there is one
+  if (sg.activeLevel) {
+    socket.emit('loadLevel', sg.activeLevel.name)
+  }
 
   //Add server time to the response
   let newPlayerData = players[clientId].getData();
