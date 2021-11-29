@@ -17,7 +17,7 @@ const {
 // ref variables so I can type quicker
 let state;
 let players;
-let sp, st, sg;
+let sp, st, sg, sl;
 
 /**
  * Used to initialize the game.  It initializes other modules and gets shorthand variables
@@ -31,6 +31,7 @@ export const init = (_io) => {
   sp = state.physics;
   st = state.time;
   sg = state.game;
+  sl = state.level;
 }
 
 export const start = () => {
@@ -101,14 +102,18 @@ export const addNewPlayer = (socket) => {
   let clientId = sg.lastPlayerID++;
 
   //Create a new player object and store it in the array
-  players[clientId] = new Player(state, clientId, new Vector(utils.randomInt(5, 70), utils.randomInt(5, 60)));
+  players[clientId] = new Player(
+    state, 
+    clientId, 
+    new Vector(utils.randomInt(5, 70), utils.randomInt(5, 60))
+  );
   time.startClientTimer(clientId, 0);
 
   //Emit the new player's id to their client
   socket.emit('setClientID', clientId);
   //Load the active level on the client, if there is one
-  if (sg.activeLevel) {
-    socket.emit('loadLevel', sg.activeLevel.name)
+  if (sl.activeLevelData) {
+    socket.emit('loadLevel', sl.activeLevelData.name)
   }
 
   //Add server time to the response

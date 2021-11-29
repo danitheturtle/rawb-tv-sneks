@@ -1,7 +1,8 @@
 import engine from 'engine';
+import assets from './assets';
 const { levelLoader, levels } = engine;
 
-let s, sp, si, sg, sv;
+let s, sp, si, sg, sv, sl;
 
 export const init = (_state) => {
   s = _state;
@@ -9,6 +10,7 @@ export const init = (_state) => {
   sg = s.game;
   si = s.image;
   sv = s.view;
+  sl = s.level;
   
   levelLoader.init(_state);
 }
@@ -19,5 +21,7 @@ export const start = () => {
 
 export const loadLevel = (levelName) => {
   levelLoader.loadLevel(levelName);
+  console.dir('levelName');
+  sl.activeBackground = si.backgrounds[sl.activeLevelData.background];
   sv.active?.rescaleGU();
 }

@@ -3,6 +3,7 @@ import { CLIENT_STATES } from './clientState';
 import * as drawing from './drawing';
 import * as keys from './keys';
 import * as socket from './socket';
+import * as playerController from './playerController';
 const { time, physics } = engine;
 
 let s, sg, sv, si, sp;
@@ -21,6 +22,7 @@ export const start = () => {
     //Set the state to display the start screen
     sg.clientState = CLIENT_STATES.TUTORIAL_SCREEN;
   });
+  s.resize();
   update();
 }
 
@@ -53,10 +55,11 @@ export const update = () => {
     case CLIENT_STATES.PLAYING:
       break;
   }
+  
   //Game is currently playing and all player setup is now finished
-
   time.update();
   physics.update();
+  playerController.update();
 
   //Store the drawing context shorthand
   let c = s.ctx;
@@ -64,8 +67,19 @@ export const update = () => {
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   
+  for (const p in s.players) {
+    const player = sg.players[p];
+    player.update();
+    const relativePos = sv.active?.getObjectRelativePosition(player, true);
+  }
+  
+  if (sg.players[sg.clientId] !== undefined && sv.active !== undefined) {
+    sv.active.follow(sg.players[sg.clientId].collider.center.clone().multiplyScalar(sg.gu));
+  }
+  
   drawing.draw();
-
+  drawing.drawGUI();
+  
   if (sg.clientState === CLIENT_STATES.PAUSED) {
     updatePaused();
   }

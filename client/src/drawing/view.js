@@ -1,12 +1,13 @@
 import * as keys from '../keys';
 import engine from 'engine';
 const { utils } = engine;
-let s, sg, sv, gu;
+let s, sg, sl, sv, gu;
 
 export const init = (_state) => {
   s = _state;
   sg = s.game;
   sv = s.view;
+  sl = s.level;
   gu = sg.gu;
 
   keys.keyDown("+", () => {
@@ -32,9 +33,9 @@ export class View {
 
     //Limits
     this.xLimitMin = 0;
-    this.xLimitMax = sg.activeLevel?.guWidth ? sg.activeLevel.guWidth : 100;
+    this.xLimitMax = sl.activeLevelData?.guWidth ? sl.activeLevelData.guWidth : 100;
     this.yLimitMin = 0;
-    this.yLimitMax = sg.activeLevel?.guHeight ? sg.activeLevel.guHeight : 100;
+    this.yLimitMax = sl.activeLevelData?.guHeight ? sl.activeLevelData.guHeight : 100;
 
     //Buffer
     this.xBuffer = 0.25;
@@ -161,9 +162,9 @@ export class View {
     //Re-define position limits for the view
     sv.active.setLimitsGU(
       0, 
-      sg.activeLevel?.guWidth ? sg.activeLevel.guWidth : 100,
+      sl.activeLevelData?.guWidth ? sl.activeLevelData.guWidth : 100,
       0, 
-      sg.activeLevel?.guHeight ? sg.activeLevel.guHeight : 100
+      sl.activeLevelData?.guHeight ? sl.activeLevelData.guHeight : 100
     );
     //Make sure they didn't zoom out past the world border
     sv.active.xMin(sv.active.xMin());

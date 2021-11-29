@@ -1,4 +1,4 @@
-const baseConfig = require('../babel.config.js');
+const baseConfig = require('../babel.config.cjs');
 
 module.exports = function config(api) {
   const baseConfigResult = baseConfig(api);

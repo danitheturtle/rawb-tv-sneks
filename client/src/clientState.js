@@ -1,6 +1,8 @@
 import engine from 'engine';
+import Victor from 'victor';
 import { getViewport } from './clientUtils';
 import assets from './assets';
+const Vector = Victor;
 const { State, GAME_STATES } = engine;
 
 export const CLIENT_STATES = {
@@ -25,7 +27,7 @@ export class ClientState extends State {
       //Client state.  LOADING by default
       clientState: CLIENT_STATES.LOADING,
       //Player ID of the client
-      clientID: undefined,
+      clientId: undefined,
       //Is the player connecting to a socket
       connecting: false,
       //Has the player joined the game
@@ -38,11 +40,8 @@ export class ClientState extends State {
     
     this.player = {
       shouldUpdateServer: false,
-      moveLeft: false,
-      moveRight: false,
-      dropDown: false,
-      sprint: false,
-      shouldJump: false
+      moveHeading: new Vector(1, 0),
+      sprint: false
     };
     
     this.audio = {
@@ -62,13 +61,20 @@ export class ClientState extends State {
         p1Spritesheet: assets.images.p1Spritesheet
       },
       backgroundAssets: {
-        defaultBackground: assets.images.defaultBackground
+        defaultBackground: assets.images.defaultBackground,
+        dangerBackground: assets.images.dangerBackground,
+        radicalBackground: assets.images.radicalBackground
       },
       tutorialImg: assets.images.tutorialBackground,
       tilesheets: {},
       spritesheets: {},
       sprites: {},
       backgrounds: {}
+    };
+    
+    this.level = {
+      ...this.level,
+      activeBackground: undefined
     };
     
     this.view = {
@@ -88,7 +94,8 @@ export class ClientState extends State {
   resize() {
     if (!this.canvas) return;
     this.viewport = getViewport();
-    if (this.view.active) {
+    
+    if (this.view?.active) {
       this.view.active.width = this.viewport.width;
       this.view.active.height = this.viewport.height;
       //Re-scale game units based on the active view

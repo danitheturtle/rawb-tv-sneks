@@ -2,7 +2,7 @@ import { Spritesheet } from './spritesheet';
 import { Background } from './background';
 import engine from 'engine';
 const { utils } = engine;
-let s, sg, si, sv, sp;
+let s, sg, si, sv, sp, sl;
 let layers = [];
 
 export const init = (_state) => {
@@ -11,6 +11,7 @@ export const init = (_state) => {
   si = s.image;
   sv = s.view;
   sp = s.physics;
+  sl = s.level;
 
   //load assets
   Object.entries(si.tilesheetAssets).forEach(([sheetName, tilesheet]) => {
@@ -33,15 +34,13 @@ export const init = (_state) => {
 export const start = () => {}
 
 export const draw = () => {
-  //draw backgrounds
-  for (const bID in si.backgrounds) {
-    const back = si.backgrounds[bID];
-    const dx = sv.active.xMin() * back.parallaxSpeed[0];
-    const dy = sv.active.yMin() * back.parallaxSpeed[1];
-    const dHeight = 75 * sg.gu;
-    const dWidth = dHeight * back.whRatio;
-    s.ctx.drawImage(back.image, dx, dy, dWidth, dHeight);
-  }
+  //draw background
+  const back = sl.activeBackground;
+  const dx = sv.active.xMin() * back.parallaxSpeed[0];
+  const dy = sv.active.yMin() * back.parallaxSpeed[1];
+  const dHeight = 75 * sg.gu;
+  const dWidth = dHeight * back.whRatio;
+  s.ctx.drawImage(back.image, dx, dy, dWidth, dHeight);
   //draw tilesheets
   for (let l = 0; l < layers.length; l++) {
     //Loop through the data
@@ -88,9 +87,13 @@ export const draw = () => {
     }
   }
   //draw game objects
-  // for (const go in sp.gameObjects) {
-  //   go.draw();
-  // }
+  for (const go in sp.gameObjects) {
+    sp.gameObjects[go].draw();
+  }
+}
+
+export const drawGUI = () => {
+  
 }
 
 export const createTileLayer = (layerData) => {

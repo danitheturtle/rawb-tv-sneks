@@ -25,7 +25,9 @@ export class Collider {
     }
   }
 
-  setData() {}
+  setData(_data, _parent) {
+    this.parent = _parent
+  }
 }
 
 export class CircleCollider extends Collider {
@@ -42,8 +44,9 @@ export class CircleCollider extends Collider {
     }
   }
 
-  setData(data) {
-    this.radius = data?.radius;
+  setData(_data, _parent) {
+    this.radius = _data?.radius;
+    this.parent = _parent;
   }
 }
 
@@ -103,14 +106,15 @@ export class BoxCollider extends Collider {
     }
   }
 
-  setData(data) {
-    this.width = data.width;
-    this.height = data.height;
+  setData(_data, _parent) {
+    this.width = _data.width;
+    this.height = _data.height;
+    this.parent = _parent;
   }
 }
 
 export class GameObject {
-  constructor(_gameStateRef, _pos, _collider = new CircleCollider(2), _vel = new Vector(0.0, 0.0), _accel = new Vector(0.0, 0.0)) {
+  constructor(_gameStateRef, _pos, _vel = new Vector(0.0, 0.0), _accel = new Vector(0.0, 0.0), _collider = new CircleCollider(2), _renderer = undefined) {
     this.gameStateRef = _gameStateRef;
     this.id = this.gameStateRef.physics.lastGameObjectID++;
     this.pos = _pos;
@@ -118,6 +122,7 @@ export class GameObject {
     this.accel = _accel;
     this.hasCollisions = true;
     this.collider = _collider;
+    this.renderer = _renderer;
     this.collider.parent = this;
     this.gameStateRef.physics.gameObjects[this.id] = this;
   }
@@ -132,7 +137,11 @@ export class GameObject {
     this.accel = new Vector(0.0, 0.0);
   }
   
-  draw() {}
+  draw() {
+    if (this.renderer) {
+      this.renderer.draw();
+    }
+  }
 
   applyCollisions(otherObjects) {
     if (!this.hasCollisions) return;
@@ -153,7 +162,8 @@ export class GameObject {
       accelX: this.accel.x,
       accelY: this.accel.y,
       hasCollisions: this.hasCollisions,
-      collider: this.collider.getData()
+      collider: this.collider.getData(),
+      renderer: this.renderer?.getData()
     }
   }
   setData(data, timeDelta = 0) {
@@ -171,16 +181,20 @@ export class GameObject {
     this.accel.x = data.accelX;
     this.accel.y = data.accelY;
     this.hasCollisions = data.hasCollisions;
-    switch (data.collider.type) {
-      case 'circle':
-        this.collider = new CircleCollider().setData(data.collider);
+    if (!this.collider) {
+      switch (data.collider.type) {
+        case 'circle':
+        this.collider = new CircleCollider().setData(data.collider, this);
         break;
-      case 'boundingBox':
-        this.collider = new BoxCollider().setData(data.collider);
+        case 'boundingBox':
+        this.collider = new BoxCollider().setData(data.collider, this);
         break;
-      default:
-        this.collider = new Collider().setData(data.collider);
+        default:
+        this.collider = new Collider().setData(data.collider, this);
         break;
+      }
+    } else {
+      this.collider.setData(data.collider, this);
     }
   }
 }

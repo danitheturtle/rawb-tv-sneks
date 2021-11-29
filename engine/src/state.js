@@ -20,8 +20,7 @@ export class State {
       //Track the game state
       gameState: GAME_STATES.GAME_WAITING_FOR_PLAYERS,
       //Store all player objects
-      players: {},
-      activeLevel: undefined
+      players: {}
     };
     //Score state
     this.score = {
@@ -53,6 +52,9 @@ export class State {
       clientTimers: {},
       //General timers with unique ids
       timers: {}
+    };
+    this.level = {
+      activeLevelData: undefined
     };
   }
 }

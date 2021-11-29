@@ -20,8 +20,7 @@ export const init = (_state) => {
     sg.players[data.id] = new Player(
       s,
       data.id,
-      new Vector(data.x, data.y),
-      new CircleCollider(2)
+      new Vector(data.x, data.y)
     );
     //Start a client timer for that player
     time.startClientTimer(data.id, data.time);
@@ -52,44 +51,43 @@ export const init = (_state) => {
     //Reset client-specific game state to the defaults
     s.game.gameState = CLIENT_STATES.GAME_WAITING_FOR_PLAYERS;
   });
-  
-  socket.on('loadLevel', (levelName) => {
-    levelLoader.loadLevel(levelName);
-  });
 
   //Listen for the server sending this client its ID
-  socket.on('setClientID', (id) => {
+  socket.on('setClientID', (_clientId) => {
     //Set our id
-    sg.clientID = id;
+    sg.clientId = _clientId;
     //getting an ID means game has been joined
     sg.joinedGame = true;
+  });
+
+  socket.on('loadLevel', (levelName) => {
+    levelLoader.loadLevel(levelName);
     //update game state to move on from connecting
     sg.clientState = CLIENT_STATES.PLAYING
   });
-
+  
   socket.on('allPlayers', function(data) {
     //Loop through every player in the data
-    for (const id in data) {
+    for (const clientId in data) {
       //If a player sent by the server doesn't exist on the client
-      if (!sg.players[id]) {
+      if (!sg.players[clientId]) {
         //Create that player
-        sg.players[id] = new Player(
+        sg.players[clientId] = new Player(
           s,
-          data[id].id,
-          new Vector(data[id].x, data[id].y),
-          new CircleCollider(2),
-          new Vector(data[id].velX, data[id].velY),
-          new Vector(data[id].accelX, data[id].accelY)
+          data[clientId].clientId,
+          new Vector(data[clientId].x, data[clientId].y),
+          new Vector(data[clientId].velX, data[clientId].velY),
+          new Vector(data[clientId].accelX, data[clientId].accelY)
         );
       }
       //If the player is not the client player
-      if (sg.clientID != id) {
+      if (sg.clientId !== clientId) {
         //Set the data
-        sg.players[id].setData(data[id]);
+        sg.players[clientId].setData(data[clientId]);
         //Else, the player is the client player
       } else {
         //Set data but remain client-authoritative
-        sg.players[id].setClientData(data[id]);
+        sg.players[clientId].setClientData(data[clientId]);
       }
     }
   });
@@ -109,9 +107,9 @@ export const createNewPlayer = () => {
  */
 export const updateClientPlayer = () => {
   //Get the client player data
-  const playerData = sg.players[sg.clientID].getData();
+  const playerData = sg.players[sg.clientId].getData();
   //Grab the client's time
-  playerData.time = st.clientTimers[sg.clientID];
+  playerData.time = st.clientTimers[sg.clientId];
   //Emit an update
   socket.emit('updatePlayer', playerData);
 }

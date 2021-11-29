@@ -4,8 +4,8 @@ import { GameObject } from './physicsObjects';
 const Vector = Victor;
 
 export class Player extends GameObject {
-  constructor(_gameStateRef, _clientId, _pos, _collider, _vel, _accel) {
-    super(_gameStateRef, _pos, _collider, _vel, _accel)
+  constructor(_gameStateRef, _clientId, _pos, _vel, _accel, _collider, _renderer) {
+    super(_gameStateRef, _pos, _vel, _accel, _collider, _renderer)
     //Store their ID
     this.clientId = _clientId;
 
@@ -44,6 +44,7 @@ export class Player extends GameObject {
   getData() {
     return {
       ...super.getData(),
+      clientId: this.clientId,
       time: this.gameStateRef.time.clientTimers[this.clientId],
       moveLeft: this.moveLeft,
       moveRight: this.moveRight,
