@@ -124,12 +124,19 @@ export class GameObject {
     this.collider = _collider;
     this.renderer = _renderer;
     this.collider.parent = this;
+    if (this.renderer) {
+      this.renderer.parent = this;
+    }
     this.gameStateRef.physics.gameObjects[this.id] = this;
   }
 
   update() {
     //Add acceleration to the velocity scaled by dt.  Limit the velocity so collisions don't break
-    this.vel.add(this.accel.multiplyScalar(time.dt())).limit(this.gameStateRef.physics.speedLimit, 0.75);
+    this.vel.add(this.accel.multiplyScalar(time.dt()));
+    //limit velocity with game speed
+    if (this.vel.lengthSq() > this.gameStateRef.physics.moveSpeed * this.gameStateRef.physics.moveSpeed) {
+      this.vel.normalize().multiplyScalar(this.gameStateRef.physics.moveSpeed);
+    }
     //Add velocity to the position scaled by dt
     this.pos.add(this.vel.clone().multiplyScalar(time.dt()));
 
@@ -195,6 +202,9 @@ export class GameObject {
       }
     } else {
       this.collider.setData(data.collider, this);
+    }
+    if (data.renderer) {
+      this.renderer?.setData(data.renderer, this);
     }
   }
 }

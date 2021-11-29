@@ -2,6 +2,7 @@ import engine from 'engine';
 import Victor from 'victor';
 import { CLIENT_STATES } from './clientState';
 import * as levelLoader from './clientLevelLoader';
+import { PlayerRenderer } from './drawing/playerRenderer';
 const Vector = Victor;
 const { Player, CircleCollider, time } = engine;
 let s, sg, sp, st, socket;
@@ -20,7 +21,11 @@ export const init = (_state) => {
     sg.players[data.id] = new Player(
       s,
       data.id,
-      new Vector(data.x, data.y)
+      new Vector(data.x, data.y),
+      new Vector(data.velX, data.velY),
+      new Vector(data.accelX, data.accelY),
+      new CircleCollider(2),
+      new PlayerRenderer(2)
     );
     //Start a client timer for that player
     time.startClientTimer(data.id, data.time);
@@ -67,6 +72,7 @@ export const init = (_state) => {
   });
   
   socket.on('allPlayers', function(data) {
+    // console.dir(data);
     //Loop through every player in the data
     for (const clientId in data) {
       //If a player sent by the server doesn't exist on the client
@@ -77,17 +83,19 @@ export const init = (_state) => {
           data[clientId].clientId,
           new Vector(data[clientId].x, data[clientId].y),
           new Vector(data[clientId].velX, data[clientId].velY),
-          new Vector(data[clientId].accelX, data[clientId].accelY)
+          new Vector(data[clientId].accelX, data[clientId].accelY),
+          new CircleCollider(2),
+          new PlayerRenderer(2)
         );
       }
       //If the player is not the client player
-      if (sg.clientId !== clientId) {
+      if (sg.clientId == clientId) {
+        //Set data but remain client-authoritative
+        sg.players[clientId].setClientData(data[clientId]);
+      } else {
         //Set the data
         sg.players[clientId].setData(data[clientId]);
         //Else, the player is the client player
-      } else {
-        //Set data but remain client-authoritative
-        sg.players[clientId].setClientData(data[clientId]);
       }
     }
   });

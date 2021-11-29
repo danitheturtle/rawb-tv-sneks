@@ -54,8 +54,8 @@ export const randomInt = (min, max) => {
 
 export const randomVec = () => {
   let vec = [
-    this.randomRange(-1, 1),
-    this.randomRange(-1, 1)
+    randomRange(-1, 1),
+    randomRange(-1, 1)
   ];
   let len = Math.sqrt(vec[0] * vec[0] + vec[1] * vec[1]);
   if (len == 0) {
@@ -66,13 +66,13 @@ export const randomVec = () => {
 }
 
 export const randomRGB = () => {
-  return "rgb(" + this.randomInt(0, 255) + "," + this.randomInt(0, 255) + "," + this.randomInt(0, 255) + ")";
+  return "rgb(" + randomInt(0, 255) + "," + randomInt(0, 255) + "," + randomInt(0, 255) + ")";
 }
 
 export const randomRGBA = () => {
-  return "rgba(" + this.randomInt(0, 255) + "," + this.randomInt(0, 255) + "," + this.randomInt(0, 255) + "," + this.randomRange(0.0, 1.0) + ")";
+  return "rgba(" + randomInt(0, 255) + "," + randomInt(0, 255) + "," + randomInt(0, 255) + "," + randomRange(0.0, 1.0) + ")";
 }
 
 export const randomRGBOpacity = () => {
-  return "rgba(" + this.randomInt(0, 255) + "," + this.randomInt(0, 255) + "," + this.randomInt(0, 255) + "," + this.clamp(opacity, 0.0, 1.0) + ")";
+  return "rgba(" + randomInt(0, 255) + "," + randomInt(0, 255) + "," + randomInt(0, 255) + "," + clamp(opacity, 0.0, 1.0) + ")";
 }

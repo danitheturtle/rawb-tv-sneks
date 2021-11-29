@@ -1,6 +1,7 @@
 import { Spritesheet } from './spritesheet';
 import { Background } from './background';
 import engine from 'engine';
+import * as playerRenderer from './playerRenderer';
 const { utils } = engine;
 let s, sg, si, sv, sp, sl;
 let layers = [];
@@ -29,6 +30,8 @@ export const init = (_state) => {
 
   si.tutorialImg = new Background('tutorialImg', si.tutorialImg[0], si.tutorialImg[1]);
   sg.loading.push(si.tutorialImg.load());
+  
+  playerRenderer.init(s);
 }
 
 export const start = () => {}
@@ -38,7 +41,7 @@ export const draw = () => {
   const back = sl.activeBackground;
   const dx = sv.active.xMin() * back.parallaxSpeed[0];
   const dy = sv.active.yMin() * back.parallaxSpeed[1];
-  const dHeight = 75 * sg.gu;
+  const dHeight = sl.activeLevelData.guWidth * sg.gu;
   const dWidth = dHeight * back.whRatio;
   s.ctx.drawImage(back.image, dx, dy, dWidth, dHeight);
   //draw tilesheets

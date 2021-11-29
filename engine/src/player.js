@@ -1,6 +1,9 @@
 import Victor from 'victor';
 import * as physics from './physics';
+import * as time from './time';
 import { GameObject } from './physicsObjects';
+import { randomVec } from './utils';
+import { GLOBALS } from './state';
 const Vector = Victor;
 
 export class Player extends GameObject {
@@ -9,9 +12,8 @@ export class Player extends GameObject {
     //Store their ID
     this.clientId = _clientId;
 
-    //Player input tracking.  Everything is false by default
-    this.moveLeft = false;
-    this.moveRight = false;
+    //Player input tracking.  Everything is false/blank by default
+    this.moveHeading = randomVec();
     this.sprint = false;
     
     //custom spritesheet support for meme potential
@@ -19,22 +21,9 @@ export class Player extends GameObject {
   }
 
   update() {
+    //accelerate towards moveHeading, clamp speed
+    this.accel = this.moveHeading.clone().multiplyScalar(this.gameStateRef.physics.accelSpeed);
     super.update();
-    const sp = this.gameStateRef.physics;
-    //Set the hor velocity to zero
-    this.vel.x = 0;
-    //If moving left, move left
-    if (this.moveLeft) {
-      this.vel.add(new Vector(this.sprint ?
-        sp.moveSpeed * sp.sprintMult :
-        sp.moveSpeed, 0.0));
-    }
-    //If moving right, move right
-    if (this.moveRight) {
-      this.vel.add(new Vector(this.sprint ?
-        sp.moveSpeed * sp.sprintMult :
-        sp.moveSpeed, 0.0));
-    }
   }
   
   setCustomSpritesheet(spritesheetURL) {
@@ -46,8 +35,8 @@ export class Player extends GameObject {
       ...super.getData(),
       clientId: this.clientId,
       time: this.gameStateRef.time.clientTimers[this.clientId],
-      moveLeft: this.moveLeft,
-      moveRight: this.moveRight,
+      moveHeadingX: this.moveHeading.x,
+      moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
       customSpritesheetURL: this.customSpritesheetURL
     };
@@ -56,8 +45,7 @@ export class Player extends GameObject {
   setData(data) {
     super.setData(data, this.gameStateRef.time.clientTimers[data.clientId] - data.time);
     this.clientId = data.clientId;
-    this.moveLeft = data.moveLeft;
-    this.moveRight = data.moveRight;
+    this.moveHeading = new Vector(data.moveHeadingX, data.moveHeadingY),
     this.sprint = data.sprint;
     this.customSpritesheetURL = data.customSpritesheetURL;
     this.gameStateRef.time.clientTimers[data.clientId] = data.time;

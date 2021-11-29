@@ -228,3 +228,7 @@ export const getKeyCode = (key) => {
 export const mouse = () => {
   return mouseCoords;
 }
+
+export const mouseMove = (cb) => {
+  mouseMoveCallbacks.push(cb);
+}

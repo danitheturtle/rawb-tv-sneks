@@ -32,9 +32,10 @@ export class State {
       //Game object unique ID tracker
       lastGameObjectID: 0,
       //Physics globals (see physics.js for more info)
-      speedLimit: 0,
-      moveSpeed: undefined,
-      sprintMult: undefined,
+      speedLimit: 40,
+      moveSpeed: 20,
+      accelSpeed: 20,
+      sprintMult: 2,
       //Game Objects
       gameObjects: {}
     };

@@ -9,8 +9,9 @@ export const init = (_state) => {
   state = _state;
   sp = state.physics;
   //Set up physics globals
-  sp.speedLimit = 60;
-  sp.moveSpeed = 10;
+  sp.speedLimit = 40;
+  sp.moveSpeed = 20;
+  sp.accelSpeed = 20;
   sp.sprintMult = 2;
 }
 

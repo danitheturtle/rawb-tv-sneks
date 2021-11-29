@@ -1,5 +1,7 @@
 import * as keys from '../keys';
 import engine from 'engine';
+import Victor from 'victor';
+const Vector = Victor;
 const { utils } = engine;
 let s, sg, sl, sv, gu;
 
@@ -38,8 +40,8 @@ export class View {
     this.yLimitMax = sl.activeLevelData?.guHeight ? sl.activeLevelData.guHeight : 100;
 
     //Buffer
-    this.xBuffer = 0.25;
-    this.yBuffer = 0.25;
+    this.xBuffer = 0.49;
+    this.yBuffer = 0.49;
   }
 
   follow(center) {
@@ -145,15 +147,9 @@ export class View {
 
   getObjectRelativePosition(obj, multiplyByGU) {
     if (obj.pos === undefined) {
-      return {
-        x: obj.x * (multiplyByGU ? sg.gu : 1) - this.xMin(),
-        y: obj.y * (multiplyByGU ? sg.gu : 1) - this.yMin()
-      };
+      return new Vector(obj.x * (multiplyByGU ? sg.gu : 1) - this.xMin(), obj.y * (multiplyByGU ? sg.gu : 1) - this.yMin());
     } else {
-      return {
-        x: obj.pos.x * (multiplyByGU ? sg.gu : 1) - this.xMin(),
-        y: obj.pos.y * (multiplyByGU ? sg.gu : 1) - this.yMin()
-      }
+      return new Vector(obj.pos.x * (multiplyByGU ? sg.gu : 1) - this.xMin(), obj.pos.y * (multiplyByGU ? sg.gu : 1) - this.yMin());
     }
   }
 
