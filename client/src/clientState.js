@@ -79,7 +79,7 @@ export class ClientState extends State {
     
     this.view = {
       active: undefined,
-      viewScale: 50
+      viewScale: 100
     };
     //Non-nested vars
     this.viewport = getViewport();

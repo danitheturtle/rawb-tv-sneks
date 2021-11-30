@@ -31,7 +31,7 @@ export class View {
     this.height = _height;
 
     //How many game units fit along the largest axis of the view
-    this.viewScale = 40;
+    this.viewScale = 100;
 
     //Limits
     this.xLimitMin = 0;

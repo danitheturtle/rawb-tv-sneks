@@ -11,7 +11,8 @@ const {
   BoxCollider,
   CircleCollider,
   GameObject,
-  Player
+  Player,
+  SnakeCollider
 } = engine;
 
 // ref variables so I can type quicker
@@ -105,7 +106,10 @@ export const addNewPlayer = (socket) => {
   players[clientId] = new Player(
     state, 
     clientId, 
-    new Vector(utils.randomInt(5, 70), utils.randomInt(5, 60))
+    new Vector(utils.randomInt(5, 70), utils.randomInt(5, 60)),
+    new Vector(0.0, 0.0),
+    new Vector(0.0, 0.0),
+    new SnakeCollider(2)
   );
   time.startClientTimer(clientId, 0);
 

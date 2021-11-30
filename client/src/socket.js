@@ -4,7 +4,7 @@ import { CLIENT_STATES } from './clientState';
 import * as levelLoader from './clientLevelLoader';
 import { PlayerRenderer } from './drawing/playerRenderer';
 const Vector = Victor;
-const { Player, CircleCollider, time } = engine;
+const { Player, SnakeCollider, time } = engine;
 let s, sg, sp, st, socket;
 
 export const init = (_state) => {
@@ -24,7 +24,7 @@ export const init = (_state) => {
       new Vector(data.x, data.y),
       new Vector(data.velX, data.velY),
       new Vector(data.accelX, data.accelY),
-      new CircleCollider(2),
+      new SnakeCollider(2),
       new PlayerRenderer(2)
     );
     //Start a client timer for that player
@@ -84,7 +84,7 @@ export const init = (_state) => {
           new Vector(data[clientId].x, data[clientId].y),
           new Vector(data[clientId].velX, data[clientId].velY),
           new Vector(data[clientId].accelX, data[clientId].accelY),
-          new CircleCollider(2),
+          new SnakeCollider(2),
           new PlayerRenderer(2)
         );
       }
