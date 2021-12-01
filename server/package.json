@@ -6,14 +6,14 @@
     "start:compiled": "node ../dist/server/index.js",
     "start": "nodemon --watch ./src ./src/index.js --exec babel-node",
     "debug": "nodemon --inspect --watch ./src ./src/index.js --exec babel-node --env=development",
-    "build": "rm -rf ../dist/server && babel ./src --out-dir ../dist/server"
+    "build": "rm -rf ../dist/server && NODE_ENV=production && babel ./src --out-dir ../dist/server"
   },
   "keywords": [],
   "author": "danitheturtle",
   "dependencies": {
     "core-js": "^3.10.1",
-    "engine": "*",
-    "env": "*",
+    "engine": "workspace:*",
+    "env": "workspace:*",
     "express": "^4.17.1",
     "nanoid": "^3.1.25",
     "pretty-error": "^3.0.3",
@@ -26,6 +26,7 @@
     "@babel/core": "^7.14.6",
     "@babel/node": "^7.14.9",
     "@babel/preset-env": "^7.14.7",
+    "babel-plugin-import-path-replace": "^0.1.0",
     "minimist": "^1.2.5",
     "nodemon": "^2.0.9"
   }

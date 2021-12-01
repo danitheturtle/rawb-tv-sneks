@@ -11,8 +11,8 @@
     "server"
   ],
   "scripts": {
-    "build": "yarn workspace engine build && yarn workspace server build && yarn workspace client build",
-    "start": "node ./dist/server/index.js"
+    "build": "yarn workspace env build && yarn workspace engine build && yarn workspace server build && yarn workspace client build",
+    "start": "node ./dist/server/index.js --env=production"
   },
   "keywords": [],
   "author": "danitheturtle",
@@ -21,6 +21,7 @@
     "core-js": "^3.19.2",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "minimist": "^1.2.5",
     "socket.io": "^4.4.0",
     "victor": "^1.1.0"
   },
@@ -30,7 +31,8 @@
     "@babel/plugin-syntax-jsx": "^7.14.5",
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-react": "^7.14.5",
-    "@babel/runtime": "^7.14.8"
+    "@babel/runtime": "^7.14.8",
+    "babel-plugin-import-path-replace": "^0.1.0"
   },
   "browserslist": [
     "defaults",

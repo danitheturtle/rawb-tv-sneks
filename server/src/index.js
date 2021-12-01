@@ -1,4 +1,4 @@
-require('env');
+import _ from 'environmentVars';
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -16,7 +16,11 @@ let io = new Server(server);
 //Hook in the app router
 app.use(router);
 
-app.use(express.static(path.resolve(__dirname, "../../dist/web")))
+if (process.env.APP_ENV === 'production') {
+  app.use(express.static(path.resolve(__dirname, "../client")));
+} else {
+  app.use(express.static(path.resolve(__dirname, "../../dist/client")))
+}
 
 //On a new player connection
 io.on('connection', (socket) => {

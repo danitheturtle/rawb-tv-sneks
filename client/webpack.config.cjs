@@ -5,7 +5,6 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
 const pkg = require("./package.json");
-require('env');
 
 /**
  * @param {Record<string, boolean> | undefined} envName
@@ -16,7 +15,12 @@ module.exports = function config(envArg) {
   const isEnvProduction = envArg.production;
   const isEnvDevelopment = envArg.development;
   const isDevServer = isEnvDevelopment && process.argv.includes("serve");
-  
+  //include env from different place based on environment
+  if (isEnvProduction) {
+    require('../dist/env/index.cjs');
+  } else if (isEnvDevelopment) {
+    require('env');
+  }
   //profiling prod environment to debug issues?
   const isEnvProductionProfile = isEnvProduction && process.argv.includes("--profile");
   
@@ -38,7 +42,7 @@ module.exports = function config(envArg) {
     entry: "./src",
 
     output: {
-      path: path.resolve(__dirname, "../dist/web"),
+      path: path.resolve(__dirname, "../dist/client"),
       publicPath: "/",
       assetModuleFilename: 'image/[hash][ext][query]',
       environment: {
@@ -121,8 +125,16 @@ module.exports = function config(envArg) {
           options: {
             rootMode: "upward",
             sourceType: "module",
-            plugins: [].filter(Boolean),
-            cacheDirectory: `../.cache/${pkg.name}.babel-loader`,
+            plugins: [[
+              "import-path-replace",
+              {
+                "rules": [{
+                  "match": "engine",
+                  "replacement": isEnvProduction ? path.resolve(__dirname, '../dist/engine') : 'engine'
+                }]
+              }
+            ]],
+            cacheDirectory: `../.cache/${pkg.name}.benvironmentVarsabel-loader`,
             cacheCompression: false,
             compact: isEnvProduction,
           },

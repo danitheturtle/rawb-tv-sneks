@@ -20,7 +20,6 @@ module.exports.loadEnv = function loadEnv(envName) {
   if (!env.VERSION) {
     env.VERSION = os.userInfo().username;
   }
-
   Object.assign(process.env, env);
   return { ...env };
 };

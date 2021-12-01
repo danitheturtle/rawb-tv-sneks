@@ -2013,6 +2013,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-import-path-replace@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "babel-plugin-import-path-replace@npm:0.1.0"
+  checksum: 9b4f08c45663bbfa5451bdc39068043df12f94caa2c9d980a2f311012e2169656a59b94adaac25b44a4f97d1466f01a21cddc2d90b1e2e7817a061dc4d4605e5
+  languageName: node
+  linkType: hard
+
 "babel-plugin-polyfill-corejs2@npm:^0.3.0":
   version: 0.3.0
   resolution: "babel-plugin-polyfill-corejs2@npm:0.3.0"
@@ -2383,10 +2390,11 @@ __metadata:
     "@babel/preset-react": ^7.14.5
     "@babel/runtime": ^7.14.8
     babel-loader: ^8.2.2
+    babel-plugin-import-path-replace: ^0.1.0
     copy-webpack-plugin: ^9.0.1
     css-loader: ^6.2.0
-    engine: "*"
-    env: "*"
+    engine: "workspace:*"
+    env: "workspace:*"
     html-webpack-plugin: ^5.3.2
     http-proxy-middleware: ^1.1.0
     json-loader: ^0.5.7
@@ -3097,7 +3105,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"engine@*, engine@workspace:engine":
+"engine@workspace:*, engine@workspace:engine":
   version: 0.0.0-use.local
   resolution: "engine@workspace:engine"
   dependencies:
@@ -3105,7 +3113,6 @@ __metadata:
     "@babel/core": ^7.14.6
     "@babel/preset-env": ^7.14.7
     core-js: ^3.10.1
-    env: "*"
     minimist: ^1.2.5
     nanoid: ^3.1.25
     nodemon: ^2.0.9
@@ -3137,7 +3144,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"env@*, env@workspace:env":
+"env@workspace:*, env@workspace:env":
   version: 0.0.0-use.local
   resolution: "env@workspace:env"
   dependencies:
@@ -6251,9 +6258,10 @@ fsevents@~2.3.2:
     "@babel/core": ^7.14.6
     "@babel/node": ^7.14.9
     "@babel/preset-env": ^7.14.7
+    babel-plugin-import-path-replace: ^0.1.0
     core-js: ^3.10.1
-    engine: "*"
-    env: "*"
+    engine: "workspace:*"
+    env: "workspace:*"
     express: ^4.17.1
     minimist: ^1.2.5
     nanoid: ^3.1.25
@@ -6360,9 +6368,11 @@ fsevents@~2.3.2:
     "@babel/preset-env": ^7.14.7
     "@babel/preset-react": ^7.14.5
     "@babel/runtime": ^7.14.8
+    babel-plugin-import-path-replace: ^0.1.0
     core-js: ^3.19.2
     dotenv: ^10.0.0
     express: ^4.17.1
+    minimist: ^1.2.5
     socket.io: ^4.4.0
     victor: ^1.1.0
   languageName: unknown

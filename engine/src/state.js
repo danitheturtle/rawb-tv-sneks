@@ -40,6 +40,7 @@ export class State {
       //Game object unique ID tracker
       lastGameObjectID: 0,
       //Game Objects
+      //TODO: Need a way to make game object ID server-authoritative
       gameObjects: {}
     };
     //Timer state
