@@ -1,11 +1,17 @@
 #Yarn 3
 **/.yarn/**
 !.yarn/cache
+!.yarn/cache/*
 !.yarn/patches
+!.yarn/patches/*
 !.yarn/plugins
+!.yarn/plugins/*
 !.yarn/releases
+!.yarn/releases/*
 !.yarn/sdks
+!.yarn/sdks/*
 !.yarn/versions
+!.yarn/versions/*
 
 # Logs
 logs
@@ -19,13 +25,8 @@ yarn-error.log*
 **/.env.development
 **/.env.test
 **/.env.production
+**/.cache
 **/.cache/**
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
 
 # Dependency directories
 node_modules/
