@@ -2653,6 +2653,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"core-js@npm:^3.19.2":
+  version: 3.19.2
+  resolution: "core-js@npm:3.19.2"
+  checksum: a605f7b0448a7aa13731fd9a13525460681e15ce60ec0e1ff45e88b18b71e74f6c625959200f0f8376ec0a1eb94b0f06e3d6807a01c5a46f3871d08a2c4f1d58
+  languageName: node
+  linkType: hard
+
 "core-util-is@npm:~1.0.0":
   version: 1.0.3
   resolution: "core-util-is@npm:1.0.3"
@@ -6353,7 +6360,10 @@ fsevents@~2.3.2:
     "@babel/preset-env": ^7.14.7
     "@babel/preset-react": ^7.14.5
     "@babel/runtime": ^7.14.8
+    core-js: ^3.19.2
     dotenv: ^10.0.0
+    express: ^4.17.1
+    socket.io: ^4.4.0
     victor: ^1.1.0
   languageName: unknown
   linkType: soft

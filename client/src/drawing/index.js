@@ -2,6 +2,7 @@ import { Spritesheet } from './spritesheet';
 import { Background } from './background';
 import engine from 'engine';
 import * as playerRenderer from './playerRenderer';
+import * as circleRenderer from './circleRenderer';
 const { utils } = engine;
 let s, sg, si, sv, sp, sl;
 let layers = [];
@@ -32,6 +33,7 @@ export const init = (_state) => {
   sg.loading.push(si.tutorialImg.load());
   
   playerRenderer.init(s);
+  circleRenderer.init(s);
 }
 
 export const start = () => {}
@@ -174,4 +176,20 @@ export const drawProgressBar = (x, y, width, height, backColor, frontColor, val,
   let frontWidth = utils.map(val, minVal, maxVal, 0, width);
   c.fillRect(x, y, frontWidth, height);
   c.restore();
+}
+
+export const randomPalletteColor = () => {
+  const allColors = [
+    '#55D6BE',
+    '#FFFD98',
+    '#A833B9',
+    '#AFD2E9',
+    '#ED254E',
+    '#F18805',
+    '#7D5BA6',
+    '#FC6471',
+    '#D81159',
+    '#606C38'
+  ];
+  return allColors[utils.randomInt(0, allColors.length-1)]
 }

@@ -9,7 +9,14 @@ export const GAME_STATES = {
 export const GLOBALS = {
   gameLength: 180,
   endscreenLength: 10,
-  startCountdownLength: 15
+  startCountdownLength: 15,
+  initialViewScale: 120,
+  initialSnakeSize: 5,
+  numPickupsPerMinute: 50,
+  pickupCap: 500,
+  baseMoveSpeed: 20,
+  baseAccelSpeed: 40,
+  sprintMult: 4
 };
 
 export class State {
@@ -20,7 +27,8 @@ export class State {
       //Track the game state
       gameState: GAME_STATES.GAME_WAITING_FOR_PLAYERS,
       //Store all player objects
-      players: {}
+      players: {},
+      pickups: {}
     };
     //Score state
     this.score = {
@@ -31,11 +39,6 @@ export class State {
     this.physics = {
       //Game object unique ID tracker
       lastGameObjectID: 0,
-      //Physics globals (see physics.js for more info)
-      speedLimit: 40,
-      moveSpeed: 20,
-      accelSpeed: 20,
-      sprintMult: 2,
       //Game Objects
       gameObjects: {}
     };

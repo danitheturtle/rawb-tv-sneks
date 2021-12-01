@@ -10,11 +10,18 @@
     "engine",
     "server"
   ],
+  "scripts": {
+    "build": "yarn workspace engine build && yarn workspace server build && yarn workspace client build",
+    "start": "node ./dist/server/index.js"
+  },
   "keywords": [],
   "author": "danitheturtle",
   "license": "MIT",
   "dependencies": {
+    "core-js": "^3.19.2",
     "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "socket.io": "^4.4.0",
     "victor": "^1.1.0"
   },
   "devDependencies": {

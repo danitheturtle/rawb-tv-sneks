@@ -2,7 +2,7 @@ import * as keys from '../keys';
 import engine from 'engine';
 import Victor from 'victor';
 const Vector = Victor;
-const { utils } = engine;
+const { utils, GLOBALS } = engine;
 let s, sg, sl, sv, gu;
 
 export const init = (_state) => {
@@ -13,14 +13,26 @@ export const init = (_state) => {
   gu = sg.gu;
 
   keys.keyDown("+", () => {
-    sv.viewScale--;
+    if (!sv.active) return;
+    sv.active.viewScale--;
     sv.active.rescaleGU();
   });
 
   keys.keyDown("-", () => {
-    sv.viewScale++;
+    if (!sv.active) return;
+    sv.active.viewScale++;
     sv.active.rescaleGU();
   });
+  
+  keys.scroll((dir) => {
+    if (!sv.active) return;
+    if (dir === -1) {
+      sv.active.viewScale++;
+    } else {
+      sv.active.viewScale--;
+    }
+    sv.active.rescaleGU();
+  })
 };
 
 export class View {
@@ -31,7 +43,7 @@ export class View {
     this.height = _height;
 
     //How many game units fit along the largest axis of the view
-    this.viewScale = 100;
+    this.viewScale = GLOBALS.initialViewScale;
 
     //Limits
     this.xLimitMin = 0;
@@ -154,7 +166,7 @@ export class View {
   }
 
   rescaleGU() {
-    sg.gu = Math.round(Math.max(this.width, this.height) / sv.viewScale);
+    sg.gu = Math.round(Math.max(this.width, this.height) / sv.active.viewScale);
     //Re-define position limits for the view
     sv.active.setLimitsGU(
       0, 

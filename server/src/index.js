@@ -21,9 +21,9 @@ app.use(express.static(path.resolve(__dirname, "../../dist/web")))
 //On a new player connection
 io.on('connection', (socket) => {
   //Bind createNewPlayer for when the client requests a player
-  socket.on('createNewPlayer', () => {
+  socket.on('createNewPlayer', (clientPlayerData) => {
     //Add a new player to the game and store the ID on this socket
-    socket.playerID = game.addNewPlayer(socket);
+    socket.playerID = game.addNewPlayer(socket, clientPlayerData);
   
     //Listen to player updates from the client
     socket.on('updatePlayer', (data) => {

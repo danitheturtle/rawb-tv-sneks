@@ -8,11 +8,6 @@ let state, sp;
 export const init = (_state) => {
   state = _state;
   sp = state.physics;
-  //Set up physics globals
-  sp.speedLimit = 40;
-  sp.moveSpeed = 20;
-  sp.accelSpeed = 20;
-  sp.sprintMult = 2;
 }
 
 export const start = () => {
@@ -24,7 +19,7 @@ export const update = () => {
   for (const goID in sp.gameObjects) {
     const obj = sp.gameObjects[goID];
     //Update the object
-    obj.applyCollisions(sp.gameObjects);
+    // obj.applyCollisions(sp.gameObjects);
     obj.update();
   }
 }

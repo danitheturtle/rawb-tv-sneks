@@ -150,15 +150,6 @@ export class GameObject {
     }
   }
 
-  applyCollisions(otherObjects) {
-    if (!this.hasCollisions) return;
-    for (let k = 0; k < otherObjects.length; k++) {
-      const collisionManifold = physics.collide(this.collider, otherObjects[k].collider);
-      if (collisionManifold.norm.lengthSq() < 1.0) continue;
-      console.dir("Collision detected!")
-    }
-  }
-
   getData() {
     return {
       id: this.id,

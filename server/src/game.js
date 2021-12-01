@@ -1,10 +1,10 @@
 import engine from 'engine';
 import Victor from 'victor';
 import * as levelLoader from './serverLevelLoader';
+import * as scoring from './serverScoring';
 import { ServerState, SERVER_STATES } from './state';
 const Vector = Victor;
 const {
-  scoring,
   time,
   utils,
   physics,
@@ -28,6 +28,7 @@ export const init = (_io) => {
   time.init(state);
   physics.init(state);
   levelLoader.init(state);
+  scoring.init(state);
   players = state.game.players;
   sp = state.physics;
   st = state.time;
@@ -50,12 +51,31 @@ export const updateGame = () => {
   //Update other modules
   time.update();
   physics.update();
-  scoring.update();
 
   //Update all players
-  for (const id in players) {
-    players[id].update();
+  for (const clientId in players) {
+    players[clientId].update();
+    // if (players[clientId].dead) continue;
+    //find collision with other players
+    for (const otherId in players) {
+      if (otherId === clientId) continue;
+      if (players[clientId].collider.checkCollisionWithOtherSnake(players[otherId].collider)) {
+        players[otherId].die();
+        state.io.emit('playerDied', otherId);
+      }
+    }
+    //Detect pickups
+    for (const pickupId in sg.pickups) {
+      if (players[clientId].collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
+        sg.pickups[pickupId].collectedBy = clientId;
+        sg.collectedPickups.push(sg.pickups[pickupId]);
+        players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
+        delete sp.gameObjects[sg.pickups[pickupId].id];
+        delete sg.pickups[pickupId];
+      }
+    }
   }
+  scoring.update();
 }
 
 /**
@@ -80,10 +100,14 @@ export const updateNetwork = () => {
     gameState: sg.gameState,
     gameStartTimer: st.timers.gameStartTimer,
     gameTimer: st.timers.gameTimer,
-    gameOverTimer: st.timers.gameOverTimer
+    gameOverTimer: st.timers.gameOverTimer,
+    collectedPickups: sg.collectedPickups.map(p => p.getData()),
+    newPickups: sg.newPickups.map(p => p.getData())
   };
   //Emit up-to-date game state to all clients
   state.io.emit('updateGameState', updatedGameState);
+  sg.collectedPickups = [];
+  sg.newPickups = [];
 }
 
 /**
@@ -98,7 +122,7 @@ export const updatePlayerFromClient = (socket, data) => {
  * Creates and adds a new player to the game.  Sends that player their client ID
  */
 
-export const addNewPlayer = (socket) => {
+export const addNewPlayer = (socket, clientData) => {
   //Create an ID for this player
   let clientId = sg.lastPlayerID++;
 
@@ -111,13 +135,17 @@ export const addNewPlayer = (socket) => {
     new Vector(0.0, 0.0),
     new SnakeCollider(2)
   );
+  Object.keys(clientData).forEach(key => {
+    players[clientId][key] = clientData[key];
+  });
   time.startClientTimer(clientId, 0);
 
   //Emit the new player's id to their client
   socket.emit('setClientID', clientId);
-  //Load the active level on the client, if there is one
+  //Load the active level on the client, if there is one, and pickups
   if (sl.activeLevelData) {
     socket.emit('loadLevel', sl.activeLevelData.name)
+    socket.emit('allPickups', Object.values(sg.pickups).map(pickup => pickup.getData()));
   }
 
   //Add server time to the response

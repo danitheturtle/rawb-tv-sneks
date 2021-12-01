@@ -2,9 +2,12 @@ import engine from 'engine';
 import Victor from 'victor';
 import { CLIENT_STATES } from './clientState';
 import * as levelLoader from './clientLevelLoader';
+import * as drawing from './drawing';
 import { PlayerRenderer } from './drawing/playerRenderer';
+import { CircleRenderer } from './drawing/circleRenderer';
+const { Player, SnakeCollider, Pickup, CircleCollider, time } = engine;
 const Vector = Victor;
-const { Player, SnakeCollider, time } = engine;
+
 let s, sg, sp, st, socket;
 
 export const init = (_state) => {
@@ -18,28 +21,33 @@ export const init = (_state) => {
   //Listen for new players
   socket.on('newPlayer', (data) => {
     //Add the new player to the list
-    sg.players[data.id] = new Player(
+    sg.players[data.clientId] = new Player(
       s,
-      data.id,
+      data.clientId,
       new Vector(data.x, data.y),
       new Vector(data.velX, data.velY),
       new Vector(data.accelX, data.accelY),
       new SnakeCollider(2),
-      new PlayerRenderer(2)
+      new PlayerRenderer(2, data.snakeColor)
     );
     //Start a client timer for that player
-    time.startClientTimer(data.id, data.time);
+    time.startClientTimer(data.clientId, data.time);
     //Set that player's data in the game state
-    sg.players[data.id].setData(data);
+    sg.players[data.clientId].setData(data);
   });
 
   //Listen for players leaving
-  socket.on('removePlayer', (id) => {
+  socket.on('removePlayer', (clientId) => {
     //Remove that player from the state
-    delete sp.gameObjects[sg.players[id].gameObject.id];
-    delete st.clientTimers[sg.players[id]];
-    delete sg.players[id];
+    delete sp.gameObjects[sg.players[clientId].id];
+    delete st.clientTimers[sg.players[clientId]];
+    delete sg.players[clientId];
   });
+  
+  //Listen for player death
+  socket.on('playerDied', (clientId) => {
+    sg.players[clientId].die();
+  })
 
   //Listen for game state changes
   socket.on("updateGameState", (newState) => {
@@ -49,6 +57,23 @@ export const init = (_state) => {
     s.time.timers.gameStartTimer = newState.gameStartTimer;
     s.time.timers.gameTimer = newState.gameTimer;
     s.time.timers.gameOverTimer = newState.gameOverTimer;
+    newState.newPickups?.forEach(pickup => {
+      sg.pickups[pickup.pickupId] = new Pickup(
+        s, 
+        pickup.pickupId, 
+        new Vector(pickup.x, pickup.y), 
+        pickup.worth, 
+        new CircleCollider(1), 
+        new CircleRenderer(1, drawing.randomPalletteColor())
+      );
+    });
+    newState.collectedPickups?.forEach(collectedPickup => {
+      if (sg.pickups[collectedPickup.pickupId]) {
+        delete sp.gameObjects[sg.pickups[collectedPickup.pickupId].id];
+        delete sg.pickups[collectedPickup.pickupId];
+        sg.players[collectedPickup.collectedBy].collider.increaseBodyPartCount(collectedPickup.worth)
+      }
+    })
   });
 
   //Resets the game when the server detects a reset game state
@@ -71,6 +96,18 @@ export const init = (_state) => {
     sg.clientState = CLIENT_STATES.PLAYING
   });
   
+  socket.on('allPickups', (pickupData) => {
+    pickupData.forEach(pickup => {
+      sg.pickups[pickup.pickupId] = new Pickup(
+        s, pickup.pickupId, 
+        new Vector(pickup.x, pickup.y), 
+        pickup.worth, 
+        new CircleCollider(1), 
+        new CircleRenderer(1, drawing.randomPalletteColor())
+      );
+    });
+  });
+  
   socket.on('allPlayers', function(data) {
     // console.dir(data);
     //Loop through every player in the data
@@ -85,7 +122,7 @@ export const init = (_state) => {
           new Vector(data[clientId].velX, data[clientId].velY),
           new Vector(data[clientId].accelX, data[clientId].accelY),
           new SnakeCollider(2),
-          new PlayerRenderer(2)
+          new PlayerRenderer(2, data.snakeColor)
         );
       }
       //If the player is not the client player
@@ -106,8 +143,10 @@ export const start = () => {
 }
 
 export const createNewPlayer = () => {
+  //client-defined player data
+  const clientPlayerData = { snakeColor: drawing.randomPalletteColor() };
   //notify server there is a new player
-  socket.emit('createNewPlayer');
+  socket.emit('createNewPlayer', clientPlayerData);
 }
 
 /**

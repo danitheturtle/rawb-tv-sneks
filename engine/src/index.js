@@ -1,5 +1,6 @@
 import * as physicsObjects from './physicsObjects';
 import * as player from './player';
+import * as pickup from './pickup';
 import * as state from './state';
 import * as physics from './physics';
 import * as time from './time';
@@ -17,5 +18,6 @@ export default {
   levels,
   ...state,
   ...physicsObjects,
-  ...player
+  ...player,
+  ...pickup
 }
