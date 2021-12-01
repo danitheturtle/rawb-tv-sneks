@@ -1,12 +1,16 @@
 .yarn/*
 !.yarn/cache
+!.yarn/cache/*
 !.yarn/patches
+!.yarn/patches/*
 !.yarn/plugins
+!.yarn/plugins/*
 !.yarn/releases
+!.yarn/releases/*
 !.yarn/versions
+!.yarn/versions/*
 
-.next
-node_modules
+**/node_modules/**
 
 .env
 .env*.local
