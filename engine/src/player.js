@@ -186,11 +186,6 @@ export class Player extends GameObject {
       //Reset acceleration
       this.accel = new Vector(0.0, 0.0);
       this.collider?.update();
-      
-      //If player is out of bounds, kill them
-      if (this.isOutOfBounds()) {
-        this.die();
-      }
     }
   }
   

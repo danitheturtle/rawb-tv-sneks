@@ -57,6 +57,12 @@ export const updateGame = () => {
   //Update all players
   for (const clientId in players) {
     if (players[clientId].dead) continue;
+    //check out of bounds
+    if (players[clientId].isOutOfBounds()) {
+      players[clientId].die();
+      state.io.emit('playerDied', clientId);
+      continue;
+    }
     //find collision with other players
     for (const otherId in players) {
       if (otherId === clientId || players[otherId].dead) continue;
