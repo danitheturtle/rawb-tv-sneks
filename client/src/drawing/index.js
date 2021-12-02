@@ -3,6 +3,7 @@ import { Background } from './background';
 import engine from 'engine';
 import * as playerRenderer from './playerRenderer';
 import * as circleRenderer from './circleRenderer';
+import * as spriteRenderer from './spriteRenderer';
 const { utils } = engine;
 let s, sg, si, sv, sp, sl;
 let layers = [];
@@ -34,6 +35,7 @@ export const init = (_state) => {
   
   playerRenderer.init(s);
   circleRenderer.init(s);
+  spriteRenderer.init(s);
 }
 
 export const start = () => {}

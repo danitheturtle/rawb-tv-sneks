@@ -19,7 +19,7 @@ export class Sprite {
       drawIndex = 0;
       time.startNewTimer(this.name);
     }
-    let tile = this.tilesheet.tile(this.frameArray[drawIndex]);
-    ctx.drawImage(this.tilesheet.img, tile.x, tile.y, tile.width, tile.height, dx, dy, dWidth, dHeight);
+    let tile = this.tilesheet.tiles[this.frameArray[drawIndex]];
+    ctx.drawImage(this.tilesheet.image, tile.x, tile.y, tile.width, tile.height, dx, dy, dWidth, dHeight);
   }
 }

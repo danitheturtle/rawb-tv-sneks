@@ -164,6 +164,14 @@ export class View {
       return new Vector(obj.pos.x * (multiplyByGU ? sg.gu : 1) - this.xMin(), obj.pos.y * (multiplyByGU ? sg.gu : 1) - this.yMin());
     }
   }
+  
+  isInView(obj, multiplyByGU) {
+    if (obj.pos === undefined) {
+      return true;
+    } else {
+      return true;
+    }
+  }
 
   rescaleGU() {
     sg.gu = Math.round(Math.max(this.width, this.height) / sv.active.viewScale);

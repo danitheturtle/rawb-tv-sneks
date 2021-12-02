@@ -4,7 +4,7 @@ import { CLIENT_STATES } from './clientState';
 import * as levelLoader from './clientLevelLoader';
 import * as drawing from './drawing';
 import { PlayerRenderer } from './drawing/playerRenderer';
-import { CircleRenderer } from './drawing/circleRenderer';
+import { SpriteRenderer } from './drawing/spriteRenderer';
 const { Player, SnakeCollider, Pickup, CircleCollider, time } = engine;
 const Vector = Victor;
 
@@ -64,7 +64,7 @@ export const init = (_state) => {
         new Vector(pickup.x, pickup.y), 
         pickup.worth, 
         new CircleCollider(1), 
-        new CircleRenderer(1, drawing.randomPalletteColor())
+        new SpriteRenderer(1, "regularCheese")
       );
     });
     newState.collectedPickups?.forEach(collectedPickup => {
@@ -103,7 +103,7 @@ export const init = (_state) => {
         new Vector(pickup.x, pickup.y), 
         pickup.worth, 
         new CircleCollider(1), 
-        new CircleRenderer(1, drawing.randomPalletteColor())
+        new SpriteRenderer(1, "regularCheese")
       );
     });
   });
