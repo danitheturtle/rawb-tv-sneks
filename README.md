@@ -4,10 +4,11 @@ This is a slither.io clone for rawb.tv so we can all play together and add lots 
 
 _____
 #### Running Locally
-This should be fairly straightforward. You'll need yarn 3. Next, duplicate `/env/.env` into files 
-called `.env.development` and `.env.production`, letting you change version settings.
-By default, the dockerfile is set up for a production build on port 80. You'll have to edit all 
-the ports in the `.env.production` file to `80` as well.
+You'll need yarn 3. 
+
+Duplicate `/env/.env` into files called `.env.development` and `.env.production`, letting you 
+change version settings. By default, the dockerfile and prod server version are setup to use 
+port `8080`, so edit that value into the `.env.production` file.
 
 Then from the project root:
 ```
@@ -19,5 +20,9 @@ Congrats! You can play snakey-mouse on `localhost:8080`. Every sub-project has i
 start/build script. Running /engine, /server, and /client in that order with `yarn start` will
 get the dev build up and running with a webpack proxy.
 
-You can change env settings using the provided .env file. Just uncomment the variables. Different
-environment configs are supported, with the naming convention of `.env.${production|development}`
+To build a docker image, first run `yarn build`, then run this from the project root
+```
+docker build . -t snakey-mouse:v1
+docker run --rm -it -p 80:8080 snakey-mouse:v1
+```
+That will get you a docker image, and start it running locally on port 80.
