@@ -7,7 +7,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "echo \"Loaded env\"",
-    "build": "rm -rf ../dist/env && mkdir ../dist/env && cp ./*.* ../dist/env && cp .env ../dist/env && cp .env.production ../dist/env"
+    "build": "rm -rf ../dist/env && mkdir -p ../dist/env && cp ./*.* ../dist/env && cp .env ../dist/env && cp .env.production ../dist/env"
   },
   "dependencies": {
     "@babel/core": "^7.13.15",

@@ -4,7 +4,10 @@ This is a slither.io clone for rawb.tv so we can all play together and add lots 
 
 _____
 #### Running Locally
-This should be fairly straightforward. You'll need yarn 3. Then from the project root:
+This should be fairly straightforward. You'll need yarn 3. Next, duplicate `/env/.env` into files 
+called `.env.development` and `.env.production`, letting you change version settings. 
+
+Then from the project root:
 ```
 yarn install
 yarn build

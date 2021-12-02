@@ -28,6 +28,6 @@ COPY --from=builder /app/package.json ./package.json
 # rebuild unplugged node modules
 RUN rm -rf /app/.yarn/unplugged && yarn rebuild
 
-EXPOSE 8080
+EXPOSE 80
 
 CMD ["yarn", "start"]
