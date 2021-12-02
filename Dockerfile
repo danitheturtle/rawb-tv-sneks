@@ -15,6 +15,13 @@ RUN yarn rebuild && yarn build
 FROM node:alpine AS runner
 
 ENV NODE_ENV production
+ENV APP_NAME snakey-mouse
+ENV APP_ORIGIN http://localhost:8080
+ENV SOCKET_ORIGIN localhost
+ENV SOCKET_PORT 8080
+ENV APP_ENV production
+ENV SERVER_ORIGIN http://localhost
+ENV SERVER_PORT 8080
 WORKDIR /app
 
 # Copy files from build
