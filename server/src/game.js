@@ -86,28 +86,24 @@ export const updateGame = () => {
   }
   //Reset dead players and spawn pickups where they died
   for (const clientId in players) {
-    if (players[clientId].dead && !players[clientId].respawning) {
-      const deadPlayer = players[clientId];
-      const pickupPoints = deadPlayer.collider.pointPath;
-      for (let i=0; i<pickupPoints.length; i++) {
-        const newPickup = new Pickup(
-          state, 
-          sp.lastGameObjectID++,
-          pickupPoints[i].clone(), 
-          1,
-          new CircleCollider(1)
-        );
-        sg.pickups[newPickup.id] = newPickup;
-        sg.newPickups.push(newPickup);
-      }
-      deadPlayer.pos = new Vector(utils.randomInt(5, sl.activeLevelData.guWidth - 5), utils.randomInt(5, sl.activeLevelData.guHeight - 5));
-      deadPlayer.collider.pointPath = [deadPlayer.pos.clone()];
-      deadPlayer.collider.parts = [];
-      deadPlayer.collider.setBodyPartCount(GLOBALS.initialSnakeSize);
-      deadPlayer.collider.radius = deadPlayer.collider.initialRadius;
-      deadPlayer.respawn();
-      state.io.emit('playerRespawning', deadPlayer.getData());
-    }
+    const deadPlayer = players[clientId];
+    //If player isn't dead, or if code has already run for them
+    if (!deadPlayer.dead || (deadPlayer.dead && deadPlayer.respawning)) continue;
+    deadPlayer.collider.pointPath?.forEach(point => {
+      const newPickup = new Pickup(
+        state, 
+        sp.lastGameObjectID++,
+        point.clone(), 
+        1,
+        new CircleCollider(1)
+      );
+      sg.pickups[newPickup.id] = newPickup;
+      sg.newPickups.push(newPickup);
+    });
+    deadPlayer.pos = new Vector(utils.randomInt(5, sl.activeLevelData.guWidth - 5), utils.randomInt(5, sl.activeLevelData.guHeight - 5));
+    deadPlayer.collider.reset();
+    deadPlayer.respawn();
+    state.io.emit('playerRespawning', deadPlayer.getData());
   }
   scoring.update();
 }

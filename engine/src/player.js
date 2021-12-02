@@ -59,6 +59,13 @@ export class SnakeCollider extends CircleCollider {
       }
     }
   }
+  
+  reset() {
+    this.pointPath = [this.parent.pos.clone()];
+    this.parts = [];
+    this.bodyPartCount = GLOBALS.initialSnakeSize;
+    this.radius = this.initialRadius;
+  }
 
   increaseBodyPartCount(_amount) {
     this.bodyPartCount += _amount;
@@ -104,12 +111,10 @@ export class SnakeCollider extends CircleCollider {
   checkCollisionWithPickup(_pickup) {
     const pickupCenter = _pickup.pos;
     const pickupRadius = _pickup.collider.radius;
-    for (let i = 0; i < this.parts.length; i++) {
-      const minDistSq = this.radius * this.radius + pickupRadius * pickupRadius;
-      const partCenter = this.parts[i].clone();
-      if (partCenter.subtract(pickupCenter).lengthSq() < minDistSq) {
-        return true;
-      }
+    const minDistSq = this.radius * this.radius + pickupRadius * pickupRadius;
+    const partCenter = this.parts[0].clone();
+    if (partCenter.subtract(pickupCenter).lengthSq() < minDistSq) {
+      return true;
     }
     return false;
   }
@@ -120,7 +125,7 @@ export class SnakeCollider extends CircleCollider {
       initialRadius: this.initialRadius,
       bodyPartCount: this.bodyPartCount,
       pointPath: this.pointPath.map(p => ([p.x, p.y])),
-      parts: this.parts.map(p => [p.x, p.y])
+      parts: this.parts.map(p => ([p.x, p.y]))
     }
   }
 
