@@ -97,7 +97,8 @@ export const updateGame = () => {
       deadPlayer.collider.parts = [];
       deadPlayer.collider.setBodyPartCount(GLOBALS.initialSnakeSize);
       deadPlayer.collider.radius = deadPlayer.collider.initialRadius;
-      players[clientId].respawn();
+      deadPlayer.respawn();
+      state.io.emit('playerRespawned', deadPlayer.getData());
     }
   }
   scoring.update();

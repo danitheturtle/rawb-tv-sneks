@@ -47,6 +47,11 @@ export const init = (_state) => {
   socket.on('playerDied', (clientId) => {
     sg.players[clientId]?.die();
   });
+  
+  socket.on('playerRespawned', (data) => {
+    sg.players[data.id].setData(data);
+    sg.players[data.id].respawn();
+  })
 
   //Listen for game state changes
   socket.on("updateGameState", (newState) => {
