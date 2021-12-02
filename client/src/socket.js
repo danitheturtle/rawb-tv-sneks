@@ -28,7 +28,7 @@ export const init = (_state) => {
       new Vector(data.velX, data.velY),
       new Vector(data.accelX, data.accelY),
       new SnakeCollider(2),
-      new PlayerRenderer(2, data.snakeColor)
+      new PlayerRenderer(3, data.spriteName)
     );
     //Start a client timer for that player
     time.startClientTimer(data.clientId, data.time);
@@ -122,7 +122,7 @@ export const init = (_state) => {
           new Vector(data[clientId].velX, data[clientId].velY),
           new Vector(data[clientId].accelX, data[clientId].accelY),
           new SnakeCollider(2),
-          new PlayerRenderer(2, data.snakeColor)
+          new PlayerRenderer(3, data[clientId].spriteName)
         );
       }
       //If the player is not the client player
@@ -144,7 +144,7 @@ export const start = () => {
 
 export const createNewPlayer = () => {
   //client-defined player data
-  const clientPlayerData = { snakeColor: drawing.randomPalletteColor() };
+  const clientPlayerData = { spriteName: drawing.randomPlayerSprite() };
   //notify server there is a new player
   socket.emit('createNewPlayer', clientPlayerData);
 }

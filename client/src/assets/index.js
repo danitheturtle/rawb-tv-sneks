@@ -4,6 +4,10 @@ import cheeseSpritesheet from './spritesheets/cheeseSpritesheet.png';
 import cheeseSpritesheetData from './spritesheets/cheeseSpritesheet.js';
 import p1SpritesheetData from './spritesheets/p1_spritesheet.js';
 import p1Spritesheet from './spritesheets/p1_spritesheet.png';
+import snakeyMousePlayerSpritesheet from './spritesheets/snakeyMousePlayerSpritesheet.png';
+import snakeyMousePlayerSpritesheetData from './spritesheets/snakeyMousePlayerSpritesheet.js';
+import jimmyTheSnakePlayerSpritesheet from './spritesheets/jimmyTheSnakePlayerSpritesheet.png';
+import jimmyTheSnakePlayerSpritesheetData from './spritesheets/jimmyTheSnakePlayerSpritesheet.js';
 import defaultBackground from './backgrounds/bg_grasslands.png';
 import dangerBackground from './backgrounds/bg_danger.png';
 import radicalBackground from './backgrounds/bg_radical.png';
@@ -14,6 +18,8 @@ const allAssets = {
     coreTilesheet: [coreTilesheet, coreTilesheetData],
     p1Spritesheet: [p1Spritesheet, p1SpritesheetData],
     cheeseSpritesheet: [cheeseSpritesheet, cheeseSpritesheetData],
+    snakeyMousePlayerSpritesheet: [snakeyMousePlayerSpritesheet, snakeyMousePlayerSpritesheetData],
+    jimmyTheSnakePlayerSpritesheet: [jimmyTheSnakePlayerSpritesheet, jimmyTheSnakePlayerSpritesheetData],
     defaultBackground: [defaultBackground, {}],
     radicalBackground: [radicalBackground, {}],
     dangerBackground: [dangerBackground, {}],

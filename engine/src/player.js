@@ -2,7 +2,7 @@ import Victor from 'victor';
 import * as physics from './physics';
 import * as time from './time';
 import { GameObject, CircleCollider } from './physicsObjects';
-import { randomVec, norm, lerp } from './utils';
+import { randomVec, norm, lerp, clamp } from './utils';
 import { GLOBALS } from './state';
 const Vector = Victor;
 
@@ -147,11 +147,9 @@ export class Player extends GameObject {
     //snake data
     this.bodySpacing = 1.75;
     this.collider.pointPath.push(this.pos.clone());
-
-    //custom spritesheet support for meme potential
-    this.customSpritesheetURL = null;
-    //Player color
-    this.snakeColor = null;
+    
+    //Player sprite
+    this.spriteName = null;
   }
 
   update() {
@@ -160,6 +158,12 @@ export class Player extends GameObject {
     } else {
       //accelerate towards moveHeading, clamp speed
       this.accel = this.moveHeading.clone().multiplyScalar(GLOBALS.baseAccelSpeed);
+      // this.accel = this.vel.clone().normalize();
+      // // console.dir(`${this.moveHeading.angleDeg()} ${this.accel.angleDeg()}`)
+      // const angleDiff = (180+this.moveHeading.angleDeg()) - (180+this.accel.angleDeg());
+      // const angleDir = angleDiff > 0 ? 1 : -1;
+      // const clampedDegToRotate = clamp(Math.abs(angleDiff), 0, 90)*angleDir;
+      // this.accel.rotateDeg(clampedDegToRotate).multiplyScalar(GLOBALS.baseAccelSpeed);
       //Add acceleration to the velocity scaled by dt.  Limit the velocity so collisions don't break
       this.vel.add(this.accel.multiplyScalar(time.dt()));
       //limit velocity with current max speed (squared since its cheaper)
@@ -192,10 +196,6 @@ export class Player extends GameObject {
     this.collider.setBodyPartCount(GLOBALS.initialSnakeSize);
   }
 
-  setCustomSpritesheet(spritesheetURL) {
-    this.customSpritesheetURL = spritesheetURL
-  }
-
   getData() {
     return {
       ...super.getData(),
@@ -205,8 +205,7 @@ export class Player extends GameObject {
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
       sprintTimer: this.sprintTimer,
-      customSpritesheetURL: this.customSpritesheetURL,
-      snakeColor: this.snakeColor
+      spriteName: this.spriteName
     };
   }
 
@@ -216,11 +215,10 @@ export class Player extends GameObject {
     this.moveHeading = new Vector(data.moveHeadingX, data.moveHeadingY);
     this.sprint = data.sprint;
     this.sprintTimer = data.sprintTimer;
-    this.customSpritesheetURL = data.customSpritesheetURL;
     this.gameStateRef.time.clientTimers[data.clientId] = data.time;
-    this.snakeColor = data.snakeColor;
+    this.spriteName = data.spriteName;
     if (this.renderer) {
-      this.renderer.color = this.snakeColor;
+      this.renderer.spriteName = this.spriteName;
     }
   }
 

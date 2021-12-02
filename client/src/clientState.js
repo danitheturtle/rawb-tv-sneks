@@ -60,6 +60,8 @@ export class ClientState extends State {
       spritesheetAssets: {
         p1Spritesheet: assets.images.p1Spritesheet,
         cheeseSpritesheet: assets.images.cheeseSpritesheet,
+        snakeyMousePlayerSpritesheet: assets.images.snakeyMousePlayerSpritesheet,
+        jimmyTheSnakePlayerSpritesheet: assets.images.jimmyTheSnakePlayerSpritesheet
       },
       backgroundAssets: {
         defaultBackground: assets.images.defaultBackground,
