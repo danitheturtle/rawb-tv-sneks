@@ -139,6 +139,7 @@ export class Player extends GameObject {
     super(_gameStateRef, _clientId, _pos, _vel, _accel, _collider, _renderer);
     //Did the player recently die?
     this.dead = false;
+    this.respawning = false;
 
     //Player input tracking.  Everything is false/blank by default
     this.moveHeading = randomVec();
@@ -215,6 +216,11 @@ export class Player extends GameObject {
   }
   
   respawn() {
+    this.respawning = true;
+  }
+  
+  respawned() {
+    this.respawning = false;
     this.dead = false;
   }
 
@@ -222,6 +228,7 @@ export class Player extends GameObject {
     return {
       ...super.getData(),
       dead: this.dead,
+      respawning: this.respawning,
       time: this.gameStateRef.time.clientTimers[this.id],
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
@@ -234,6 +241,7 @@ export class Player extends GameObject {
   setData(data) {
     super.setData(data, this.gameStateRef.time.clientTimers[data.id] - data.time);
     this.dead = data.dead;
+    this.respawning = data.respawning;
     this.moveHeading = new Vector(data.moveHeadingX, data.moveHeadingY);
     this.sprint = data.sprint;
     this.sprintTimer = data.sprintTimer;

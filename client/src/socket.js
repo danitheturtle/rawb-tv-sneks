@@ -48,9 +48,13 @@ export const init = (_state) => {
     sg.players[clientId]?.die();
   });
   
-  socket.on('playerRespawned', (data) => {
+  socket.on('playerRespawning', (data) => {
     sg.players[data.id].setData(data);
-    sg.players[data.id].respawn();
+    sg.players[data.id].respawned();
+    if (data.id === sg.clientId) {
+      updateClientPlayer();
+      console.log('broadcasted respawn');
+    }
   })
 
   //Listen for game state changes

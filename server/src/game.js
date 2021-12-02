@@ -80,7 +80,7 @@ export const updateGame = () => {
   }
   //Reset dead players and spawn pickups where they died
   for (const clientId in players) {
-    if (players[clientId].dead) {
+    if (players[clientId].dead && !players[clientId].respawning) {
       const deadPlayer = players[clientId];
       const pickupPoints = deadPlayer.collider.pointPath;
       for (let i=0; i<pickupPoints.length; i++) {
@@ -100,7 +100,7 @@ export const updateGame = () => {
       deadPlayer.collider.setBodyPartCount(GLOBALS.initialSnakeSize);
       deadPlayer.collider.radius = deadPlayer.collider.initialRadius;
       deadPlayer.respawn();
-      state.io.emit('playerRespawned', deadPlayer.getData());
+      state.io.emit('playerRespawning', deadPlayer.getData());
     }
   }
   scoring.update();
