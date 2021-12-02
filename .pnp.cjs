@@ -61,6 +61,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-env", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.4"],
             ["@babel/preset-react", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.0"],
             ["@babel/runtime", "npm:7.16.3"],
+            ["axios", "npm:0.24.0"],
             ["babel-plugin-import-path-replace", "npm:0.1.0"],
             ["core-js", "npm:3.19.2"],
             ["dotenv", "npm:10.0.0"],
@@ -3182,6 +3183,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["axios", [
+        ["npm:0.24.0", {
+          "packageLocation": "./.yarn/cache/axios-npm-0.24.0-39e5c1e79e-468cf496c0.zip/node_modules/axios/",
+          "packageDependencies": [
+            ["axios", "npm:0.24.0"],
+            ["follow-redirects", "virtual:39e5c1e79ea63134f0cf339f4463df92854aaf708a45210afd29a0b4b9f67f95b34a1abbcabaae6d0033ad99a1d5f690ab51ed8e5d3283b87ccbc3a9ab3ec05f#npm:1.14.5"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["babel-loader", [
         ["npm:8.2.3", {
           "packageLocation": "./.yarn/cache/babel-loader-npm-8.2.3-855681b984-78e1e1a919.zip/node_modules/babel-loader/",
@@ -4982,10 +4993,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],
           "linkType": "SOFT",
         }],
-        ["virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.14.5", {
-          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-af3566fb1d/0/cache/follow-redirects-npm-1.14.5-7c681222a0-f004a76b2e.zip/node_modules/follow-redirects/",
+        ["virtual:39e5c1e79ea63134f0cf339f4463df92854aaf708a45210afd29a0b4b9f67f95b34a1abbcabaae6d0033ad99a1d5f690ab51ed8e5d3283b87ccbc3a9ab3ec05f#npm:1.14.5", {
+          "packageLocation": "./.yarn/__virtual__/follow-redirects-virtual-02c2a4727a/0/cache/follow-redirects-npm-1.14.5-7c681222a0-f004a76b2e.zip/node_modules/follow-redirects/",
           "packageDependencies": [
-            ["follow-redirects", "virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.14.5"],
+            ["follow-redirects", "virtual:39e5c1e79ea63134f0cf339f4463df92854aaf708a45210afd29a0b4b9f67f95b34a1abbcabaae6d0033ad99a1d5f690ab51ed8e5d3283b87ccbc3a9ab3ec05f#npm:1.14.5"],
             ["debug", null]
           ],
           "packagePeers": [
@@ -5508,7 +5519,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["http-proxy", "npm:1.18.1"],
             ["eventemitter3", "npm:4.0.7"],
-            ["follow-redirects", "virtual:a313c479c5c7e54d9ec8fbeeea69ff640f56b8989ea2dff42351a3fa5c4061fb80a52d8ede0f0826a181a216820c2d2c3f15da881e7fdf31cef1c446e42f0c45#npm:1.14.5"],
+            ["follow-redirects", "virtual:39e5c1e79ea63134f0cf339f4463df92854aaf708a45210afd29a0b4b9f67f95b34a1abbcabaae6d0033ad99a1d5f690ab51ed8e5d3283b87ccbc3a9ab3ec05f#npm:1.14.5"],
             ["requires-port", "npm:1.0.0"]
           ],
           "linkType": "HARD",
@@ -8165,6 +8176,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.16.0"],
             ["@babel/node", "virtual:5e2e00b31e527ff544c90eb3e3e3e977a366e52a6e25602d03686a4c9a155eee4d7b92ccdea0b04275344f5b2189eb629d123eb4cc6e1b883b42aea6d965568d#npm:7.16.0"],
             ["@babel/preset-env", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.4"],
+            ["axios", "npm:0.24.0"],
             ["babel-plugin-import-path-replace", "npm:0.1.0"],
             ["core-js", "npm:3.19.1"],
             ["engine", "workspace:engine"],
@@ -8292,6 +8304,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/preset-env", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.4"],
             ["@babel/preset-react", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.0"],
             ["@babel/runtime", "npm:7.16.3"],
+            ["axios", "npm:0.24.0"],
             ["babel-plugin-import-path-replace", "npm:0.1.0"],
             ["core-js", "npm:3.19.2"],
             ["dotenv", "npm:10.0.0"],

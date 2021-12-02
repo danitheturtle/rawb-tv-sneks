@@ -3,6 +3,7 @@ import express from 'express';
 import http from 'http';
 import path from 'path';
 import { Server } from 'socket.io';
+import axios from 'axios';
 import router from './router';
 import * as game from './game';
 
@@ -57,3 +58,33 @@ server.listen(port, () => {
   //Start the network loop
   game.updateNetwork();
 });
+
+const handleException = async (err, a) => {
+	console.error(err.stack);
+	try {
+		const shutdown = new Promise((resolve) => server.close(resolve));
+		const timeout = new Promise((resolve) => setTimeout(resolve, 1000));
+		const discord = axios({
+			method: "POST",
+			url: process.env["CRASHREPORT_WEBHOOK"],
+			headers: {
+				"Content-Type": "application/json",
+			},
+			data: JSON.stringify({
+				content: "**SNAKEY MOUSE CRASHED**\n<@138345057072840704>```json\n" + err.stack + "\n```",
+			}),
+		}).then(() => console.log("sent crash report"));
+		await Promise.all([discord, Promise.race([shutdown, timeout])]);
+	} catch (e) {
+		console.error("Couldn't send to discord:", e);
+		try {
+			writeFileSync(`/errors/${new Date().toISOString()}.txt`, JSON.stringify(err.stack, null, 2));
+		} finally {
+			process.exit(1);
+		}
+	}
+	process.exit(1);
+};
+
+process.on("uncaughtException", handleException);
+process.on("unhandledRejection", handleException);

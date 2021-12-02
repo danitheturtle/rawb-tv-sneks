@@ -11,6 +11,7 @@
   "keywords": [],
   "author": "danitheturtle",
   "dependencies": {
+    "axios": "^0.24.0",
     "core-js": "^3.10.1",
     "engine": "workspace:*",
     "env": "workspace:*",

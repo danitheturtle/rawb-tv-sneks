@@ -154,17 +154,13 @@ export class Player extends GameObject {
   }
 
   update() {
-    if (this.dead) {
-
-    } else {
-      //accelerate towards moveHeading, clamp speed
-      this.accel = this.moveHeading.clone().multiplyScalar(GLOBALS.baseAccelSpeed);
-      // this.accel = this.vel.clone().normalize();
-      // // console.dir(`${this.moveHeading.angleDeg()} ${this.accel.angleDeg()}`)
-      // const angleDiff = (180+this.moveHeading.angleDeg()) - (180+this.accel.angleDeg());
-      // const angleDir = angleDiff > 0 ? 1 : -1;
-      // const clampedDegToRotate = clamp(Math.abs(angleDiff), 0, 90)*angleDir;
-      // this.accel.rotateDeg(clampedDegToRotate).multiplyScalar(GLOBALS.baseAccelSpeed);
+    if (!this.dead) {
+      //Rotate towards heading, clamp degrees so you can't turn around on the spot
+      this.accel = this.vel.clone().normalize();
+      const angleDiff = (180+this.moveHeading.angleDeg()) - (180+this.accel.angleDeg());
+      const angleDir = angleDiff > 0 ? 1 : -1;
+      const clampedDegToRotate = clamp(Math.abs(angleDiff), 0, 90)*(Math.abs(angleDiff) > 180 ? -angleDir : angleDir);
+      this.accel.rotateDeg(clampedDegToRotate).multiplyScalar(GLOBALS.baseAccelSpeed);
       //Add acceleration to the velocity scaled by dt.  Limit the velocity so collisions don't break
       this.vel.add(this.accel.multiplyScalar(time.dt()));
       //limit velocity with current max speed (squared since its cheaper)
@@ -189,12 +185,34 @@ export class Player extends GameObject {
       //Reset acceleration
       this.accel = new Vector(0.0, 0.0);
       this.collider?.update();
+      
+      //If player is out of bounds, kill them
+      if (this.isOutOfBounds()) {
+        this.die();
+      }
     }
   }
 
   die() {
     this.dead = true;
     this.collider.setBodyPartCount(GLOBALS.initialSnakeSize);
+  }
+  
+  isOutOfBounds() {
+    const xMin = this.pos.x - this.collider.radius;
+    const yMin = this.pos.y - this.collider.radius;
+    const xMax = this.pos.x + this.collider.radius;
+    const yMax = this.pos.y + this.collider.radius;
+    if (
+      xMin < 0 ||
+      yMin < 0 ||
+      xMax > this.gameStateRef.level?.activeLevelData.guWidth || 
+      yMax > this.gameStateRef.level?.activeLevelData.guHeight
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   getData() {

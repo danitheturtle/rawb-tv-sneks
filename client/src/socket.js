@@ -46,7 +46,7 @@ export const init = (_state) => {
   
   //Listen for player death
   socket.on('playerDied', (clientId) => {
-    sg.players[clientId].die();
+    sg.players[clientId]?.die();
   })
 
   //Listen for game state changes
