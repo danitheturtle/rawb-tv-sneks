@@ -32,6 +32,8 @@ export class ClientState extends State {
       connecting: false,
       //Has the player joined the game
       joinedGame: false,
+      //Is the player joining
+      joiningGame: false,
       //array of promises for asset loading progress bar
       loading: [],
       //How many total assets are loading at runtime?

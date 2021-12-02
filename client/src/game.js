@@ -152,9 +152,10 @@ const updateStartScreen = () => {
 }
 
 const updateConnecting = () => {
-  if (!sg.joinedGame) {
+  if (!sg.joinedGame && !sg.joiningGame) {
     //Tell the server to add a new player
     socket.createNewPlayer();
+    sg.joiningGame = true;
   }
   const c = s.ctx;
   c.fillStyle = "white";

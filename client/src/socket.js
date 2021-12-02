@@ -88,6 +88,7 @@ export const init = (_state) => {
     sg.clientId = _clientId;
     //getting an ID means game has been joined
     sg.joinedGame = true;
+    sg.joiningGame = false;
   });
 
   socket.on('loadLevel', (levelName) => {
