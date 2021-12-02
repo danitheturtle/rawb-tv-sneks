@@ -2,7 +2,7 @@ import Victor from 'victor';
 import * as physics from './physics';
 import * as time from './time';
 import { GameObject, CircleCollider } from './physicsObjects';
-import { randomVec, norm, lerp, clamp } from './utils';
+import { randomVec, randomInt, norm, lerp, clamp } from './utils';
 import { GLOBALS } from './state';
 const Vector = Victor;
 
@@ -192,11 +192,6 @@ export class Player extends GameObject {
       }
     }
   }
-
-  die() {
-    this.dead = true;
-    this.collider.setBodyPartCount(GLOBALS.initialSnakeSize);
-  }
   
   isOutOfBounds() {
     const xMin = this.pos.x - this.collider.radius;
@@ -214,10 +209,19 @@ export class Player extends GameObject {
       return false;
     }
   }
+  
+  die() {
+    this.dead = true;
+  }
+  
+  respawn() {
+    this.dead = false;
+  }
 
   getData() {
     return {
       ...super.getData(),
+      dead: this.dead,
       time: this.gameStateRef.time.clientTimers[this.id],
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
@@ -229,6 +233,7 @@ export class Player extends GameObject {
 
   setData(data) {
     super.setData(data, this.gameStateRef.time.clientTimers[data.id] - data.time);
+    this.dead = data.dead;
     this.moveHeading = new Vector(data.moveHeadingX, data.moveHeadingY);
     this.sprint = data.sprint;
     this.sprintTimer = data.sprintTimer;

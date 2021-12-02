@@ -2,9 +2,10 @@ import engine from 'engine';
 import Victor from 'victor';
 import * as levelLoader from './serverLevelLoader';
 import * as scoring from './serverScoring';
-import { ServerState, SERVER_STATES } from './serverState';
+import { ServerState, SERVER_STATES} from './serverState';
 const Vector = Victor;
 const {
+  GLOBALS,
   time,
   utils,
   physics,
@@ -12,7 +13,8 @@ const {
   CircleCollider,
   GameObject,
   Player,
-  SnakeCollider
+  SnakeCollider,
+  Pickup
 } = engine;
 
 // ref variables so I can type quicker
@@ -54,10 +56,10 @@ export const updateGame = () => {
 
   //Update all players
   for (const clientId in players) {
-    // if (players[clientId].dead) continue;
+    if (players[clientId].dead) continue;
     //find collision with other players
     for (const otherId in players) {
-      if (otherId === clientId) continue;
+      if (otherId === clientId || players[otherId].dead) continue;
       if (players[clientId].collider.checkCollisionWithOtherSnake(players[otherId].collider)) {
         players[otherId].die();
         state.io.emit('playerDied', otherId);
@@ -72,6 +74,30 @@ export const updateGame = () => {
         delete sp.gameObjects[pickupId];
         delete sg.pickups[pickupId];
       }
+    }
+  }
+  //Reset dead players and spawn pickups where they died
+  for (const clientId in players) {
+    if (players[clientId].dead) {
+      const deadPlayer = players[clientId];
+      const pickupPoints = deadPlayer.collider.pointPath;
+      for (let i=0; i<pickupPoints.length; i++) {
+        const newPickup = new Pickup(
+          state, 
+          sp.lastGameObjectID++,
+          pickupPoints[i].clone(), 
+          1,
+          new CircleCollider(1)
+        );
+        sg.pickups[newPickup.id] = newPickup;
+        sg.newPickups.push(newPickup);
+      }
+      deadPlayer.pos = new Vector(utils.randomInt(5, sl.activeLevelData.guWidth - 5), utils.randomInt(5, sl.activeLevelData.guHeight - 5));
+      deadPlayer.collider.pointPath = [deadPlayer.pos.clone()];
+      deadPlayer.collider.parts = [];
+      deadPlayer.collider.setBodyPartCount(GLOBALS.initialSnakeSize);
+      deadPlayer.collider.radius = deadPlayer.collider.initialRadius;
+      players[clientId].respawn();
     }
   }
   scoring.update();

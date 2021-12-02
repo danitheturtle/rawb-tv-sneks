@@ -43,11 +43,10 @@ export const init = (_state) => {
     delete st.clientTimers[clientId];
     delete sg.players[clientId];
   });
-  
-  //Listen for player death
+
   socket.on('playerDied', (clientId) => {
     sg.players[clientId]?.die();
-  })
+  });
 
   //Listen for game state changes
   socket.on("updateGameState", (newState) => {
@@ -126,7 +125,7 @@ export const init = (_state) => {
         );
       }
       //If the player is not the client player
-      if (sg.clientId == clientId) {
+      if (sg.clientId == clientId && !sg.players[clientId].dead) {
         //Set data but remain client-authoritative
         sg.players[clientId].setClientData(data[clientId]);
       } else {
