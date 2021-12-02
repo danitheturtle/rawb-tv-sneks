@@ -5,7 +5,9 @@ This is a slither.io clone for rawb.tv so we can all play together and add lots 
 _____
 #### Running Locally
 This should be fairly straightforward. You'll need yarn 3. Next, duplicate `/env/.env` into files 
-called `.env.development` and `.env.production`, letting you change version settings. 
+called `.env.development` and `.env.production`, letting you change version settings.
+By default, the dockerfile is set up for a production build on port 80. You'll have to edit all 
+the ports in the `.env.production` file to `80` as well.
 
 Then from the project root:
 ```
