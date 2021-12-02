@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
   //Bind createNewPlayer for when the client requests a player
   socket.on('createNewPlayer', (clientPlayerData) => {
     //Add a new player to the game and store the ID on this socket
-    socket.playerID = game.addNewPlayer(socket, clientPlayerData);
+    socket.clientId = game.addNewPlayer(socket, clientPlayerData);
   
     //Listen to player updates from the client
     socket.on('updatePlayer', (data) => {
@@ -37,7 +37,7 @@ io.on('connection', (socket) => {
     //Only bind disconnect if the player was created in the first place
     //Disconnect the player
     socket.on('disconnect', () => {
-      game.disconnectPlayer(socket.playerID);
+      game.disconnectPlayer(socket.clientId);
     });
   });
 });

@@ -7,8 +7,9 @@ import { GLOBALS } from './state';
 const Vector = Victor;
 
 export class SnakeCollider extends CircleCollider {
-  constructor(_radius, _bodyPartCount = GLOBALS.initialSnakeSize) {
-    super(_radius);
+  constructor(_initialRadius, _bodyPartCount = GLOBALS.initialSnakeSize) {
+    super(_initialRadius);
+    this.initialRadius = _initialRadius;
     this.bodyPartCount = _bodyPartCount;
     this.pointPath = [];
     this.parts = [];
@@ -17,6 +18,8 @@ export class SnakeCollider extends CircleCollider {
   }
 
   update() {
+    //Update radius based on score
+    this.radius = this.initialRadius + Math.min(this.bodyPartCount / 100, 8);
     //have we reached radius*parent.bodySpacing distance from last set snake point?
     const scaledRadiusDist = this.radius * this.parent.bodySpacing;
     const lastPointToPlayerPos = this.parent.pos.clone().subtract(this.pointPath[0]);
@@ -114,7 +117,7 @@ export class SnakeCollider extends CircleCollider {
   getData() {
     return {
       type: this.type,
-      radius: this.radius,
+      initialRadius: this.initialRadius,
       bodyPartCount: this.bodyPartCount,
       pointPath: this.pointPath.map(p => ([p.x, p.y])),
       parts: this.parts.map(p => [p.x, p.y])
@@ -124,7 +127,7 @@ export class SnakeCollider extends CircleCollider {
   setData(_data, _parent) {
     this.parent = _parent;
     this.type = _data.type;
-    this.radius = _data.radius;
+    this.initialRadius = _data.initialRadius;
     this.bodyPartCount = _data.bodyPartCount;
     this.pointPath = _data.pointPath.map(p => (new Vector(p[0], p[1])));
     this.parts = _data.parts.map(p => (new Vector(p[0], p[1])));
@@ -133,9 +136,7 @@ export class SnakeCollider extends CircleCollider {
 
 export class Player extends GameObject {
   constructor(_gameStateRef, _clientId, _pos, _vel, _accel, _collider, _renderer) {
-    super(_gameStateRef, _pos, _vel, _accel, _collider, _renderer)
-    //Store their ID
-    this.clientId = _clientId;
+    super(_gameStateRef, _clientId, _pos, _vel, _accel, _collider, _renderer);
     //Did the player recently die?
     this.dead = false;
 
@@ -199,8 +200,7 @@ export class Player extends GameObject {
   getData() {
     return {
       ...super.getData(),
-      clientId: this.clientId,
-      time: this.gameStateRef.time.clientTimers[this.clientId],
+      time: this.gameStateRef.time.clientTimers[this.id],
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
@@ -210,12 +210,11 @@ export class Player extends GameObject {
   }
 
   setData(data) {
-    super.setData(data, this.gameStateRef.time.clientTimers[data.clientId] - data.time);
-    this.clientId = data.clientId;
+    super.setData(data, this.gameStateRef.time.clientTimers[data.id] - data.time);
     this.moveHeading = new Vector(data.moveHeadingX, data.moveHeadingY);
     this.sprint = data.sprint;
     this.sprintTimer = data.sprintTimer;
-    this.gameStateRef.time.clientTimers[data.clientId] = data.time;
+    this.gameStateRef.time.clientTimers[data.id] = data.time;
     this.spriteName = data.spriteName;
     if (this.renderer) {
       this.renderer.spriteName = this.spriteName;
@@ -223,6 +222,6 @@ export class Player extends GameObject {
   }
 
   setClientData(data) {
-    this.gameStateRef.time.clientTimers[data.clientId] = data.time;
+    this.gameStateRef.time.clientTimers[data.id] = data.time;
   }
 }

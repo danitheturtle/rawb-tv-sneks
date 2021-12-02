@@ -16,6 +16,8 @@ export class PlayerRenderer {
   }
   draw() {
     if (!this.parent || !this.parent?.collider) return;
+    //update radius based on length
+    this.radius = this.parent.collider.radius * 1.5;
     //Grab player sprites
     const playerHead = si.sprites[`${this.spriteName}Head`];
     const playerBody = si.sprites[`${this.spriteName}Body`];
@@ -37,11 +39,13 @@ export class PlayerRenderer {
           this.radius * sg.gu * 2
         );
       } else {
+        c.translate(pos.x, pos.y);
+        c.rotate(snakeBodyRelativePositions[i-1].clone().subtract(pos).horizontalAngle()+Math.PI/2);
         playerBody.draw(
           s, 
           c, 
-          pos.x - this.radius * sg.gu, 
-          pos.y - this.radius * sg.gu, 
+          -this.radius * sg.gu, 
+          -this.radius * sg.gu, 
           this.radius * sg.gu * 2, 
           this.radius * sg.gu * 2
         );

@@ -114,9 +114,9 @@ export class BoxCollider extends Collider {
 }
 
 export class GameObject {
-  constructor(_gameStateRef, _pos, _vel = new Vector(0.0, 0.0), _accel = new Vector(0.0, 0.0), _collider = new CircleCollider(2), _renderer = undefined) {
+  constructor(_gameStateRef, _id, _pos, _vel = new Vector(0.0, 0.0), _accel = new Vector(0.0, 0.0), _collider = new CircleCollider(2), _renderer = undefined) {
     this.gameStateRef = _gameStateRef;
-    this.id = this.gameStateRef.physics.lastGameObjectID++;
+    this.id = _id;
     this.pos = _pos;
     this.vel = _vel;
     this.accel = _accel;
@@ -165,6 +165,10 @@ export class GameObject {
     }
   }
   setData(data, timeDelta = 0) {
+    //If id is unset, set it
+    if (!this.id) {
+      this.id = data.id;
+    }
     //Calculate new pos based on latency
     let newPos = new Vector(data.x + data.velX * timeDelta, data.y + data.velY * timeDelta);
     //If the changed distance is less than 1gu, lerp it

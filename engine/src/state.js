@@ -37,10 +37,7 @@ export class State {
     };
     //Physics state
     this.physics = {
-      //Game object unique ID tracker
-      lastGameObjectID: 0,
-      //Game Objects
-      //TODO: Need a way to make game object ID server-authoritative
+      //Game Objects. Game object ID will be set by the server
       gameObjects: {}
     };
     //Timer state

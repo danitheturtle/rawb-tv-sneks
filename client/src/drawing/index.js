@@ -199,7 +199,9 @@ export const randomPalletteColor = () => {
 export const randomPlayerSprite = () => {
   const allSpriteNames = [
     "snakeyMousePlayer",
-    "jimmyTheSnakePlayer"
+    "jimmyTheSnakePlayer",
+    "dangerRatPlayer",
+    "evilMousePlayer"
   ];
   return allSpriteNames[utils.randomInt(0, allSpriteNames.length-1)];
 }

@@ -10,10 +10,14 @@ export class ServerState extends State {
     super(_io);
     this.game = {
       ...this.game,
-      //Last player to connect.  Every client gets a unique player ID
-      lastPlayerID: 0,
       newPickups: [],
       collectedPickups: []
     };
+    
+    this.physics = {
+      ...this.physics,
+      //Game object unique ID tracker
+      lastGameObjectID: 0,
+    }
   }
 }

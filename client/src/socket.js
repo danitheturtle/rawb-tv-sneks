@@ -21,9 +21,9 @@ export const init = (_state) => {
   //Listen for new players
   socket.on('newPlayer', (data) => {
     //Add the new player to the list
-    sg.players[data.clientId] = new Player(
+    sg.players[data.id] = new Player(
       s,
-      data.clientId,
+      data.id,
       new Vector(data.x, data.y),
       new Vector(data.velX, data.velY),
       new Vector(data.accelX, data.accelY),
@@ -31,16 +31,16 @@ export const init = (_state) => {
       new PlayerRenderer(3, data.spriteName)
     );
     //Start a client timer for that player
-    time.startClientTimer(data.clientId, data.time);
+    time.startClientTimer(data.id, data.time);
     //Set that player's data in the game state
-    sg.players[data.clientId].setData(data);
+    sg.players[data.id].setData(data);
   });
 
   //Listen for players leaving
   socket.on('removePlayer', (clientId) => {
     //Remove that player from the state
-    delete sp.gameObjects[sg.players[clientId].id];
-    delete st.clientTimers[sg.players[clientId]];
+    delete sp.gameObjects[clientId];
+    delete st.clientTimers[clientId];
     delete sg.players[clientId];
   });
   
@@ -58,9 +58,9 @@ export const init = (_state) => {
     s.time.timers.gameTimer = newState.gameTimer;
     s.time.timers.gameOverTimer = newState.gameOverTimer;
     newState.newPickups?.forEach(pickup => {
-      sg.pickups[pickup.pickupId] = new Pickup(
+      sg.pickups[pickup.id] = new Pickup(
         s, 
-        pickup.pickupId, 
+        pickup.id, 
         new Vector(pickup.x, pickup.y), 
         pickup.worth, 
         new CircleCollider(1), 
@@ -68,12 +68,12 @@ export const init = (_state) => {
       );
     });
     newState.collectedPickups?.forEach(collectedPickup => {
-      if (sg.pickups[collectedPickup.pickupId]) {
-        delete sp.gameObjects[sg.pickups[collectedPickup.pickupId].id];
-        delete sg.pickups[collectedPickup.pickupId];
+      if (sg.pickups[collectedPickup.id]) {
+        delete sp.gameObjects[collectedPickup.id];
+        delete sg.pickups[collectedPickup.id];
         sg.players[collectedPickup.collectedBy].collider.increaseBodyPartCount(collectedPickup.worth)
       }
-    })
+    });
   });
 
   //Resets the game when the server detects a reset game state
@@ -117,7 +117,7 @@ export const init = (_state) => {
         //Create that player
         sg.players[clientId] = new Player(
           s,
-          data[clientId].clientId,
+          clientId,
           new Vector(data[clientId].x, data[clientId].y),
           new Vector(data[clientId].velX, data[clientId].velY),
           new Vector(data[clientId].accelX, data[clientId].accelY),

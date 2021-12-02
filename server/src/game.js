@@ -2,7 +2,7 @@ import engine from 'engine';
 import Victor from 'victor';
 import * as levelLoader from './serverLevelLoader';
 import * as scoring from './serverScoring';
-import { ServerState, SERVER_STATES } from './state';
+import { ServerState, SERVER_STATES } from './serverState';
 const Vector = Victor;
 const {
   time,
@@ -54,7 +54,6 @@ export const updateGame = () => {
 
   //Update all players
   for (const clientId in players) {
-    players[clientId].update();
     // if (players[clientId].dead) continue;
     //find collision with other players
     for (const otherId in players) {
@@ -70,7 +69,7 @@ export const updateGame = () => {
         sg.pickups[pickupId].collectedBy = clientId;
         sg.collectedPickups.push(sg.pickups[pickupId]);
         players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
-        delete sp.gameObjects[sg.pickups[pickupId].id];
+        delete sp.gameObjects[pickupId];
         delete sg.pickups[pickupId];
       }
     }
@@ -89,8 +88,8 @@ export const updateNetwork = () => {
   //Grab player data to send to clients
   let playerData = {};
   for (const i in players) {
-    let curData = playerData[players[i].clientId] = players[i].getData();
-    curData.serverTime = st.clientTimers[players[i].clientId];
+    let curData = playerData[players[i].id] = players[i].getData();
+    curData.serverTime = st.clientTimers[players[i].id];
   }
   //Emit the full player list to the new client
   state.io.emit('allPlayers', playerData);
@@ -115,7 +114,7 @@ export const updateNetwork = () => {
  * their game client.
  */
 export const updatePlayerFromClient = (socket, data) => {
-  players[data.clientId].setData(data);
+  players[data.id].setData(data);
 }
 
 /**
@@ -124,24 +123,24 @@ export const updatePlayerFromClient = (socket, data) => {
 
 export const addNewPlayer = (socket, clientData) => {
   //Create an ID for this player
-  let clientId = sg.lastPlayerID++;
+  let newPlayerId = sp.lastGameObjectID++;
 
   //Create a new player object and store it in the array
-  players[clientId] = new Player(
+  players[newPlayerId] = new Player(
     state, 
-    clientId, 
+    newPlayerId, 
     new Vector(utils.randomInt(5, 70), utils.randomInt(5, 60)),
     new Vector(0.0, 0.0),
     new Vector(0.0, 0.0),
     new SnakeCollider(2)
   );
   Object.keys(clientData).forEach(key => {
-    players[clientId][key] = clientData[key];
+    players[newPlayerId][key] = clientData[key];
   });
-  time.startClientTimer(clientId, 0);
+  time.startClientTimer(newPlayerId, 0);
 
   //Emit the new player's id to their client
-  socket.emit('setClientID', clientId);
+  socket.emit('setClientID', newPlayerId);
   //Load the active level on the client, if there is one, and pickups
   if (sl.activeLevelData) {
     socket.emit('loadLevel', sl.activeLevelData.name)
@@ -149,18 +148,18 @@ export const addNewPlayer = (socket, clientData) => {
   }
 
   //Add server time to the response
-  let newPlayerData = players[clientId].getData();
-  newPlayerData.time = st.clientTimers[clientId];
+  let newPlayerData = players[newPlayerId].getData();
+  newPlayerData.time = st.clientTimers[newPlayerId];
   //Emit the new player to all connected clients
   state.io.emit('newPlayer', newPlayerData);
 
   //Return the new player's ID
-  return clientId;
+  return newPlayerId;
 }
 
 export const disconnectPlayer = (clientId) => {
   //Remove the player's Game Object
-  delete sp.gameObjects[players[clientId].id];
+  delete sp.gameObjects[clientId];
   //Remove the player's timer
   delete st.clientTimers[clientId];
   //Remove the player's data in the player array

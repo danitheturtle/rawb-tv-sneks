@@ -61,7 +61,9 @@ export class ClientState extends State {
         p1Spritesheet: assets.images.p1Spritesheet,
         cheeseSpritesheet: assets.images.cheeseSpritesheet,
         snakeyMousePlayerSpritesheet: assets.images.snakeyMousePlayerSpritesheet,
-        jimmyTheSnakePlayerSpritesheet: assets.images.jimmyTheSnakePlayerSpritesheet
+        jimmyTheSnakePlayerSpritesheet: assets.images.jimmyTheSnakePlayerSpritesheet,
+        evilMousePlayerSpritesheet: assets.images.evilMousePlayerSpritesheet,
+        dangerRatPlayerSpritesheet: assets.images.dangerRatPlayerSpritesheet
       },
       backgroundAssets: {
         defaultBackground: assets.images.defaultBackground,

@@ -21,7 +21,6 @@ export const start = () => {
 
 export const loadLevel = (levelName) => {
   levelLoader.loadLevel(levelName);
-  console.dir('levelName');
   sl.activeBackground = si.backgrounds[sl.activeLevelData.background];
   sv.active?.rescaleGU();
 }

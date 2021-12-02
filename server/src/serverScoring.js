@@ -3,16 +3,12 @@ import Victor from 'victor';
 const Vector = Victor;
 const { Pickup, GLOBALS, CircleCollider, utils } = engine;
 
-let s, sg, sl;
+let s, sg, sl, sp;
 export const init = (_state) => {
   s = _state;
   sg = s.game;
   sl = s.level;
-}
-
-let nextPickupId = 0;
-export const getNextPickupId = () => {
-  return nextPickupId++;
+  sp = s.physics;
 }
 
 let loopCount = 0;
@@ -22,7 +18,7 @@ export const update = () => {
   if (loopCount % (3600 / GLOBALS.numPickupsPerMinute) === 0 && Object.keys(sg.pickups).length < GLOBALS.pickupCap) {
     const newPickup = new Pickup(
       s, 
-      getNextPickupId(),
+      sp.lastGameObjectID++,
       new Vector(
         utils.randomRange(0, s.level.activeLevelData.guWidth), 
         utils.randomRange(0, s.level.activeLevelData.guHeight)
