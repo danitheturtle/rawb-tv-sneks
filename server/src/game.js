@@ -68,11 +68,13 @@ export const updateGame = () => {
     //Detect pickups
     for (const pickupId in sg.pickups) {
       if (players[clientId].collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
-        sg.pickups[pickupId].collectedBy = clientId;
-        sg.collectedPickups.push(sg.pickups[pickupId]);
-        players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
-        delete sp.gameObjects[pickupId];
-        delete sg.pickups[pickupId];
+        if (!sg.pickups[pickupId].collectedBy) {
+          sg.pickups[pickupId].collectedBy = clientId;
+          sg.collectedPickups.push(sg.pickups[pickupId]);
+          players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
+          delete sp.gameObjects[pickupId];
+          delete sg.pickups[pickupId];
+        }
       }
     }
   }
