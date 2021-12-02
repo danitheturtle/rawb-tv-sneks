@@ -88,8 +88,8 @@ export const updateNetwork = () => {
   //Grab player data to send to clients
   let playerData = {};
   for (const i in players) {
-    let curData = playerData[players[i].id] = players[i].getData();
-    curData.serverTime = st.clientTimers[players[i].id];
+    let curData = playerData[i] = players[i].getData();
+    curData.serverTime = st.clientTimers[i];
   }
   //Emit the full player list to the new client
   state.io.emit('allPlayers', playerData);
@@ -129,7 +129,7 @@ export const addNewPlayer = (socket, clientData) => {
   players[newPlayerId] = new Player(
     state, 
     newPlayerId, 
-    new Vector(utils.randomInt(5, 70), utils.randomInt(5, 60)),
+    new Vector(utils.randomInt(5, sl.activeLevelData.guWidth - 5), utils.randomInt(5, sl.activeLevelData.guHeight - 5)),
     new Vector(0.0, 0.0),
     new Vector(0.0, 0.0),
     new SnakeCollider(2)

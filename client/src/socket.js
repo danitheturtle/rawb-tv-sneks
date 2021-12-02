@@ -109,7 +109,6 @@ export const init = (_state) => {
   });
   
   socket.on('allPlayers', function(data) {
-    // console.dir(data);
     //Loop through every player in the data
     for (const clientId in data) {
       //If a player sent by the server doesn't exist on the client
@@ -143,6 +142,7 @@ export const start = () => {
 }
 
 export const createNewPlayer = () => {
+  console.dir('joining game');
   //client-defined player data
   const clientPlayerData = { spriteName: drawing.randomPlayerSprite() };
   //notify server there is a new player

@@ -12,6 +12,10 @@ import dangerRatPlayerSpritesheet from './spritesheets/dangerRatPlayerSpriteshee
 import dangerRatPlayerSpritesheetData from './spritesheets/dangerRatPlayerSpritesheet.js';
 import evilMousePlayerSpritesheet from './spritesheets/evilMousePlayerSpritesheet.png';
 import evilMousePlayerSpritesheetData from './spritesheets/evilMousePlayerSpritesheet.js';
+import cheetohPlayerSpritesheet from './spritesheets/cheetohPlayerSpritesheet.png';
+import cheetohPlayerSpritesheetData from './spritesheets/cheetohPlayerSpritesheet.js';
+import moogliPlayerSpritesheet from './spritesheets/moogliPlayerSpritesheet.png';
+import moogliPlayerSpritesheetData from './spritesheets/moogliPlayerSpritesheet.js';
 import defaultBackground from './backgrounds/bg_grasslands.png';
 import dangerBackground from './backgrounds/bg_danger.png';
 import radicalBackground from './backgrounds/bg_radical.png';
@@ -26,6 +30,8 @@ const allAssets = {
     jimmyTheSnakePlayerSpritesheet: [jimmyTheSnakePlayerSpritesheet, jimmyTheSnakePlayerSpritesheetData],
     dangerRatPlayerSpritesheet: [dangerRatPlayerSpritesheet, dangerRatPlayerSpritesheetData],
     evilMousePlayerSpritesheet: [evilMousePlayerSpritesheet, evilMousePlayerSpritesheetData],
+    cheetohPlayerSpritesheet: [cheetohPlayerSpritesheet, cheetohPlayerSpritesheetData],
+    moogliPlayerSpritesheet: [moogliPlayerSpritesheet, moogliPlayerSpritesheetData],
     defaultBackground: [defaultBackground, {}],
     radicalBackground: [radicalBackground, {}],
     dangerBackground: [dangerBackground, {}],

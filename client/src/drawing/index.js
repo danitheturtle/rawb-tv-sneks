@@ -201,7 +201,9 @@ export const randomPlayerSprite = () => {
     "snakeyMousePlayer",
     "jimmyTheSnakePlayer",
     "dangerRatPlayer",
-    "evilMousePlayer"
+    "evilMousePlayer",
+    "cheetohPlayer",
+    "moogliPlayer"
   ];
   return allSpriteNames[utils.randomInt(0, allSpriteNames.length-1)];
 }
