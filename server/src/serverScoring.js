@@ -31,7 +31,8 @@ export const update = () => {
   
   //remove extra pickups
   while (Object.keys(sg.pickups).length > GLOBALS.pickupCap) {
-    const toRemove = sg.pickups[utils.randomInt(0, Object.keys(sg.pickups).length-1)];
+    const allPickupKeys = Object.keys(sg.pickups);
+    const toRemove = sg.pickups[allPickupKeys[utils.randomInt(0, allPickupKeys.length-1)]];
     delete sp.gameObjects[toRemove.id];
     delete sg.pickups[toRemove.id];
   }

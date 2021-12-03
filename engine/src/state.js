@@ -12,7 +12,7 @@ export const GLOBALS = {
   startCountdownLength: 15,
   initialViewScale: 120,
   initialSnakeSize: 5,
-  numPickupsPerMinute: 50,
+  numPickupsPerMinute: 600,
   pickupCap: 500,
   baseMoveSpeed: 20,
   baseAccelSpeed: 80,
