@@ -9,9 +9,9 @@ export const init = (_state) => {
   si = s.image;
 }
 export class PlayerRenderer {
-  constructor(_radius, _spriteName) {
-    this.radius = _radius;
-    this.spriteName = _spriteName;
+  constructor() {
+    this.radius = 3;
+    this.spriteName = undefined;
     this.parent = undefined;
   }
   draw() {
@@ -60,8 +60,9 @@ export class PlayerRenderer {
     };
   }
   setData(_data, _parent) {
-    this.radius = _data.radius;
-    this.parent = _parent;
-    this.spriteName = _data.spriteName || _parent.spriteName;
+    this.radius = _data.radius !== undefined ? _data.radius : this.radius;
+    this.parent = _parent !== undefined ? _parent : this.parent;
+    this.spriteName = _data.spriteName || _parent.spriteName || this.spriteName;
+    return this;
   }
 }

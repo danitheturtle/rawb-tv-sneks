@@ -26,14 +26,15 @@ export class Collider {
   }
 
   setData(_data, _parent) {
-    this.parent = _parent
+    this.parent = _parent !== undefined ? _parent : this.parent;
+    return this;
   }
 }
 
 export class CircleCollider extends Collider {
-  constructor(_radius) {
+  constructor() {
     super();
-    this.radius = _radius;
+    this.radius = 2;
     this.type = "circle";
   }
 
@@ -45,16 +46,17 @@ export class CircleCollider extends Collider {
   }
 
   setData(_data, _parent) {
-    this.radius = _data?.radius;
-    this.parent = _parent;
+    super.setData(_data, _parent);
+    this.radius = _data.radius !== undefined ? _data.radius : this.radius;
+    return this;
   }
 }
 
 export class BoxCollider extends Collider {
-  constructor(_width, _height) {
+  constructor() {
     super();
-    this.width = _width;
-    this.height = _height;
+    this.width = 1;
+    this.height = 1;
     this.type = "boundingBox";
   }
 
@@ -107,27 +109,40 @@ export class BoxCollider extends Collider {
   }
 
   setData(_data, _parent) {
-    this.width = _data.width;
-    this.height = _data.height;
-    this.parent = _parent;
+    this.width = _data.width !== undefined ? _data.width : this.width;
+    this.height = _data.height !== undefined ? _data.height : this.height;
+    this.parent = _parent !== undefined ? _parent : this.parent;
+    return this;
   }
 }
 
 export class GameObject {
-  constructor(_gameStateRef, _id, _pos, _vel = new Vector(0.0, 0.0), _accel = new Vector(0.0, 0.0), _collider = new CircleCollider(2), _renderer = undefined) {
+  constructor(_gameStateRef) {
     this.gameStateRef = _gameStateRef;
-    this.id = _id;
-    this.pos = _pos;
-    this.vel = _vel;
-    this.accel = _accel;
+    this.id = undefined;
+    this.pos = new Vector(0,0);
+    this.vel = new Vector(0,0);
+    this.accel = new Vector(0,0);
     this.hasCollisions = true;
+    this.collider = undefined;
+    this.renderer = undefined;
+  }
+  
+  assignId(_id) {
+    this.id = _id;
+    return this;
+  }
+  
+  addCollider(_collider) {
     this.collider = _collider;
-    this.renderer = _renderer;
     this.collider.parent = this;
-    if (this.renderer) {
-      this.renderer.parent = this;
-    }
-    this.gameStateRef.physics.gameObjects[this.id] = this;
+    return this;
+  }
+  
+  addRenderer(_renderer) {
+    this.renderer = _renderer;
+    this.renderer.parent = this;
+    return this;
   }
 
   update() {
@@ -160,30 +175,23 @@ export class GameObject {
       accelX: this.accel.x,
       accelY: this.accel.y,
       hasCollisions: this.hasCollisions,
-      collider: this.collider.getData(),
+      collider: this.collider?.getData(),
       renderer: this.renderer?.getData()
     }
   }
-  setData(data, timeDelta = 0) {
+  setData(data) {
     //If id is unset, set it
     if (!this.id) {
       this.id = data.id;
     }
-    //Calculate new pos based on latency
-    let newPos = new Vector(data.x + data.velX * timeDelta, data.y + data.velY * timeDelta);
-    //If the changed distance is less than 1gu, lerp it
-    if (newPos.distanceSq(this.pos) < 1) {
-      this.pos = new Vector(data.x + data.velX * timeDelta, data.y + data.velY * timeDelta).mix(this.pos, 0.5);
-      //Otherwise, just set the position
-    } else {
-      this.pos = newPos;
-    }
-    this.vel.x = data.velX;
-    this.vel.y = data.velY;
-    this.accel.x = data.accelX;
-    this.accel.y = data.accelY;
-    this.hasCollisions = data.hasCollisions;
-    if (!this.collider) {
+    this.pos.x = data.x !== undefined ? data.x : this.pos.x;
+    this.pos.y = data.y !== undefined ? data.y : this.pos.y;
+    this.vel.x = data.velX !== undefined ? data.velX : this.vel.x;
+    this.vel.y = data.velY !== undefined ? data.velY : this.vel.y;
+    this.accel.x = data.accelX !== undefined ? data.accelX : this.accel.x;
+    this.accel.y = data.accelY !== undefined ? data.accelY : this.accel.y;
+    this.hasCollisions = data.hasCollisions !== undefined ? data.hasCollisions : this.hasCollisions;
+    if (!this.collider && data.collider) {
       switch (data.collider.type) {
         case 'circle':
         this.collider = new CircleCollider().setData(data.collider, this);
@@ -195,11 +203,12 @@ export class GameObject {
         this.collider = new Collider().setData(data.collider, this);
         break;
       }
-    } else {
+    } else if (data.collider) {
       this.collider.setData(data.collider, this);
     }
     if (data.renderer) {
       this.renderer?.setData(data.renderer, this);
     }
+    return this;
   }
 }

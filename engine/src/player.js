@@ -7,10 +7,10 @@ import { GLOBALS } from './state';
 const Vector = Victor;
 
 export class SnakeCollider extends CircleCollider {
-  constructor(_initialRadius, _bodyPartCount = GLOBALS.initialSnakeSize) {
-    super(_initialRadius);
-    this.initialRadius = _initialRadius;
-    this.bodyPartCount = _bodyPartCount;
+  constructor() {
+    super();
+    this.initialRadius = 2;
+    this.bodyPartCount = GLOBALS.initialSnakeSize;
     this.pointPath = [];
     this.parts = [];
     this.type = 'snake';
@@ -18,6 +18,8 @@ export class SnakeCollider extends CircleCollider {
   }
 
   update() {
+    if (!this.parent) return;
+    if (this.pointPath.length < 1) { this.pointPath.push(this.parent.pos.clone()); }
     //Update radius based on score
     this.radius = this.initialRadius + Math.min(this.bodyPartCount / 100, 8);
     //have we reached radius*parent.bodySpacing distance from last set snake point?
@@ -130,18 +132,19 @@ export class SnakeCollider extends CircleCollider {
   }
 
   setData(_data, _parent) {
-    this.parent = _parent;
-    this.type = _data.type;
-    this.initialRadius = _data.initialRadius;
-    this.bodyPartCount = _data.bodyPartCount;
-    this.pointPath = _data.pointPath.map(p => (new Vector(p[0], p[1])));
-    this.parts = _data.parts.map(p => (new Vector(p[0], p[1])));
+    this.parent = _parent !== undefined ? _parent : this.parent;
+    this.type = _data.type !== undefined ? _data.type : this.type;
+    this.initialRadius = _data.initialRadius !== undefined ? _data.initialRadius : this.initialRadius;
+    this.bodyPartCount = _data.bodyPartCount !== undefined ? _data.bodyPartCount : this.bodyPartCount;
+    this.pointPath = _data.pointPath !== undefined ? _data.pointPath.map(p => (new Vector(p[0], p[1]))) : this.pointpath;
+    this.parts = _data.parts !== undefined ? _data.parts.map(p => (new Vector(p[0], p[1]))) : this.parts;
+    return this;
   }
 }
 
 export class Player extends GameObject {
-  constructor(_gameStateRef, _clientId, _pos, _vel, _accel, _collider, _renderer) {
-    super(_gameStateRef, _clientId, _pos, _vel, _accel, _collider, _renderer);
+  constructor(_gameStateRef) {
+    super(_gameStateRef);
     //Did the player recently die?
     this.dead = false;
     this.respawning = false;
@@ -153,7 +156,6 @@ export class Player extends GameObject {
 
     //snake data
     this.bodySpacing = 1.75;
-    this.collider.pointPath.push(this.pos.clone());
     
     //Player sprite
     this.spriteName = null;
@@ -229,7 +231,6 @@ export class Player extends GameObject {
       ...super.getData(),
       dead: this.dead,
       respawning: this.respawning,
-      time: this.gameStateRef.time.clientTimers[this.id],
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
@@ -238,21 +239,23 @@ export class Player extends GameObject {
     };
   }
 
-  setData(data) {
-    super.setData(data, this.gameStateRef.time.clientTimers[data.id] - data.time);
-    this.dead = data.dead;
-    this.respawning = data.respawning;
-    this.moveHeading = new Vector(data.moveHeadingX, data.moveHeadingY);
-    this.sprint = data.sprint;
-    this.sprintTimer = data.sprintTimer;
-    this.gameStateRef.time.clientTimers[data.id] = data.time;
-    this.spriteName = data.spriteName;
+  setData(_data) {
+    super.setData(_data);
+    this.dead = _data.dead !== undefined ? _data.dead : this.dead;
+    this.respawning = _data.respawning !== undefined ? _data.respawning : this.respawning;
+    this.moveHeading = new Vector(
+      _data.moveHeadingX !== undefined ? _data.moveHeadingX : this.moveHeading.x, 
+      _data.moveHeadingY !== undefined ? _data.moveHeadingY : this.moveHeading.y
+    );
+    this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
+    this.sprintTimer = _data.sprintTimer !== undefined ? _data.sprintTimer : this.sprintTimer;
+    this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
     if (this.renderer) {
       this.renderer.spriteName = this.spriteName;
     }
+    return this;
   }
 
   setClientData(data) {
-    this.gameStateRef.time.clientTimers[data.id] = data.time;
   }
 }

@@ -36,8 +36,8 @@ io.on('connection', (socket) => {
     });
     
     //Listen for a reset game call for debugging
-    socket.on('resetDebug', () => {
-      game.reset();
+    socket.on('resetDebug', (clientId) => {
+      game.reset(clientId);
     });
   
     //Only bind disconnect if the player was created in the first place

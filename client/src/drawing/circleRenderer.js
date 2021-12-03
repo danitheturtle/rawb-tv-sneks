@@ -8,9 +8,9 @@ export const init = (_state) => {
   sv = s.view;
 }
 export class CircleRenderer {
-  constructor(_radius, _color = "red") {
-    this.radius = _radius;
-    this.color = _color;
+  constructor() {
+    this.radius = 2;
+    this.color = undefined;
     this.parent = undefined;
   }
   draw() {
@@ -31,8 +31,8 @@ export class CircleRenderer {
     };
   }
   setData(_data, _parent) {
-    this.radius = _data.radius;
-    this.color = _data.color;
-    this.parent = _parent;
+    this.radius = _data.radius !== undefined ? _data.radius : this.radius;
+    this.color = _data.color !== undefined ? _data.color : this.color;
+    this.parent = _parent !== undefined ? _parent : this.parent;
   }
 }

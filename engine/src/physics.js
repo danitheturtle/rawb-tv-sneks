@@ -19,7 +19,6 @@ export const update = () => {
   for (const goID in sp.gameObjects) {
     const obj = sp.gameObjects[goID];
     //Update the object
-    // obj.applyCollisions(sp.gameObjects);
     obj.update();
   }
 }

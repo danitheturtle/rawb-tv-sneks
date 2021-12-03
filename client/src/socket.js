@@ -21,26 +21,16 @@ export const init = (_state) => {
   //Listen for new players
   socket.on('newPlayer', (data) => {
     //Add the new player to the list
-    sg.players[data.id] = new Player(
-      s,
-      data.id,
-      new Vector(data.x, data.y),
-      new Vector(data.velX, data.velY),
-      new Vector(data.accelX, data.accelY),
-      new SnakeCollider(2),
-      new PlayerRenderer(3, data.spriteName)
-    );
-    //Start a client timer for that player
-    time.startClientTimer(data.id, data.time);
-    //Set that player's data in the game state
-    sg.players[data.id].setData(data);
+    sp.gameObjects[data.id] = sg.players[data.id] = new Player(s)
+      .addCollider(new SnakeCollider())
+      .addRenderer(new PlayerRenderer())
+      .setData(data);
   });
 
   //Listen for players leaving
   socket.on('removePlayer', (clientId) => {
     //Remove that player from the state
     delete sp.gameObjects[clientId];
-    delete st.clientTimers[clientId];
     delete sg.players[clientId];
   });
 
@@ -57,8 +47,10 @@ export const init = (_state) => {
     }
   });
   
-  socket.on('collectedPickup', ({ clientId, worth }) => {
+  socket.on('collectedPickup', ({ clientId, pickupId, worth }) => {
     sg.players[clientId].collider.increaseBodyPartCount(worth);
+    delete sp.gameObjects[pickupId];
+    delete sg.pickups[pickupId];
   });
 
   //Listen for game state changes
@@ -79,36 +71,26 @@ export const init = (_state) => {
       delete sg.pickups[deletableId];
     });
     newPickupIds.forEach(newId => {
-      const newData = newState.pickups[newId];
       if (!sg.pickups[newId]) {
-        sg.pickups[newId] = new Pickup(
-          s,
-          newData.id,
-          new Vector(newData.x, newData.y),
-          newData.worth,
-          new CircleCollider(1),
-          new SpriteRenderer(1, "regularCheese")
-        );
+        sp.gameObjects[newId] = sg.pickups[newId] = new Pickup(s)
+          .addCollider(new CircleCollider())
+          .addRenderer(new SpriteRenderer())
+          .setData({
+            ...newState.pickups[newId],
+            renderer: { radius: 1, spriteName: "regularCheese" }
+          });
       }
-      sg.pickups[newId].setData(newData);
-    })
+    });
     //Update players
     //Loop through every player in the data
     for (const clientId in newState.players) {
       //If a player sent by the server doesn't exist on the client
       if (!sg.players[clientId]) {
-        const newPlayerData = newState.players[clientId];
         //Create that player
-        sg.players[clientId] = new Player(
-          s,
-          clientId,
-          new Vector(newPlayerData.x, newPlayerData.y),
-          new Vector(newPlayerData.velX, newPlayerData.velY),
-          new Vector(newPlayerData.accelX, newPlayerData.accelY),
-          new SnakeCollider(2),
-          new PlayerRenderer(3, newPlayerData.spriteName)
-        );
-        sg.players[clientId].setData(newPlayerData);
+        sp.gameObjects[clientId] = sg.players[clientId] = new Player(s)
+          .addCollider(new SnakeCollider())
+          .addRenderer(new PlayerRenderer())
+          .setData(newState.players[clientId]);
       } else {
         //If the player is not the client player
         if (sg.clientId == clientId) {
@@ -159,8 +141,6 @@ export const createNewPlayer = () => {
 export const updateClientPlayer = () => {
   //Get the client player data
   const playerData = sg.players[sg.clientId].getData();
-  //Grab the client's time
-  playerData.time = st.clientTimers[sg.clientId];
   //Emit an update
   socket.emit('updatePlayer', playerData);
 }
