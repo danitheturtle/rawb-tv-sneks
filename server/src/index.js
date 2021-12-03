@@ -34,6 +34,11 @@ io.on('connection', (socket) => {
     socket.on('updatePlayer', (data) => {
       game.updatePlayerFromClient(socket, data);
     });
+    
+    //Listen for a reset game call for debugging
+    socket.on('resetDebug', () => {
+      game.reset();
+    });
   
     //Only bind disconnect if the player was created in the first place
     //Disconnect the player

@@ -94,7 +94,7 @@ export const updateGame = () => {
   //Reset dead players and spawn pickups where they died
   for (const clientId in players) {
     const deadPlayer = players[clientId];
-    //If player isn't dead, or if code has already run for them
+    //If player isn't dead, or if code has already run for them, skip
     if (!deadPlayer.dead || (deadPlayer.dead && deadPlayer.respawning)) continue;
     deadPlayer.collider.pointPath?.forEach(point => {
       const newPickup = new Pickup(
@@ -150,6 +150,10 @@ export const updateNetwork = () => {
   };
   //Emit up-to-date game state to all clients
   state.io.emit('updateGameState', updatedGameState);
+}
+
+export const reset = () => {
+  scoring.reset();
 }
 
 /**

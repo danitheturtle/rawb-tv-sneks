@@ -29,6 +29,20 @@ export const update = () => {
     sg.pickups[newPickup.id] = newPickup;
   }
   
+  //remove extra pickups
+  while (Object.keys(sg.pickups).length > GLOBALS.pickupCap) {
+    const toRemove = sg.pickups[utils.randomInt(0, Object.keys(sg.pickups).length-1)];
+    delete sp.gameObjects[toRemove.id];
+    delete sg.pickups[toRemove.id];
+  }
+  
   loopCount++;
   loopCount = loopCount % 3600;
+}
+
+export const reset = () => {
+  Object.keys(sg.pickups).forEach(pickupId => {
+    delete sp.gameObjects[pickupId];
+    delete sg.pickups[pickupId];
+  });
 }

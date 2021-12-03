@@ -141,6 +141,10 @@ export const init = (_state) => {
 
 export const start = () => {}
 
+export const reset = () => {
+  socket.emit('resetDebug');
+}
+
 export const createNewPlayer = () => {
   console.dir('joining game');
   //client-defined player data
