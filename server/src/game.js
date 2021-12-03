@@ -89,7 +89,6 @@ export const updateGame = () => {
         pickupId: pickupId,
         worth: sg.pickups[pickupId].worth
       });
-      delete sp.gameObjects[pickupId];
       delete sg.pickups[pickupId];
     });
   }
@@ -100,8 +99,9 @@ export const updateGame = () => {
     //If player isn't dead, or if code has already run for them, skip
     if (!deadPlayer.dead || (deadPlayer.dead && deadPlayer.respawning)) continue;
     deadPlayer.collider.pointPath?.forEach(point => {
-      const newPickupId = sp.lastGameObjectID++;
-      sp.gameObjects[newPickupId] = sg.pickups[newPickupId] = new Pickup(state)
+      const newPickupId = `pickup-${point.x}-${point.y}`;
+      if (!sg.pickups[newPickupId]) { 
+        sp.gameObjects[newPickupId] = sg.pickups[newPickupId] = new Pickup(state)
         .addCollider(new CircleCollider())
         .setData({
           id: newPickupId,
@@ -111,6 +111,8 @@ export const updateGame = () => {
             radius: 1
           }
         });
+        state.io.emit('updatePickup', sg.pickups[newPickupId].getData());
+      }
     });
     deadPlayer.pos.x = utils.randomInt(5, sl.activeLevelData.guWidth - 5);
     deadPlayer.pos.y = utils.randomInt(5, sl.activeLevelData.guHeight - 5);
@@ -135,20 +137,13 @@ export const updateNetwork = () => {
     playerData[clientId] = sg.players[clientId].getData();
   }
   
-  //Grab all pickup data
-  let pickupData = {};
-  for (const pickupId in sg.pickups) {
-    pickupData[pickupId] = sg.pickups[pickupId].getData();
-  }
-  
   //Get game state data
   let updatedGameState = {
     gameState: sg.gameState,
     gameStartTimer: st.timers.gameStartTimer,
     gameTimer: st.timers.gameTimer,
     gameOverTimer: st.timers.gameOverTimer,
-    players: playerData,
-    pickups: pickupData
+    players: playerData
   };
   //Emit up-to-date game state to all clients
   state.io.emit('updateGameState', updatedGameState);
@@ -194,6 +189,8 @@ export const addNewPlayer = (socket, clientData) => {
   if (sl.activeLevelData) {
     socket.emit('loadLevel', sl.activeLevelData.name);
   }
+  //Emit all pickup objects
+  state.io.emit('allPickups', Object.values(sg.pickups).map(pickupRef => pickupRef.getData()))
   //Emit the new player to all connected clients
   state.io.emit('newPlayer', sg.players[newPlayerId].getData());
 

@@ -16,23 +16,30 @@ export const update = () => {
   if (!sl.activeLevelData) return;
   
   if (loopCount % (3600 / GLOBALS.numPickupsPerMinute) === 0) {
-    const newPickupId = sp.lastGameObjectID++;
-    sp.gameObjects[newPickupId] = sg.pickups[newPickupId]= new Pickup(s)
+    const newPos = {
+      x: utils.randomRange(0, s.level.activeLevelData.guWidth),
+      y: utils.randomRange(0, s.level.activeLevelData.guHeight)
+    }
+    const newPickupId = `pickup-${newPos.x}-${newPos.y}`;
+    if (sg.pickups[newPickupId]) { delete sg.pickups[newPickupId]; }
+    sp.gameObjects[newPickupId] = sg.pickups[newPickupId] = new Pickup(s)
       .addCollider(new CircleCollider())
       .setData({
         id: newPickupId,
-        x: utils.randomRange(0, s.level.activeLevelData.guWidth),
-        y: utils.randomRange(0, s.level.activeLevelData.guHeight),
+        x: newPos.x,
+        y: newPos.y,
         collider: {
           radius: 1
         }
       });
+    s.io.emit('updatePickup', sg.pickups[newPickupId].getData());
   }
   
   //remove extra pickups
   while (Object.keys(sg.pickups).length > GLOBALS.pickupCap) {
     const allPickupKeys = Object.keys(sg.pickups);
     const toRemove = sg.pickups[allPickupKeys[utils.randomInt(0, allPickupKeys.length-1)]];
+    s.io.emit('collectedPickup', { pickupId: toRemove.id });
     delete sp.gameObjects[toRemove.id];
     delete sg.pickups[toRemove.id];
   }
@@ -43,6 +50,7 @@ export const update = () => {
 
 export const reset = () => {
   Object.keys(sg.pickups).forEach(pickupId => {
+    s.io.emit('collectedPickup', { pickupId });
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];
   });

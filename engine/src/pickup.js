@@ -7,6 +7,7 @@ export class Pickup extends GameObject {
     super(_gameStateRef);
     this.worth = 1;
     this.collectedBy = undefined;
+    this.lastData = {};
   }
   
   getData() {
@@ -18,6 +19,7 @@ export class Pickup extends GameObject {
   }
   
   setData(_data) {
+    this.lastData = this.getData();
     super.setData(_data);
     this.worth = _data.worth !== undefined ? _data.worth : this.worth;
     this.collectedBy = _data.collectedBy !== undefined ? _data.collectedBy : this.collectedBy;

@@ -47,8 +47,34 @@ export const init = (_state) => {
     }
   });
   
+  const updatePickup = (pickupData) => {
+    if (sg.pickups[pickupData.id]) {
+      sg.pickups[pickupData.id].setData(pickupData);
+    } else {
+      sp.gameObjects[pickupData.id] = sg.pickups[pickupData.id] = new Pickup(s)
+        .addCollider(new CircleCollider())
+        .addRenderer(new SpriteRenderer())
+        .setData({
+          ...pickupData,
+          renderer: { radius: 1, spriteName: "regularCheese" }
+        });
+    }
+  }
+  
+  socket.on('allPickups', (pickupsData) => {
+    pickupsData.forEach(pickupData => {
+      updatePickup(pickupData);
+    });
+  });
+  
+  socket.on('updatePickup', (pickupData) => {
+    updatePickup(pickupData);
+  });
+  
   socket.on('collectedPickup', ({ clientId, pickupId, worth }) => {
-    sg.players[clientId].collider.increaseBodyPartCount(worth);
+    if (clientId) {
+      sg.players[clientId].collider.increaseBodyPartCount(worth);
+    }
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];
   });
@@ -61,26 +87,7 @@ export const init = (_state) => {
     s.time.timers.gameStartTimer = newState.gameStartTimer;
     s.time.timers.gameTimer = newState.gameTimer;
     s.time.timers.gameOverTimer = newState.gameOverTimer;
-    //get pickups again from server
-    const newPickupIds = Object.keys(newState.pickups);
-    const clientPickupIds = Object.keys(sg.pickups);
-    clientPickupIds.filter(cid => {
-      return !newPickupIds.includes(cid)
-    }).forEach(deletableId => {
-      delete sp.gameObjects[deletableId];
-      delete sg.pickups[deletableId];
-    });
-    newPickupIds.forEach(newId => {
-      if (!sg.pickups[newId]) {
-        sp.gameObjects[newId] = sg.pickups[newId] = new Pickup(s)
-          .addCollider(new CircleCollider())
-          .addRenderer(new SpriteRenderer())
-          .setData({
-            ...newState.pickups[newId],
-            renderer: { radius: 1, spriteName: "regularCheese" }
-          });
-      }
-    });
+    
     //Update players
     //Loop through every player in the data
     for (const clientId in newState.players) {

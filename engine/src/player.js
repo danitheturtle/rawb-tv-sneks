@@ -158,7 +158,10 @@ export class Player extends GameObject {
     this.bodySpacing = 1.75;
     
     //Player sprite
-    this.spriteName = null;
+    this.spriteName = undefined;
+    
+    //Data storage for diffing socket updates
+    this.lastData = undefined;
   }
 
   update() {
@@ -240,6 +243,7 @@ export class Player extends GameObject {
   }
 
   setData(_data) {
+    this.lastData = this.getData();
     super.setData(_data);
     this.dead = _data.dead !== undefined ? _data.dead : this.dead;
     this.respawning = _data.respawning !== undefined ? _data.respawning : this.respawning;
