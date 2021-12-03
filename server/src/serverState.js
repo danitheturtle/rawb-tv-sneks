@@ -8,12 +8,6 @@ export const SERVER_STATES = {
 export class ServerState extends State {
   constructor(_io) {
     super(_io);
-    this.game = {
-      ...this.game,
-      newPickups: [],
-      collectedPickups: []
-    };
-    
     this.physics = {
       ...this.physics,
       //Game object unique ID tracker

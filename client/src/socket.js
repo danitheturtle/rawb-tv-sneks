@@ -47,15 +47,19 @@ export const init = (_state) => {
   socket.on('playerDied', (clientId) => {
     sg.players[clientId]?.die();
   });
-  
+
   socket.on('playerRespawning', (data) => {
     sg.players[data.id].setData(data);
     sg.players[data.id].respawned();
-    if (data.id === sg.clientId) {
+    if (data.id == sg.clientId) {
       updateClientPlayer();
-      console.log('broadcasted respawn');
+      console.dir('broadcasted respawn');
     }
-  })
+  });
+  
+  socket.on('collectedPickup', ({ clientId, worth }) => {
+    sg.players[clientId].collider.increaseBodyPartCount(worth);
+  });
 
   //Listen for game state changes
   socket.on("updateGameState", (newState) => {
@@ -65,29 +69,57 @@ export const init = (_state) => {
     s.time.timers.gameStartTimer = newState.gameStartTimer;
     s.time.timers.gameTimer = newState.gameTimer;
     s.time.timers.gameOverTimer = newState.gameOverTimer;
-    newState.newPickups?.forEach(pickup => {
-      sg.pickups[pickup.id] = new Pickup(
-        s, 
-        pickup.id, 
-        new Vector(pickup.x, pickup.y), 
-        pickup.worth, 
-        new CircleCollider(1), 
-        new SpriteRenderer(1, "regularCheese")
-      );
+    //get pickups again from server
+    const newPickupIds = Object.keys(newState.pickups);
+    const clientPickupIds = Object.keys(sg.pickups);
+    clientPickupIds.filter(cid => {
+      return !newPickupIds.includes(cid)
+    }).forEach(deletableId => {
+      delete sp.gameObjects[deletableId];
+      delete sg.pickups[deletableId];
     });
-    newState.collectedPickups?.forEach(collectedPickup => {
-      if (sg.pickups[collectedPickup.id]) {
-        delete sp.gameObjects[collectedPickup.id];
-        delete sg.pickups[collectedPickup.id];
-        sg.players[collectedPickup.collectedBy].collider.increaseBodyPartCount(collectedPickup.worth)
+    newPickupIds.forEach(newId => {
+      const newData = newState.pickups[newId];
+      if (!sg.pickups[newId]) {
+        sg.pickups[newId] = new Pickup(
+          s,
+          newData.id,
+          new Vector(newData.x, newData.y),
+          newData.worth,
+          new CircleCollider(1),
+          new SpriteRenderer(1, "regularCheese")
+        );
       }
-    });
-  });
-
-  //Resets the game when the server detects a reset game state
-  socket.on('resetGame', () => {
-    //Reset client-specific game state to the defaults
-    s.game.gameState = CLIENT_STATES.GAME_WAITING_FOR_PLAYERS;
+      sg.pickups[newId].setData(newData);
+    })
+    //Update players
+    //Loop through every player in the data
+    for (const clientId in newState.players) {
+      //If a player sent by the server doesn't exist on the client
+      if (!sg.players[clientId]) {
+        const newPlayerData = newState.players[clientId];
+        //Create that player
+        sg.players[clientId] = new Player(
+          s,
+          clientId,
+          new Vector(newPlayerData.x, newPlayerData.y),
+          new Vector(newPlayerData.velX, newPlayerData.velY),
+          new Vector(newPlayerData.accelX, newPlayerData.accelY),
+          new SnakeCollider(2),
+          new PlayerRenderer(3, newPlayerData.spriteName)
+        );
+        sg.players[clientId].setData(newPlayerData);
+      } else {
+        //If the player is not the client player
+        if (sg.clientId == clientId) {
+          //Set data but remain client-authoritative
+          sg.players[clientId].setClientData(newState.players[clientId]);
+        } else {
+          //Set the data
+          sg.players[clientId].setData(newState.players[clientId]);
+        }
+      }
+    }
   });
 
   //Listen for the server sending this client its ID
@@ -104,51 +136,10 @@ export const init = (_state) => {
     //update game state to move on from connecting
     sg.clientState = CLIENT_STATES.PLAYING
   });
-  
-  socket.on('allPickups', (pickupData) => {
-    pickupData.forEach(pickup => {
-      sg.pickups[pickup.pickupId] = new Pickup(
-        s, pickup.pickupId, 
-        new Vector(pickup.x, pickup.y), 
-        pickup.worth, 
-        new CircleCollider(1), 
-        new SpriteRenderer(1, "regularCheese")
-      );
-    });
-  });
-  
-  socket.on('allPlayers', function(data) {
-    //Loop through every player in the data
-    for (const clientId in data) {
-      //If a player sent by the server doesn't exist on the client
-      if (!sg.players[clientId]) {
-        //Create that player
-        sg.players[clientId] = new Player(
-          s,
-          clientId,
-          new Vector(data[clientId].x, data[clientId].y),
-          new Vector(data[clientId].velX, data[clientId].velY),
-          new Vector(data[clientId].accelX, data[clientId].accelY),
-          new SnakeCollider(2),
-          new PlayerRenderer(3, data[clientId].spriteName)
-        );
-      }
-      //If the player is not the client player
-      if (sg.clientId == clientId && !sg.players[clientId].dead) {
-        //Set data but remain client-authoritative
-        sg.players[clientId].setClientData(data[clientId]);
-      } else {
-        //Set the data
-        sg.players[clientId].setData(data[clientId]);
-        //Else, the player is the client player
-      }
-    }
-  });
 }
 
 
-export const start = () => {
-}
+export const start = () => {}
 
 export const createNewPlayer = () => {
   console.dir('joining game');

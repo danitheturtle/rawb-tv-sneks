@@ -27,7 +27,6 @@ export const update = () => {
       new CircleCollider(1)
     );
     sg.pickups[newPickup.id] = newPickup;
-    sg.newPickups.push(newPickup);
   }
   
   loopCount++;

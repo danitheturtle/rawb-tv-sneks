@@ -72,17 +72,24 @@ export const updateGame = () => {
       }
     }
     //Detect pickups
+    let pickupsCollected = [];
     for (const pickupId in sg.pickups) {
       if (players[clientId].collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
         if (!sg.pickups[pickupId].collectedBy) {
           sg.pickups[pickupId].collectedBy = clientId;
-          sg.collectedPickups.push(sg.pickups[pickupId]);
           players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
-          delete sp.gameObjects[pickupId];
-          delete sg.pickups[pickupId];
+          pickupsCollected.push(pickupId);
         }
       }
     }
+    pickupsCollected.forEach(pickupId => {
+      state.io.emit('collectedPickup', { 
+        clientId: sg.pickups[pickupId].collectedBy,
+        worth: sg.pickups[pickupId].worth
+      });
+      delete sp.gameObjects[pickupId];
+      delete sg.pickups[pickupId];
+    });
   }
   //Reset dead players and spawn pickups where they died
   for (const clientId in players) {
@@ -98,7 +105,6 @@ export const updateGame = () => {
         new CircleCollider(1)
       );
       sg.pickups[newPickup.id] = newPickup;
-      sg.newPickups.push(newPickup);
     });
     deadPlayer.pos = new Vector(utils.randomInt(5, sl.activeLevelData.guWidth - 5), utils.randomInt(5, sl.activeLevelData.guHeight - 5));
     deadPlayer.collider.reset();
@@ -118,26 +124,32 @@ export const updateNetwork = () => {
 
   //Grab player data to send to clients
   let playerData = {};
-  for (const i in players) {
-    let curData = playerData[i] = players[i].getData();
-    curData.serverTime = st.clientTimers[i];
+  for (const clientId in players) {
+    let curData = playerData[clientId] = players[clientId].getData();
+    curData.serverTime = st.clientTimers[clientId];
   }
-  //Emit the full player list to the new client
-  state.io.emit('allPlayers', playerData);
-
+  //Emit the full player list to the client
+  // state.io.emit('allPlayers', playerData);
+  
+  //Grab all pickup data
+  let pickupData = {};
+  for (const pickupId in sg.pickups) {
+    pickupData[pickupId] = sg.pickups[pickupId].getData();
+  }
+  //Emit the full list to the client
+  // state.io.emit('allPickups', pickupData);
+  
   //Get game state data
   let updatedGameState = {
     gameState: sg.gameState,
     gameStartTimer: st.timers.gameStartTimer,
     gameTimer: st.timers.gameTimer,
     gameOverTimer: st.timers.gameOverTimer,
-    collectedPickups: sg.collectedPickups.map(p => p.getData()),
-    newPickups: sg.newPickups.map(p => p.getData())
+    players: playerData,
+    pickups: pickupData
   };
   //Emit up-to-date game state to all clients
   state.io.emit('updateGameState', updatedGameState);
-  sg.collectedPickups = [];
-  sg.newPickups = [];
 }
 
 /**
@@ -145,7 +157,9 @@ export const updateNetwork = () => {
  * their game client.
  */
 export const updatePlayerFromClient = (socket, data) => {
-  players[data.id].setData(data);
+  if (!players[data.id].dead || (players[data.id].dead && players[data.id].respawning)) {
+    players[data.id].setData(data);
+  }
 }
 
 /**
@@ -174,8 +188,7 @@ export const addNewPlayer = (socket, clientData) => {
   socket.emit('setClientID', newPlayerId);
   //Load the active level on the client, if there is one, and pickups
   if (sl.activeLevelData) {
-    socket.emit('loadLevel', sl.activeLevelData.name)
-    socket.emit('allPickups', Object.values(sg.pickups).map(pickup => pickup.getData()));
+    socket.emit('loadLevel', sl.activeLevelData.name);
   }
 
   //Add server time to the response
