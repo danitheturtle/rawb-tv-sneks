@@ -49,8 +49,8 @@ export const update = () => {
 }
 
 export const reset = () => {
+  s.io.emit('allPickups', []);
   Object.keys(sg.pickups).forEach(pickupId => {
-    s.io.emit('collectedPickup', { pickupId });
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];
   });

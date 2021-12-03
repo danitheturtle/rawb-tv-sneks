@@ -62,6 +62,10 @@ export const init = (_state) => {
   }
   
   socket.on('allPickups', (pickupsData) => {
+    Object.keys(sg.pickups).forEach(pickupId => {
+      delete sp.gameObjects[pickupId];
+      delete sg.pickups[pickupId];
+    });
     pickupsData.forEach(pickupData => {
       updatePickup(pickupData);
     });
