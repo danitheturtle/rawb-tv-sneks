@@ -36,7 +36,7 @@ io.on('connection', (socket) => {
     });
     
     //Listen for a reset game call for debugging
-    socket.on('resetDebug', (clientId) => {
+    socket.on('reset', (clientId) => {
       game.reset(clientId);
     });
   

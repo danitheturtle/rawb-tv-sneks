@@ -124,7 +124,7 @@ export const init = (_state) => {
 export const start = () => {}
 
 export const reset = () => {
-  socket.emit('resetDebug');
+  socket.emit('reset', sg.clientId);
 }
 
 export const createNewPlayer = () => {

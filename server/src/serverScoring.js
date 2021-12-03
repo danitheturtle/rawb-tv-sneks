@@ -41,8 +41,7 @@ export const update = () => {
   loopCount = loopCount % 3600;
 }
 
-export const reset = (clientId) => {
-  sg.players[clientId]?.die();
+export const reset = () => {
   Object.keys(sg.pickups).forEach(pickupId => {
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];

@@ -155,7 +155,9 @@ export const updateNetwork = () => {
 }
 
 export const reset = (clientId) => {
-  scoring.reset(clientId);
+  sg.players[clientId].die();
+  state.io.emit('playerDied', clientId);
+  scoring.reset();
 }
 
 /**
