@@ -35,6 +35,10 @@ io.on('connection', (socket) => {
       game.updatePlayerFromClient(socket, data);
     });
     
+    socket.on('playerCollectedPickup', (data) => {
+      game.playerCollectedPickup(data);
+    });
+    
     //Listen for a reset game call for debugging
     socket.on('reset', (clientId) => {
       game.reset(clientId);

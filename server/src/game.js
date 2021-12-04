@@ -70,27 +70,6 @@ export const updateGame = () => {
         state.io.emit('playerDied', otherId);
       }
     }
-    //If player died, continue
-    if (sg.players[clientId].dead) continue;
-    
-    //Detect pickups
-    const pickupsCollected = [];
-    for (const pickupId in sg.pickups) {
-      if (sg.pickups[pickupId].collectedBy !== undefined) continue;
-      if (sg.players[clientId].collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
-        sg.pickups[pickupId].collectedBy = clientId;
-        sg.players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
-        pickupsCollected.push(pickupId);
-      }
-    }
-    pickupsCollected.forEach(pickupId => {
-      state.io.emit('collectedPickup', { 
-        clientId: sg.pickups[pickupId].collectedBy,
-        pickupId: pickupId,
-        worth: sg.pickups[pickupId].worth
-      });
-      delete sg.pickups[pickupId];
-    });
   }
   
   //Reset dead players and spawn pickups where they died
@@ -162,6 +141,17 @@ export const reset = (clientId) => {
 export const updatePlayerFromClient = (socket, data) => {
   if (!sg.players[data.id].dead || (sg.players[data.id].dead && sg.players[data.id].respawning)) {
     sg.players[data.id].setData(data);
+  }
+}
+
+/**
+ * Player picked up an item
+ */
+export const playerCollectedPickup = ({ clientId, pickupId }) => {
+  if (sg.pickups[pickupId] && sg.players[clientId]) {
+    state.io.emit('collectedPickup', { clientId, pickupId, worth: sg.pickups[pickupId].worth });
+    delete sp.gameObjects[pickupId];
+    delete sg.pickups[pickupId];
   }
 }
 

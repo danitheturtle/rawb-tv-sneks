@@ -76,7 +76,7 @@ export const init = (_state) => {
   });
   
   socket.on('collectedPickup', ({ clientId, pickupId, worth }) => {
-    if (clientId) {
+    if (clientId && clientId != sg.clientId) {
       sg.players[clientId].collider.increaseBodyPartCount(worth);
     }
     delete sp.gameObjects[pickupId];
@@ -154,4 +154,10 @@ export const updateClientPlayer = () => {
   const playerData = sg.players[sg.clientId].getData();
   //Emit an update
   socket.emit('updatePlayer', playerData);
+}
+
+export const playerCollectedPickup = (clientId, pickupId) => {
+  socket.emit('playerCollectedPickup', { clientId, pickupId });
+  delete sp.gameObjects[pickupId];
+  delete sg.pickups[pickupId];
 }

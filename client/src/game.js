@@ -60,7 +60,9 @@ export const update = () => {
   time.update();
   physics.update();
   playerController.update();
-
+  
+  //Check for pickups
+  
   //Store the drawing context shorthand
   let c = s.ctx;
   //Re-draw the background
@@ -71,6 +73,21 @@ export const update = () => {
     const player = sg.players[p];
     player.update();
     const relativePos = sv.active?.getObjectRelativePosition(player, true);
+  }
+  
+  //Check for pickups
+  const self = sg.players[sg.clientId];
+  if (!self.dead) {
+    //Detect pickups
+    const pickupsCollected = [];
+    for (const pickupId in sg.pickups) {
+      if (sg.pickups[pickupId].collectedBy !== undefined) continue;
+      if (self.collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
+        sg.pickups[pickupId].collectedBy = self.id;
+        self.collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
+        socket.playerCollectedPickup(self.id, pickupId);
+      }
+    }
   }
   
   if (sg.players[sg.clientId] !== undefined && sv.active !== undefined) {
