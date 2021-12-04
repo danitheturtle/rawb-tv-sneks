@@ -37,7 +37,8 @@ export class ClientState extends State {
       //array of promises for asset loading progress bar
       loading: [],
       //How many total assets are loading at runtime?
-      numAssetsLoading: 0
+      numAssetsLoading: 0,
+      playerNameValue: ""
     };
     
     this.player = {
@@ -97,6 +98,10 @@ export class ClientState extends State {
   
   setCanvas(_canvas) {
     this.canvas = _canvas;
+  }
+  
+  setInput(_input) {
+    this.input = _input;
   }
   
   resize() {

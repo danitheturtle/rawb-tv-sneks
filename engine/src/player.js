@@ -14,6 +14,7 @@ export class SnakeCollider extends CircleCollider {
     this.pointPath = [];
     this.parts = [];
     this.type = 'snake';
+    this.name = undefined;
     this.parent = undefined;
   }
 
@@ -232,6 +233,7 @@ export class Player extends GameObject {
   getData() {
     return {
       ...super.getData(),
+      name: this.name,
       dead: this.dead,
       respawning: this.respawning,
       moveHeadingX: this.moveHeading.x,
@@ -245,6 +247,7 @@ export class Player extends GameObject {
   setData(_data) {
     this.lastData = this.getData();
     super.setData(_data);
+    this.name = _data.name !== undefined ? _data.name : this.name;
     this.dead = _data.dead !== undefined ? _data.dead : this.dead;
     this.respawning = _data.respawning !== undefined ? _data.respawning : this.respawning;
     this.moveHeading = new Vector(
@@ -255,6 +258,7 @@ export class Player extends GameObject {
     this.sprintTimer = _data.sprintTimer !== undefined ? _data.sprintTimer : this.sprintTimer;
     this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
     if (this.renderer) {
+      this.renderer.playerName = this.name;
       this.renderer.spriteName = this.spriteName;
     }
     return this;

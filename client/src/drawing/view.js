@@ -14,25 +14,13 @@ export const init = (_state) => {
 
   keys.keyDown("+", () => {
     if (!sv.active) return;
-    sv.active.viewScale--;
-    sv.active.rescaleGU();
+    sv.active.zoomIn();
   });
 
   keys.keyDown("-", () => {
     if (!sv.active) return;
-    sv.active.viewScale++;
-    sv.active.rescaleGU();
+    sv.active.zoomOut();
   });
-  
-  keys.scroll((dir) => {
-    if (!sv.active) return;
-    if (dir === -1) {
-      sv.active.viewScale++;
-    } else {
-      sv.active.viewScale--;
-    }
-    sv.active.rescaleGU();
-  })
 };
 
 export class View {
@@ -84,6 +72,16 @@ export class View {
       //Set the yMin for the view
       this.yMin(lerpFollow);
     }
+  }
+  
+  zoomIn(amount=1) {
+    this.viewScale = Math.max(this.viewScale-amount, GLOBALS.minViewScale);
+    this.rescaleGU();
+  }
+  
+  zoomOut(amount=1) {
+    this.viewScale = Math.min(this.viewScale+amount, GLOBALS.maxViewScale);
+    this.rescaleGU();
   }
 
   center(set) {
@@ -174,9 +172,9 @@ export class View {
   }
 
   rescaleGU() {
-    sg.gu = Math.round(Math.max(this.width, this.height) / sv.active.viewScale);
+    sg.gu = Math.round(Math.max(this.width, this.height) / this.viewScale);
     //Re-define position limits for the view
-    sv.active.setLimitsGU(
+    this.setLimitsGU(
       0, 
       sl.activeLevelData?.guWidth ? sl.activeLevelData.guWidth : 100,
       0, 

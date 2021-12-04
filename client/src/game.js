@@ -4,7 +4,7 @@ import * as drawing from './drawing';
 import * as keys from './keys';
 import * as socket from './socket';
 import * as playerController from './playerController';
-const { time, physics } = engine;
+const { time, physics, GLOBALS } = engine;
 
 let s, sg, sv, si, sp;
 
@@ -23,6 +23,10 @@ export const start = () => {
     sg.clientState = CLIENT_STATES.TUTORIAL_SCREEN;
   });
   s.resize();
+  s.input.style.display = 'none';
+  s.input.addEventListener('change', (e) => {
+    sg.playerNameValue = e.target.value;
+  });
   update();
 }
 
@@ -85,6 +89,7 @@ export const update = () => {
       if (self.collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
         sg.pickups[pickupId].collectedBy = self.id;
         self.collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
+        sv.active.zoomOut(GLOBALS.zoomAmountOnCollect);
         socket.playerCollectedPickup(self.id, pickupId);
       }
     }
@@ -135,6 +140,8 @@ const updateTutorial = () => {
 
   //If the user clicks, go to the start screen
   if (keys.pressed('mouseButton')) {
+    s.input.style.display = 'initial';
+    s.input.focus();
     sg.clientState = CLIENT_STATES.START_SCREEN;
   }
 }
@@ -143,35 +150,40 @@ const updateStartScreen = () => {
   let c = s.ctx;
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText("Snakey Mouse", s.viewport.width / 2, s.viewport.height / 3, "60px Arial", "rgba(100, 100, 100, 1.0)");
+  drawing.drawText("Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 160, "60px Arial", "rgba(100, 100, 100, 1.0)");
 
   c.fillStyle = "rgb(240, 100, 100)";
   c.strokeStyle = "rgb(100, 100, 100)";
 
   //TODO: make a canvas button class
   let buttonX = s.viewport.width / 2 - 200;
-  let buttonY = s.viewport.height / 2 - 30;
+  let buttonY = s.viewport.height / 2 + 80;
   let buttonWidth = 400;
   let buttonHeight = 60;
 
   let mouse = keys.mouse();
-
-  if (mouse[0] > buttonX && mouse[0] < buttonX + buttonWidth && mouse[1] > buttonY && mouse[1] < buttonY + buttonHeight) {
-    c.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
-    drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2, "30px Arial", "rgba(250, 250, 250, 1.0)");
-    if (keys.pressed('mouseButton')) {
-      sg.clientState = CLIENT_STATES.CONNECTING;
+  drawing.drawText("Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 40, "24px Arial", "rgba(50, 50, 50, 1.0)");
+  if (sg.playerNameValue.length > 3) {
+    if (mouse[0] > buttonX && mouse[0] < buttonX + buttonWidth && mouse[1] > buttonY && mouse[1] < buttonY + buttonHeight) {
+      c.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 110, "30px Arial", "rgba(250, 250, 250, 1.0)");
+      if (keys.pressed('mouseButton')) {
+        s.input.style.display = 'none';
+        sg.clientState = CLIENT_STATES.CONNECTING;
+      }
+    } else {
+      c.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
+      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 110, "30px Arial", "rgba(140, 140, 140, 1.0)");
     }
   } else {
-    c.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
-    drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2, "30px Arial", "rgba(140, 140, 140, 1.0)");
+    drawing.drawText("(3 character min, then press enter)", s.viewport.width / 2, s.viewport.height / 2 + 36, "12px Arial", "rgba(160, 160, 160, 1.0)");
   }
 }
 
 const updateConnecting = () => {
   if (!sg.joinedGame && !sg.joiningGame) {
     //Tell the server to add a new player
-    socket.createNewPlayer();
+    socket.createNewPlayer(sg.playerNameValue);
     sg.joiningGame = true;
   }
   const c = s.ctx;

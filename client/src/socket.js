@@ -138,10 +138,10 @@ export const reset = () => {
   socket.emit('reset', sg.clientId);
 }
 
-export const createNewPlayer = () => {
+export const createNewPlayer = (_playerNameValue) => {
   console.dir('joining game');
   //client-defined player data
-  const clientPlayerData = { spriteName: drawing.randomPlayerSprite() };
+  const clientPlayerData = { name: _playerNameValue, spriteName: drawing.randomPlayerSprite() };
   //notify server there is a new player
   socket.emit('createNewPlayer', clientPlayerData);
 }

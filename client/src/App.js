@@ -14,6 +14,7 @@ const { time, physics } = engine;
 
 const App = () => {
   const canvasRef = useRef(null);
+  const nameInputRef = useRef(null);
   const [gameState, setStateInstance] = useState(null);
   const [connected, setConnected] = useState(false);
   const [connectionError, setConnectionError] = useState(null);
@@ -60,8 +61,9 @@ const App = () => {
   
   //Start
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || !nameInputRef.current) return;
     gameState.setCanvas(canvasRef.current);
+    gameState.setInput(nameInputRef.current);
     keys.start();
     physics.start();
     socket.start();
@@ -93,16 +95,21 @@ const App = () => {
       window.removeEventListener('blur', handleBlurPause);
       window.removeEventListener('focus', handleFocusPlay);
     }
-  }, [canvasRef.current, connected])
+  }, [canvasRef.current, nameInputRef.current, connected])
 
   if (connectionError) return (<div>{connectionError.message}</div>);
   if (!connected && gameState?.game.connecting) return (<div>loading</div>);
   if (!connected && !gameState?.game.connecting) return (<div>problem connecting to server</div>)
 
   return (
-    <div id="canvas-box">
-      <canvas id="canvas" ref={canvasRef}>please enable javascript</canvas>
-    </div>
+    <>
+      <div id="input-wrapper">
+        <input ref={nameInputRef} id="name-input" />
+      </div>
+      <div id="canvas-box">
+        <canvas id="canvas" ref={canvasRef}>please enable javascript</canvas>
+      </div>
+    </>
   )
 }
 

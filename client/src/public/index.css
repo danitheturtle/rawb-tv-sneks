@@ -7,16 +7,39 @@ html,body,#snakeymouse {
 }
 
 #canvas-box {
-  position: relative;
+  z-index: 1;
+  position: absolute;
   display: flex;
   justify-content: stretch;
   align-items: stretch;
+  top: 0;
   width: 100%;
   height: 100%;
   background-color: #fafafa;
 }
 
+#input-wrapper {
+  pointer-events: none;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#name-input {
+  pointer-events: all;
+  width: 25vw;
+  height: 32px;
+  border: 1px solid #999999;
+  background-color: #fefefe;
+}
+
 #canvas {
+  z-index: 1;
   position: relative;
   flex: 1;
 }
