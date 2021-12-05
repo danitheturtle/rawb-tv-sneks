@@ -51,6 +51,7 @@ export const init = (_state) => {
   });
 
   socket.on('playerRespawning', (data) => {
+    if (!sg.players[data.id]) return;
     sg.players[data.id].setData(data);
     sg.players[data.id].respawned();
     sg.players[data.id].collider.reset();
