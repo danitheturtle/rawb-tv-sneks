@@ -81,7 +81,7 @@ export const update = () => {
   
   //Check for pickups
   const self = sg.players[sg.clientId];
-  if (!self.dead) {
+  if (self && !self.dead) {
     //Detect pickups
     const pickupsCollected = [];
     for (const pickupId in sg.pickups) {

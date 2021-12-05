@@ -165,7 +165,7 @@ export const createNewPlayer = (_playerNameValue) => {
  */
 export const updateClientPlayer = () => {
   //Get the client player data
-  const playerData = sg.players[sg.clientId].getData();
+  const playerData = sg.players[sg.clientId].getDataForNetworkUpdate();
   //Emit an update
   socket.emit('updatePlayer', playerData);
 }
