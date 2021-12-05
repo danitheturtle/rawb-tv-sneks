@@ -32,7 +32,7 @@ html,body,#snakeymouse {
 
 #name-input {
   pointer-events: all;
-  width: 25vw;
+  width: 320px;
   height: 32px;
   border: 1px solid #999999;
   background-color: #fefefe;

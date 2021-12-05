@@ -42,12 +42,14 @@ export const start = () => {}
 
 export const draw = () => {
   //draw background
-  const back = sl.activeBackground;
-  const dx = sv.active.xMin() * back.parallaxSpeed[0];
-  const dy = sv.active.yMin() * back.parallaxSpeed[1];
-  const dHeight = sl.activeLevelData.guWidth * sg.gu;
-  const dWidth = dHeight * back.whRatio;
-  s.ctx.drawImage(back.image, dx, dy, dWidth, dHeight);
+  const backs = sl.activeBackgrounds;
+  backs.forEach(back => {
+    const dx = sv.active.xMin() * back.parallaxSpeed[0];
+    const dy = sv.active.yMin() * back.parallaxSpeed[1];
+    const dHeight = sl.activeLevelData.guWidth * sg.gu;
+    const dWidth = dHeight * back.whRatio;
+    s.ctx.drawImage(back.image, dx, dy, dWidth, dHeight);
+  })
   //draw tilesheets
   for (let l = 0; l < layers.length; l++) {
     //Loop through the data

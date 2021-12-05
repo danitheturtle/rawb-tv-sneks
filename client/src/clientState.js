@@ -57,11 +57,8 @@ export class ClientState extends State {
     
     this.image = {
       raw: assets,
-      tilesheetAssets: {
-        coreTilesheet: assets.images.coreTilesheet
-      },
+      tilesheetAssets: {},
       spritesheetAssets: {
-        p1Spritesheet: assets.images.p1Spritesheet,
         cheeseSpritesheet: assets.images.cheeseSpritesheet,
         snakeyMousePlayerSpritesheet: assets.images.snakeyMousePlayerSpritesheet,
         jimmyTheSnakePlayerSpritesheet: assets.images.jimmyTheSnakePlayerSpritesheet,
@@ -71,7 +68,9 @@ export class ClientState extends State {
         moogliPlayerSpritesheet: assets.images.moogliPlayerSpritesheet
       },
       backgroundAssets: {
-        defaultBackground: assets.images.defaultBackground,
+        rawbBG1: assets.images.rawbBG1,
+        rawbBG2: assets.images.rawbBG2,
+        rawbBG3: assets.images.rawbBG3,
         dangerBackground: assets.images.dangerBackground,
         radicalBackground: assets.images.radicalBackground
       },
@@ -84,7 +83,7 @@ export class ClientState extends State {
     
     this.level = {
       ...this.level,
-      activeBackground: undefined
+      activeBackgrounds: []
     };
     
     this.view = {

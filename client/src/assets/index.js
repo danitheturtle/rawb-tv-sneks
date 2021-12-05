@@ -1,5 +1,3 @@
-import coreTilesheetData from './tilesheets/coreTilesheet';
-import coreTilesheet from './tilesheets/coreTilesheet.png';
 import cheeseSpritesheet from './spritesheets/cheeseSpritesheet.png';
 import cheeseSpritesheetData from './spritesheets/cheeseSpritesheet.js';
 import p1SpritesheetData from './spritesheets/p1_spritesheet.js';
@@ -16,15 +14,15 @@ import cheetohPlayerSpritesheet from './spritesheets/cheetohPlayerSpritesheet.pn
 import cheetohPlayerSpritesheetData from './spritesheets/cheetohPlayerSpritesheet.js';
 import moogliPlayerSpritesheet from './spritesheets/moogliPlayerSpritesheet.png';
 import moogliPlayerSpritesheetData from './spritesheets/moogliPlayerSpritesheet.js';
-import defaultBackground from './backgrounds/bg_grasslands.png';
 import dangerBackground from './backgrounds/bg_danger.png';
 import radicalBackground from './backgrounds/bg_radical.png';
 import tutorialBackground from './backgrounds/tutorial.png';
+import rawbBG1 from './backgrounds/rawbBG1.jpg';
+import rawbBG2 from './backgrounds/rawbBG2.png';
+import rawbBG3 from './backgrounds/rawbBG3.png';
 // console.dir(coreTilesheetData);
 const allAssets = {
   images: {
-    coreTilesheet: [coreTilesheet, coreTilesheetData],
-    p1Spritesheet: [p1Spritesheet, p1SpritesheetData],
     cheeseSpritesheet: [cheeseSpritesheet, cheeseSpritesheetData],
     snakeyMousePlayerSpritesheet: [snakeyMousePlayerSpritesheet, snakeyMousePlayerSpritesheetData],
     jimmyTheSnakePlayerSpritesheet: [jimmyTheSnakePlayerSpritesheet, jimmyTheSnakePlayerSpritesheetData],
@@ -32,10 +30,12 @@ const allAssets = {
     evilMousePlayerSpritesheet: [evilMousePlayerSpritesheet, evilMousePlayerSpritesheetData],
     cheetohPlayerSpritesheet: [cheetohPlayerSpritesheet, cheetohPlayerSpritesheetData],
     moogliPlayerSpritesheet: [moogliPlayerSpritesheet, moogliPlayerSpritesheetData],
-    defaultBackground: [defaultBackground, {}],
     radicalBackground: [radicalBackground, {}],
     dangerBackground: [dangerBackground, {}],
-    tutorialBackground: [tutorialBackground, {}]
+    tutorialBackground: [tutorialBackground, {}],
+    rawbBG1: [rawbBG1, {}],
+    rawbBG2: [rawbBG2, {}],
+    rawbBG3: [rawbBG3, {}]
   }
 };
 

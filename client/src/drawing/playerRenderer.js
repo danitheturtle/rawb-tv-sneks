@@ -21,24 +21,24 @@ export class PlayerRenderer {
     if (!this.parent || !this.parent?.collider) return;
     //update radius based on length
     this.radius = this.parent.collider.radius * 1.33;
-    
-    //Update parts path
+
     if (!!this.parts[0]) {
       this.parts[0].x = this.parent.pos.x;
       this.parts[0].y = this.parent.pos.y;
     } else {
       this.parts[0] = new Vector(this.parent.pos.x, this.parent.pos.y);
     }
-    const scaledRadiusDist = this.radius * this.parent.bodySpacing;
     const lastPointToPlayerPos = this.parent.pos.clone().subtract(this.parent.collider.pointPath[0]);
+    const scaledRadiusDist  = this.parent.collider.radius*this.parent.bodySpacing;
     const partDistFromNextPoint = Math.max(scaledRadiusDist - lastPointToPlayerPos.length(), 0);
-    for (let i = 0; i < this.bodyPartCount - 1; i++) {
-      const thisPathPoint = i > this.pointPath.length - 1 ?
-        this.pointPath[this.pointPath.length - 1] :
-        this.pointPath[i]
-      const nextPathPoint = i + 1 > this.pointPath.length - 1 ?
-        this.pointPath[this.pointPath.length - 1] :
-        this.pointPath[i + 1];
+    const colliderRef = this.parent.collider;
+    for (let i = 0; i < colliderRef.bodyPartCount - 1; i++) {
+      const thisPathPoint = i > colliderRef.pointPath.length - 1 ?
+        colliderRef.pointPath[colliderRef.pointPath.length - 1] :
+        colliderRef.pointPath[i]
+      const nextPathPoint = i + 1 > colliderRef.pointPath.length - 1 ?
+        colliderRef.pointPath[colliderRef.pointPath.length - 1] :
+        colliderRef.pointPath[i + 1];
 
       const partLocation = partDistFromNextPoint !== 0 ?
         nextPathPoint.clone()
@@ -60,7 +60,7 @@ export class PlayerRenderer {
     const playerHead = si.sprites[`${this.spriteName}Head`];
     const playerBody = si.sprites[`${this.spriteName}Body`];
     const c = s.ctx;
-    const snakeBodyRelativePositions = this.parent.collider.parts
+    const snakeBodyRelativePositions = this.parts
       .map(partPos => sv.active?.getObjectRelativePosition(partPos, true));
     for (let i=snakeBodyRelativePositions.length-1; i>=0; i--) {
       const pos = snakeBodyRelativePositions[i];

@@ -21,6 +21,12 @@ export const start = () => {
 
 export const loadLevel = (levelName) => {
   levelLoader.loadLevel(levelName);
-  sl.activeBackground = si.backgrounds[sl.activeLevelData.background];
+  sl.activeBackgrounds = Object.entries(sl.activeLevelData.backgrounds)
+    .sort(([_, bgData1], [__, bgData2]) => bgData1.zIndex < bgData2.zIndex ? -1 : 1)
+    .map(([bgName, bgData]) => {
+      const bgAsset = si.backgrounds[bgName];
+      bgAsset.parallaxSpeed = bgData.parallaxSpeed;
+      return bgAsset;
+    });
   sv.active?.rescaleGU();
 }

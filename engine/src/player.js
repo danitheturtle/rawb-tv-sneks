@@ -12,7 +12,6 @@ export class SnakeCollider extends CircleCollider {
     this.initialRadius = 2;
     this.bodyPartCount = GLOBALS.initialSnakeSize;
     this.pointPath = [];
-    this.parts = [];
     this.type = 'snake';
     this.name = undefined;
     this.parent = undefined;
@@ -30,44 +29,15 @@ export class SnakeCollider extends CircleCollider {
     if (distToLastPoint >= scaledRadiusDist) {
       this.addNextPoint(this.pointPath[0].clone().add(lastPointToPlayerPos.normalize().multiplyScalar(scaledRadiusDist)));
     }
-
-    if (!!this.parts[0]) {
-      this.parts[0].x = this.parent.pos.x;
-      this.parts[0].y = this.parent.pos.y;
-    } else {
-      this.parts[0] = new Vector(this.parent.pos.x, this.parent.pos.y);
-    }
-    const partDistFromNextPoint = Math.max(scaledRadiusDist - distToLastPoint, 0);
-    for (let i = 0; i < this.bodyPartCount - 1; i++) {
-      const thisPathPoint = i > this.pointPath.length - 1 ?
-        this.pointPath[this.pointPath.length - 1] :
-        this.pointPath[i]
-      const nextPathPoint = i + 1 > this.pointPath.length - 1 ?
-        this.pointPath[this.pointPath.length - 1] :
-        this.pointPath[i + 1];
-
-      const partLocation = partDistFromNextPoint !== 0 ?
-        nextPathPoint.clone()
-        .subtract(thisPathPoint)
-        .normalize()
-        .multiplyScalar(partDistFromNextPoint)
-        .add(thisPathPoint) :
-        nextPathPoint.clone();
-
-      if (!!this.parts[i + 1]) {
-        this.parts[i + 1].x = partLocation.x;
-        this.parts[i + 1].y = partLocation.y;
-      } else {
-        this.parts[i + 1] = new Vector(partLocation.x, partLocation.y);
-      }
-    }
   }
   
   reset() {
     this.pointPath = [this.parent.pos.clone()];
-    this.parts = [];
     this.bodyPartCount = GLOBALS.initialSnakeSize;
     this.radius = this.initialRadius;
+    if (this.parent.renderer) {
+      this.parent.renderer.parts = [];
+    }
   }
 
   increaseBodyPartCount(_amount) {
@@ -76,14 +46,19 @@ export class SnakeCollider extends CircleCollider {
 
   decreaseBodyPartCount(_amount) {
     this.bodyPartCount -= _amount;
-    this.parts = this.parts.slice(0, this.bodyPartCount);
     this.pointPath = this.pointPath.slice(0, this.bodyPartCount);
+    if (this.parent.renderer) {
+      this.parent.renderer.parts = this.parent.renderer.parts.slice(0, this.bodyPartCount);
+    }
   }
 
   setBodyPartCount(_amount) {
     this.bodyPartCount = _amount;
     if (this.pointPath.length >= _amount) {
       this.pointPath = this.pointPath.slice(0, this.bodyPartCount);
+    }
+    if (this.parent.renderer && this.parent.renderer.parts.length >= _amount) {
+      this.parent.renderer.parts = this.parent.renderer.parts.slice(0, this.bodyPartCount);
     }
   }
 
@@ -101,9 +76,9 @@ export class SnakeCollider extends CircleCollider {
   checkCollisionWithOtherSnake(_other) {
     const otherCenter = _other.pointPath[0];
     const otherRadius = _other.radius;
-    for (let i = 0; i < this.parts.length; i++) {
+    for (let i = 0; i < this.pointPath.length; i++) {
       const minDistSq = this.radius * this.radius + otherRadius * otherRadius;
-      const partCenter = this.parts[i].clone();
+      const partCenter = this.pointPath[i].clone();
       if (partCenter.subtract(otherCenter).lengthSq() < minDistSq) {
         return true;
       }
@@ -115,8 +90,8 @@ export class SnakeCollider extends CircleCollider {
     const pickupCenter = _pickup.pos;
     const pickupRadius = _pickup.collider.radius;
     const minDistSq = this.radius * this.radius + pickupRadius * pickupRadius;
-    const partCenter = this.parts[0].clone();
-    if (partCenter.subtract(pickupCenter).lengthSq() < minDistSq) {
+    const playerCenter = this.parent.pos.clone();
+    if (playerCenter.subtract(pickupCenter).lengthSq() < minDistSq) {
       return true;
     }
     return false;
@@ -127,8 +102,7 @@ export class SnakeCollider extends CircleCollider {
       type: this.type,
       initialRadius: this.initialRadius,
       bodyPartCount: this.bodyPartCount,
-      pointPath: this.pointPath.map(p => ([p.x, p.y])),
-      parts: this.parts.map(p => ([p.x, p.y]))
+      pointPath: this.pointPath.map(p => ([p.x, p.y]))
     }
   }
   
@@ -145,7 +119,6 @@ export class SnakeCollider extends CircleCollider {
     this.initialRadius = _data.initialRadius !== undefined ? _data.initialRadius : this.initialRadius;
     this.bodyPartCount = _data.bodyPartCount !== undefined ? _data.bodyPartCount : this.bodyPartCount;
     this.pointPath = _data.pointPath !== undefined ? _data.pointPath.map(p => (new Vector(p[0], p[1]))) : this.pointPath;
-    this.parts = _data.parts !== undefined ? _data.parts.map(p => (new Vector(p[0], p[1]))) : this.parts;
     return this;
   }
 }
@@ -163,7 +136,7 @@ export class Player extends GameObject {
     this.sprintTimer = 0;
 
     //snake data
-    this.bodySpacing = 1.75;
+    this.bodySpacing = 1.65;
     
     //Player sprite
     this.spriteName = undefined;
@@ -183,18 +156,18 @@ export class Player extends GameObject {
       //Add acceleration to the velocity scaled by dt.  Limit the velocity so collisions don't break
       this.vel.add(this.accel.multiplyScalar(time.dt()));
       //limit velocity with current max speed (squared since its cheaper)
-      const currentMaxSpeed = this.sprint && this.collider.parts.length > 5 ? 
+      const currentMaxSpeed = this.sprint && this.collider.pointPath.length > 5 ? 
         GLOBALS.sprintMult * GLOBALS.sprintMult * GLOBALS.baseMoveSpeed * GLOBALS.baseMoveSpeed : 
         GLOBALS.baseMoveSpeed * GLOBALS.baseMoveSpeed;
       if (this.vel.lengthSq() > currentMaxSpeed) {
-        this.vel.normalize().multiplyScalar(this.sprint && this.collider.parts.length > 5 ? GLOBALS.baseMoveSpeed * GLOBALS.sprintMult : GLOBALS.baseMoveSpeed);
+        this.vel.normalize().multiplyScalar(this.sprint && this.collider.pointPath.length > 5 ? GLOBALS.baseMoveSpeed * GLOBALS.sprintMult : GLOBALS.baseMoveSpeed);
       }
       //Add velocity to the position scaled by dt
       this.pos.add(this.vel.clone().multiplyScalar(time.dt()));
       
       //Sprint decreases snake length. If snake is too short, stop sprinting
       if (this.sprint) {
-        if (this.sprintTimer % 30 === 0 && this.collider.parts.length > 5) {
+        if (this.sprintTimer % 30 === 0 && this.collider.pointPath.length > 5) {
           this.collider.decreaseBodyPartCount(1);
         }
         this.sprintTimer = (this.sprintTimer + 1) % 30;

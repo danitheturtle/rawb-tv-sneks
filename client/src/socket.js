@@ -53,6 +53,7 @@ export const init = (_state) => {
   socket.on('playerRespawning', (data) => {
     sg.players[data.id].setData(data);
     sg.players[data.id].respawned();
+    sg.players[data.id].collider.reset();
     if (data.id == sg.clientId) {
       updateClientPlayer();
       console.dir('broadcasted respawn');

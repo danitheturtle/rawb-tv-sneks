@@ -157,7 +157,7 @@ const updateStartScreen = () => {
 
   //TODO: make a canvas button class
   let buttonX = s.viewport.width / 2 - 200;
-  let buttonY = s.viewport.height / 2 + 80;
+  let buttonY = s.viewport.height / 2 + 60;
   let buttonWidth = 400;
   let buttonHeight = 60;
 
@@ -166,14 +166,14 @@ const updateStartScreen = () => {
   if (sg.playerNameValue.length > 3) {
     if (mouse[0] > buttonX && mouse[0] < buttonX + buttonWidth && mouse[1] > buttonY && mouse[1] < buttonY + buttonHeight) {
       c.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
-      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 110, "30px Arial", "rgba(250, 250, 250, 1.0)");
+      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 90, "30px Arial", "rgba(250, 250, 250, 1.0)");
       if (keys.pressed('mouseButton')) {
         s.input.style.display = 'none';
         sg.clientState = CLIENT_STATES.CONNECTING;
       }
     } else {
       c.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
-      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 110, "30px Arial", "rgba(140, 140, 140, 1.0)");
+      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 90, "30px Arial", "rgba(140, 140, 140, 1.0)");
     }
   } else {
     drawing.drawText("(3 character min, then press enter)", s.viewport.width / 2, s.viewport.height / 2 + 36, "12px Arial", "rgba(160, 160, 160, 1.0)");
