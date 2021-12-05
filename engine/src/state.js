@@ -17,7 +17,7 @@ export const GLOBALS = {
   initialSnakeSize: 5,
   numPickupsPerMinute: 100,
   pickupCap: 500,
-  baseMoveSpeed: 20,
+  baseMoveSpeed: 15,
   baseAccelSpeed: 80,
   sprintMult: 4
 };
