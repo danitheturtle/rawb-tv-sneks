@@ -24,6 +24,10 @@ export class Collider {
       type: this.type
     }
   }
+  
+  getDataForNetworkUpdate() {
+    return this.getData();
+  }
 
   setData(_data, _parent) {
     this.parent = _parent !== undefined ? _parent : this.parent;
@@ -43,6 +47,10 @@ export class CircleCollider extends Collider {
       type: this.type,
       radius: this.radius
     }
+  }
+  
+  getDataForNetworkUpdate() {
+    return this.getData();
   }
 
   setData(_data, _parent) {
@@ -106,6 +114,10 @@ export class BoxCollider extends Collider {
       width: this.width,
       height: this.height
     }
+  }
+  
+  getDataForNetworkUpdate() {
+    return this.getData();
   }
 
   setData(_data, _parent) {
@@ -177,6 +189,20 @@ export class GameObject {
       hasCollisions: this.hasCollisions,
       collider: this.collider?.getData(),
       renderer: this.renderer?.getData()
+    }
+  }
+  getDataForNetworkUpdate() {
+    return {
+      id: this.id,
+      x: this.pos.x,
+      y: this.pos.y,
+      velX: this.vel.x,
+      velY: this.vel.y,
+      accelX: this.accel.x,
+      accelY: this.accel.y,
+      hasCollisions: this.hasCollisions,
+      collider: this.collider?.getDataForNetworkUpdate(),
+      renderer: this.renderer?.getDataForNetworkUpdate()
     }
   }
   setData(data) {

@@ -113,7 +113,7 @@ export const updateNetwork = () => {
   //Grab player data to send to clients
   let playerData = {};
   for (const clientId in sg.players) {
-    playerData[clientId] = sg.players[clientId].getData();
+    playerData[clientId] = sg.players[clientId].getDataForNetworkUpdate();
   }
   
   //Get game state data
@@ -149,6 +149,7 @@ export const updatePlayerFromClient = (socket, data) => {
  */
 export const playerCollectedPickup = ({ clientId, pickupId }) => {
   if (sg.pickups[pickupId] && sg.players[clientId]) {
+    sg.players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
     state.io.emit('collectedPickup', { clientId, pickupId, worth: sg.pickups[pickupId].worth });
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];
@@ -178,11 +179,14 @@ export const addNewPlayer = (socket, clientData) => {
   //Load the active level on the client, if there is one, and pickups
   if (sl.activeLevelData) {
     socket.emit('loadLevel', sl.activeLevelData.name);
+    //Emit all pickup objects
+    socket.emit('allPickups', Object.values(sg.pickups).map(pickupRef => pickupRef.getData()))
+    //Emit all players
+    socket.emit('allPlayers', Object.values(sg.players).map(playerRef => playerRef.getData()))
   }
-  //Emit all pickup objects
-  state.io.emit('allPickups', Object.values(sg.pickups).map(pickupRef => pickupRef.getData()))
+  const newData = sg.players[newPlayerId].getData()
   //Emit the new player to all connected clients
-  state.io.emit('newPlayer', sg.players[newPlayerId].getData());
+  state.io.emit('newPlayer', newData);
 
   //Return the new player's ID
   return newPlayerId;

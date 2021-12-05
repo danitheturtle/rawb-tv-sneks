@@ -21,10 +21,22 @@ export const init = (_state) => {
   //Listen for new players
   socket.on('newPlayer', (data) => {
     //Add the new player to the list
-    sp.gameObjects[data.id] = sg.players[data.id] = new Player(s)
-      .addCollider(new SnakeCollider())
-      .addRenderer(new PlayerRenderer())
-      .setData(data);
+    if (data.id != sg.clientId) {
+      sp.gameObjects[data.id] = sg.players[data.id] = new Player(s)
+        .addCollider(new SnakeCollider())
+        .addRenderer(new PlayerRenderer())
+        .setData(data);
+    }
+  });
+  
+  //Listen for all players
+  socket.on('allPlayers', (_players) => {
+    _players.forEach(data => {
+      sp.gameObjects[data.id] = sg.players[data.id] = new Player(s)
+        .addCollider(new SnakeCollider())
+        .addRenderer(new PlayerRenderer())
+        .setData(data);
+    });
   });
 
   //Listen for players leaving

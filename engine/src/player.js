@@ -20,7 +20,7 @@ export class SnakeCollider extends CircleCollider {
 
   update() {
     if (!this.parent) return;
-    if (this.pointPath.length < 1) { this.pointPath.push(this.parent.pos.clone()); }
+    if (this.pointPath.length < 1 ) { this.pointPath.push(this.parent.pos.clone()); }
     //Update radius based on score
     this.radius = this.initialRadius + Math.min(this.bodyPartCount / 100, 8);
     //have we reached radius*parent.bodySpacing distance from last set snake point?
@@ -28,7 +28,7 @@ export class SnakeCollider extends CircleCollider {
     const lastPointToPlayerPos = this.parent.pos.clone().subtract(this.pointPath[0]);
     const distToLastPoint = lastPointToPlayerPos.length();
     if (distToLastPoint >= scaledRadiusDist) {
-      this.addNextPoint(this.parent.pos.clone());
+      this.addNextPoint(this.pointPath[0].clone().add(lastPointToPlayerPos.normalize().multiplyScalar(scaledRadiusDist)));
     }
 
     if (!!this.parts[0]) {
@@ -131,13 +131,20 @@ export class SnakeCollider extends CircleCollider {
       parts: this.parts.map(p => ([p.x, p.y]))
     }
   }
+  
+  getDataForNetworkUpdate() {
+    return {
+      type: this.type,
+      bodyPartCount: this.bodyPartCount
+    }
+  }
 
   setData(_data, _parent) {
     this.parent = _parent !== undefined ? _parent : this.parent;
     this.type = _data.type !== undefined ? _data.type : this.type;
     this.initialRadius = _data.initialRadius !== undefined ? _data.initialRadius : this.initialRadius;
     this.bodyPartCount = _data.bodyPartCount !== undefined ? _data.bodyPartCount : this.bodyPartCount;
-    this.pointPath = _data.pointPath !== undefined ? _data.pointPath.map(p => (new Vector(p[0], p[1]))) : this.pointpath;
+    this.pointPath = _data.pointPath !== undefined ? _data.pointPath.map(p => (new Vector(p[0], p[1]))) : this.pointPath;
     this.parts = _data.parts !== undefined ? _data.parts.map(p => (new Vector(p[0], p[1]))) : this.parts;
     return this;
   }
@@ -243,9 +250,23 @@ export class Player extends GameObject {
       spriteName: this.spriteName
     };
   }
+  
+  getDataForNetworkUpdate() {
+    return {
+      ...super.getDataForNetworkUpdate(),
+      name: this.name,
+      dead: this.dead,
+      respawning: this.respawning,
+      moveHeadingX: this.moveHeading.x,
+      moveHeadingY: this.moveHeading.y,
+      sprint: this.sprint,
+      sprintTimer: this.sprintTimer,
+      spriteName: this.spriteName
+    }
+  }
 
   setData(_data) {
-    this.lastData = this.getData();
+    this.lastData = this.getDataForNetworkUpdate();
     super.setData(_data);
     this.name = _data.name !== undefined ? _data.name : this.name;
     this.dead = _data.dead !== undefined ? _data.dead : this.dead;
