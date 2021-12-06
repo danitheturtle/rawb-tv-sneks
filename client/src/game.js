@@ -164,7 +164,7 @@ const updateStartScreen = () => {
 
   let mouse = keys.mouse();
   drawing.drawText("Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 40, "24px Arial", "rgba(50, 50, 50, 1.0)");
-  if (sg.playerNameValue.length > 3) {
+  if (sg.playerNameValue.length >= 3) {
     if (mouse[0] > buttonX && mouse[0] < buttonX + buttonWidth && mouse[1] > buttonY && mouse[1] < buttonY + buttonHeight) {
       c.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
       drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 90, "30px Arial", "rgba(250, 250, 250, 1.0)");
