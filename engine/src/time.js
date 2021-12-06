@@ -10,8 +10,8 @@ export const init = (state) => {
 export const calculateDeltaTime = () => {
   //Get time in ms
   const now = Date.now();
-  //Get capped instant FPS (from last frame to this frame)
-  st.fps = utils.clamp(1000 / (now - st.lastTime), 5, 60);
+  //Get instant FPS (from last frame to this frame)
+  st.fps = utils.clamp(1000 / (now - st.lastTime), 5, 200);
   //Store this frame time
   st.lastTime = now;
   //Return the last frame's time (delta time) in seconds
