@@ -5,6 +5,7 @@ const snakeyMousePlayerSpritesheet = {
   "spacing": 0,
   "tileCount": 2,
   "columns": 2,
+  "animationSpeed": 0.1,
   "spritesheet": "./assets/spritesheets/snakeyMousePlayerSpritesheet.png",
   "sprites": {
     "snakeyMousePlayerHead": [0],

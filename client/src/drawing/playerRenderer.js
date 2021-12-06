@@ -29,7 +29,7 @@ export class PlayerRenderer {
       this.parts[0] = new Vector(this.parent.pos.x, this.parent.pos.y);
     }
     const lastPointToPlayerPos = this.parent.pos.clone().subtract(this.parent.collider.pointPath[0]);
-    const scaledRadiusDist  = this.parent.collider.radius*this.parent.bodySpacing;
+    const scaledRadiusDist  = this.parent.collider.initialRadius*this.parent.bodySpacing;
     const partDistFromNextPoint = Math.max(scaledRadiusDist - lastPointToPlayerPos.length(), 0);
     const colliderRef = this.parent.collider;
     for (let i = 0; i < colliderRef.bodyPartCount - 1; i++) {
@@ -58,7 +58,22 @@ export class PlayerRenderer {
     
     //Grab player sprites
     const playerHead = si.sprites[`${this.spriteName}Head`];
-    const playerBody = si.sprites[`${this.spriteName}Body`];
+    let playerBody = si.sprites[`${this.spriteName}Body`];
+    //If no player body, the body is split into multiple sections
+    if (!playerBody) {
+      playerBody = [];
+      //max of 4 sections and a "last" part currently
+      for (let i=0; i<4; i++) {
+        const nextSpriteRef = si.sprites[`${this.spriteName}Body-${i}`];
+        if (nextSpriteRef) {
+          playerBody.push(nextSpriteRef)
+        } else {
+          break;
+        }
+      }
+    }
+    const playerBodyLast = si.sprites[`${this.spriteName}Body-last`];
+    
     const c = s.ctx;
     const snakeBodyRelativePositions = this.parts
       .map(partPos => sv.active?.getObjectRelativePosition(partPos, true));
@@ -85,10 +100,28 @@ export class PlayerRenderer {
           this.radius * sg.gu * 2, 
           this.radius * sg.gu * 2
         );
+      } else if (i === snakeBodyRelativePositions.length-1 && playerBodyLast) {
+        c.translate(pos.x, pos.y);
+        c.rotate(snakeBodyRelativePositions[i-1].clone().subtract(pos).horizontalAngle()+Math.PI/2);
+        playerBodyLast.draw(
+          s, 
+          c, 
+          -this.radius * sg.gu, 
+          -this.radius * sg.gu, 
+          this.radius * sg.gu * 2, 
+          this.radius * sg.gu * 2
+        );
       } else {
         c.translate(pos.x, pos.y);
         c.rotate(snakeBodyRelativePositions[i-1].clone().subtract(pos).horizontalAngle()+Math.PI/2);
-        playerBody.draw(
+        let selectedSprite;
+        if (playerBody instanceof Array) {
+          const spriteIndex = i % playerBody.length;
+          selectedSprite = playerBody[spriteIndex];
+        } else {
+          selectedSprite = playerBody;
+        }
+        selectedSprite.draw(
           s, 
           c, 
           -this.radius * sg.gu, 

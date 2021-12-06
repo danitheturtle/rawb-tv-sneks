@@ -80,12 +80,15 @@ export const updateGame = () => {
     deadPlayer.collider.pointPath?.forEach(point => {
       const newPickupId = `pickup-${point.x}-${point.y}`;
       if (!sg.pickups[newPickupId]) { 
+        const pickupType = scoring.randomPickupType();
         sp.gameObjects[newPickupId] = sg.pickups[newPickupId] = new Pickup(state)
         .addCollider(new CircleCollider())
         .setData({
           id: newPickupId,
           x: point.x,
           y: point.y,
+          pickupType: pickupType[0],
+          worth: pickupType[1],
           collider: {
             radius: 1
           }
@@ -149,7 +152,8 @@ export const updatePlayerFromClient = (socket, data) => {
  */
 export const playerCollectedPickup = ({ clientId, pickupId }) => {
   if (sg.pickups[pickupId] && sg.players[clientId]) {
-    sg.players[clientId].collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
+    sg.players[clientId].score += sg.pickups[pickupId].worth;
+    sg.players[clientId].collider.updateBodyWithScore();
     state.io.emit('collectedPickup', { clientId, pickupId, worth: sg.pickups[pickupId].worth });
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];

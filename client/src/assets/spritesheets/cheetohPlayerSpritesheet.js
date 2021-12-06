@@ -5,6 +5,7 @@ const cheetohPlayerSpritesheet = {
   "spacing": 0,
   "tileCount": 2,
   "columns": 2,
+  "animationSpeed": 0.1,
   "spritesheet": "./assets/spritesheets/cheetohPlayerSpritesheet.png",
   "sprites": {
     "cheetohPlayerHead": [0],

@@ -22,12 +22,16 @@ export const update = () => {
     }
     const newPickupId = `pickup-${newPos.x}-${newPos.y}`;
     if (sg.pickups[newPickupId]) { delete sg.pickups[newPickupId]; }
+    //Get a random type for the pickup
+    const pickupType = randomPickupType();
     sp.gameObjects[newPickupId] = sg.pickups[newPickupId] = new Pickup(s)
       .addCollider(new CircleCollider())
       .setData({
         id: newPickupId,
         x: newPos.x,
         y: newPos.y,
+        pickupType: pickupType[0],
+        worth: pickupType[1],
         collider: {
           radius: 1
         }
@@ -54,4 +58,30 @@ export const reset = () => {
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];
   });
+}
+
+export const randomPickupType = () => {
+  const allPickupTypes = [
+    ["regularCheese", 1, 500],
+    ["goldenCheese", 2, 50],
+    ["pizzaCheese", 3, 50],
+    ["epicCheese", 4, 10],
+    ["fireyCheese", 5, 5],
+    ["squirrelCheese", 5, 5],
+    ["icyCheese", 5, 5],
+    ["hairyCheese", 5, 5],
+    ["diceyCheese", 5, 5],
+    ["radicalCheese", 10, 1],
+    ["wisdomCheese", 10, 1]
+  ];
+  const totalOdds = allPickupTypes.reduce((acc, pickup) => acc + pickup[2], 0);
+  const selectedPickup = utils.randomInt(0, totalOdds);
+  let count = 0;
+  return allPickupTypes.reduce((acc, pickup) => {
+    if (acc) return acc;
+    count += pickup[2];
+    if (selectedPickup < count) {
+      return pickup;
+    }
+  }, undefined) || ["regularCheese", 1];
 }

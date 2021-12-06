@@ -88,7 +88,8 @@ export const update = () => {
       if (sg.pickups[pickupId].collectedBy !== undefined) continue;
       if (self.collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
         sg.pickups[pickupId].collectedBy = self.id;
-        self.collider.increaseBodyPartCount(sg.pickups[pickupId].worth);
+        self.score += sg.pickups[pickupId].worth;
+        self.collider.updateBodyWithScore();
         sv.active.zoomOut(GLOBALS.zoomAmountOnCollect);
         socket.playerCollectedPickup(self.id, pickupId);
       }

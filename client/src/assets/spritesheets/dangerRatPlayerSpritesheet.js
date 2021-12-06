@@ -5,6 +5,7 @@ const dangerRatPlayerSpritesheet = {
   "spacing": 0,
   "tileCount": 2,
   "columns": 2,
+  "animationSpeed": 0.1,
   "spritesheet": "./assets/spritesheets/dangerRatPlayerSpritesheet.png",
   "sprites": {
     "dangerRatPlayerHead": [0],

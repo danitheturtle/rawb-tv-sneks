@@ -18,8 +18,10 @@ export const GLOBALS = {
   numPickupsPerMinute: 100,
   pickupCap: 500,
   baseMoveSpeed: 15,
-  baseAccelSpeed: 80,
-  sprintMult: 4
+  baseAccelSpeed: 60,
+  sprintMult: 4,
+  sprintCostPerSecond: 6,
+  scoreLengthDivider: 5
 };
 
 export class State {

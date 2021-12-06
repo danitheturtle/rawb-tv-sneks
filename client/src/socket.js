@@ -5,7 +5,7 @@ import * as levelLoader from './clientLevelLoader';
 import * as drawing from './drawing';
 import { PlayerRenderer } from './drawing/playerRenderer';
 import { SpriteRenderer } from './drawing/spriteRenderer';
-const { Player, SnakeCollider, Pickup, CircleCollider, time } = engine;
+const { Player, SnakeCollider, Pickup, CircleCollider, time, GLOBALS } = engine;
 const Vector = Victor;
 
 let s, sg, sp, st, socket;
@@ -70,7 +70,7 @@ export const init = (_state) => {
         .addRenderer(new SpriteRenderer())
         .setData({
           ...pickupData,
-          renderer: { radius: 1, spriteName: "regularCheese" }
+          renderer: { radius: 1, spriteName: pickupData.pickupType }
         });
     }
   }
@@ -91,7 +91,8 @@ export const init = (_state) => {
   
   socket.on('collectedPickup', ({ clientId, pickupId, worth }) => {
     if (clientId && clientId != sg.clientId) {
-      sg.players[clientId].collider.increaseBodyPartCount(worth);
+      sg.players[clientId].score += sg.pickups[pickupId].worth;
+      sg.players[clientId].collider.updateBodyWithScore()
     }
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];

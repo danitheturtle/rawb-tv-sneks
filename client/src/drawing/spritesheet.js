@@ -13,6 +13,7 @@ export class Spritesheet {
     this.spacing = _stylesheetData.spacing;
     this.tileCount = _stylesheetData.tileCount;
     this.columns = _stylesheetData.columns;
+    this.animationSpeed = _stylesheetData.animationSpeed;
     if (_stylesheetData.sprites) {
       this.sprites = _stylesheetData.sprites;
     } else {
@@ -67,7 +68,7 @@ export class Spritesheet {
   makeSprites() {
     if (this.sprites) {
       for (const spr in this.sprites) {
-        this.stateRef.image.sprites[spr] = new Sprite(spr, this, this.sprites[spr]);
+        this.stateRef.image.sprites[spr] = new Sprite(spr, this, this.sprites[spr], this.animationSpeed);
       }
     }
   }

@@ -5,6 +5,7 @@ const evilMousePlayerSpritesheet = {
   "spacing": 0,
   "tileCount": 2,
   "columns": 2,
+  "animationSpeed": 0.1,
   "spritesheet": "./assets/spritesheets/evilMousePlayerSpritesheet.png",
   "sprites": {
     "evilMousePlayerHead": [0],

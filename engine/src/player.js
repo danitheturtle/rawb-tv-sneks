@@ -23,7 +23,7 @@ export class SnakeCollider extends CircleCollider {
     //Update radius based on score
     this.radius = this.initialRadius + Math.min(this.bodyPartCount / 100, 8);
     //have we reached radius*parent.bodySpacing distance from last set snake point?
-    const scaledRadiusDist = this.radius * this.parent.bodySpacing;
+    const scaledRadiusDist = this.initialRadius * this.parent.bodySpacing;
     const lastPointToPlayerPos = this.parent.pos.clone().subtract(this.pointPath[0]);
     const distToLastPoint = lastPointToPlayerPos.length();
     if (distToLastPoint >= scaledRadiusDist) {
@@ -37,6 +37,17 @@ export class SnakeCollider extends CircleCollider {
     this.radius = this.initialRadius;
     if (this.parent.renderer) {
       this.parent.renderer.parts = [];
+    }
+  }
+  
+  updateBodyWithScore() {
+    if (!this.parent) return;
+    const newBodyPartCount = Math.max(
+      GLOBALS.initialSnakeSize, 
+      Math.floor(this.parent.score/GLOBALS.scoreLengthDivider) + 5
+    );
+    if (newBodyPartCount !== this.bodyPartCount) {
+      this.setBodyPartCount(newBodyPartCount);
     }
   }
 
@@ -136,10 +147,13 @@ export class Player extends GameObject {
     this.sprintTimer = 0;
 
     //snake data
-    this.bodySpacing = 1.65;
+    this.bodySpacing = 1.8;
     
     //Player sprite
     this.spriteName = undefined;
+    
+    //Score
+    this.score = 0;
     
     //Data storage for diffing socket updates
     this.lastData = undefined;
@@ -167,8 +181,9 @@ export class Player extends GameObject {
       
       //Sprint decreases snake length. If snake is too short, stop sprinting
       if (this.sprint) {
-        if (this.sprintTimer % 30 === 0 && this.collider.pointPath.length > 5) {
-          this.collider.decreaseBodyPartCount(1);
+        if (this.sprintTimer % 30 === 0 && this.score > 0) {
+          this.score = Math.max(0, this.score - GLOBALS.sprintCostPerSecond/2);
+          this.collider.updateBodyWithScore();
         }
         this.sprintTimer = (this.sprintTimer + 1) % 30;
       } else {
@@ -203,6 +218,7 @@ export class Player extends GameObject {
   
   respawn() {
     this.respawning = true;
+    this.score = 0;
   }
   
   respawned() {
@@ -220,7 +236,8 @@ export class Player extends GameObject {
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
       sprintTimer: this.sprintTimer,
-      spriteName: this.spriteName
+      spriteName: this.spriteName,
+      score: this.score
     };
   }
   
@@ -234,7 +251,8 @@ export class Player extends GameObject {
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
       sprintTimer: this.sprintTimer,
-      spriteName: this.spriteName
+      spriteName: this.spriteName,
+      score: this.score
     }
   }
 
@@ -251,6 +269,7 @@ export class Player extends GameObject {
     this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
     this.sprintTimer = _data.sprintTimer !== undefined ? _data.sprintTimer : this.sprintTimer;
     this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
+    this.score = _data.score !== undefined ? _data.score : this.score;
     if (this.renderer) {
       this.renderer.playerName = this.name;
       this.renderer.spriteName = this.spriteName;

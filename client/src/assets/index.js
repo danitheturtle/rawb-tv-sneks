@@ -1,7 +1,5 @@
 import cheeseSpritesheet from './spritesheets/cheeseSpritesheet.png';
 import cheeseSpritesheetData from './spritesheets/cheeseSpritesheet.js';
-import p1SpritesheetData from './spritesheets/p1_spritesheet.js';
-import p1Spritesheet from './spritesheets/p1_spritesheet.png';
 import snakeyMousePlayerSpritesheet from './spritesheets/snakeyMousePlayerSpritesheet.png';
 import snakeyMousePlayerSpritesheetData from './spritesheets/snakeyMousePlayerSpritesheet.js';
 import jimmyTheSnakePlayerSpritesheet from './spritesheets/jimmyTheSnakePlayerSpritesheet.png';
@@ -14,6 +12,8 @@ import cheetohPlayerSpritesheet from './spritesheets/cheetohPlayerSpritesheet.pn
 import cheetohPlayerSpritesheetData from './spritesheets/cheetohPlayerSpritesheet.js';
 import moogliPlayerSpritesheet from './spritesheets/moogliPlayerSpritesheet.png';
 import moogliPlayerSpritesheetData from './spritesheets/moogliPlayerSpritesheet.js';
+import gearsPlayerSpritesheet from './spritesheets/gearsPlayerSpritesheet.png';
+import gearsPlayerSpritesheetData from './spritesheets/gearsPlayerSpritesheet.js';
 import dangerBackground from './backgrounds/bg_danger.png';
 import radicalBackground from './backgrounds/bg_radical.png';
 import tutorialBackground from './backgrounds/tutorial.png';
@@ -30,6 +30,7 @@ const allAssets = {
     evilMousePlayerSpritesheet: [evilMousePlayerSpritesheet, evilMousePlayerSpritesheetData],
     cheetohPlayerSpritesheet: [cheetohPlayerSpritesheet, cheetohPlayerSpritesheetData],
     moogliPlayerSpritesheet: [moogliPlayerSpritesheet, moogliPlayerSpritesheetData],
+    gearsPlayerSpritesheet: [gearsPlayerSpritesheet, gearsPlayerSpritesheetData],
     radicalBackground: [radicalBackground, {}],
     dangerBackground: [dangerBackground, {}],
     tutorialBackground: [tutorialBackground, {}],
