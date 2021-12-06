@@ -8,7 +8,7 @@ import { SpriteRenderer } from './drawing/spriteRenderer';
 const { Player, SnakeCollider, Pickup, CircleCollider, time, GLOBALS } = engine;
 const Vector = Victor;
 
-let s, sg, sp, st, socket;
+let s, sg, sp, st, sv, socket;
 
 export const init = (_state) => {
   //Setup shorthand
@@ -16,6 +16,7 @@ export const init = (_state) => {
   sg = s.game;
   sp = s.physics;
   st = s.time;
+  sv = s.view;
   socket = s.io;
 
   //Listen for new players
@@ -57,6 +58,7 @@ export const init = (_state) => {
     sg.players[data.id].collider.reset();
     if (data.id == sg.clientId) {
       updateClientPlayer();
+      sv.active?.reset();
       console.dir('broadcasted respawn');
     }
   });

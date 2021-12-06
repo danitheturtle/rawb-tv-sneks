@@ -83,9 +83,12 @@ const App = () => {
         gameState.game.clientState = CLIENT_STATES.PLAYING;
       }
     }
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    }
     window.addEventListener('blur', handleBlurPause);
     window.addEventListener('focus', handleFocusPlay);
-    
+    window.addEventListener('contextmenu', handleContextMenu);
     
     //Finally, start the game loop
     game.start();
@@ -94,6 +97,7 @@ const App = () => {
     return () => {
       window.removeEventListener('blur', handleBlurPause);
       window.removeEventListener('focus', handleFocusPlay);
+      window.removeEventListener('contextmenu', handleContextMenu);
     }
   }, [canvasRef.current, nameInputRef.current, connected])
 

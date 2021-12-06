@@ -10,7 +10,7 @@ export const GLOBALS = {
   gameLength: 180,
   endscreenLength: 10,
   startCountdownLength: 15,
-  initialViewScale: 100,
+  initialViewScale: 110,
   maxViewScale: 256,
   minViewScale: 70,
   zoomAmountOnCollect: 0.25,

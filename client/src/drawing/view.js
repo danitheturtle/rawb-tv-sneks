@@ -83,6 +83,11 @@ export class View {
     this.viewScale = Math.min(this.viewScale+amount, GLOBALS.maxViewScale);
     this.rescaleGU();
   }
+  
+  reset() {
+    this.viewScale = GLOBALS.initialViewScale;
+    this.rescaleGU();
+  }
 
   center(set) {
     if (set === undefined) {
