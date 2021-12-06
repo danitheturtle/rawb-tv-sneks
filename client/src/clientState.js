@@ -38,7 +38,9 @@ export class ClientState extends State {
       loading: [],
       //How many total assets are loading at runtime?
       numAssetsLoading: 0,
-      playerNameValue: ""
+      playerNameValue: "",
+      //Score. Updated by server
+      scoreboard: []
     };
     
     this.player = {

@@ -104,6 +104,7 @@ export const init = (_state) => {
   socket.on("updateGameState", (newState) => {
     //Update things based on server-authoritative state
     s.game.gameState = newState.gameState;
+    s.game.scoreboard = newState.scoreboard?.sort(([_, __, plScore1], [___, ____, plScore2]) => plScore1 > plScore2 ? -1 : 1);
     s.score.winner = newState.winnerID;
     s.time.timers.gameStartTimer = newState.gameStartTimer;
     s.time.timers.gameTimer = newState.gameTimer;

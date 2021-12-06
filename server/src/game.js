@@ -70,6 +70,10 @@ export const updateGame = () => {
         state.io.emit('playerDied', otherId);
       }
     }
+    //If sprinting, update score
+    if (sg.players[clientId].sprint) {
+      scoring.updatePlayerScore(clientId);
+    }
   }
   
   //Reset dead players and spawn pickups where they died
@@ -100,6 +104,7 @@ export const updateGame = () => {
     deadPlayer.pos.y = utils.randomInt(5, sl.activeLevelData.guHeight - 5);
     deadPlayer.collider.reset();
     deadPlayer.respawn();
+    scoring.updatePlayerScore(clientId);
     state.io.emit('playerRespawning', deadPlayer.getData());
   }
   scoring.update();
@@ -125,6 +130,7 @@ export const updateNetwork = () => {
     gameStartTimer: st.timers.gameStartTimer,
     gameTimer: st.timers.gameTimer,
     gameOverTimer: st.timers.gameOverTimer,
+    scoreboard: sg.scoreboard,
     players: playerData
   };
   //Emit up-to-date game state to all clients
@@ -154,6 +160,7 @@ export const playerCollectedPickup = ({ clientId, pickupId }) => {
   if (sg.pickups[pickupId] && sg.players[clientId]) {
     sg.players[clientId].score += sg.pickups[pickupId].worth;
     sg.players[clientId].collider.updateBodyWithScore();
+    scoring.updatePlayerScore(clientId);
     state.io.emit('collectedPickup', { clientId, pickupId, worth: sg.pickups[pickupId].worth });
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];
@@ -177,6 +184,8 @@ export const addNewPlayer = (socket, clientData) => {
       y: utils.randomInt(5, sl.activeLevelData.guHeight - 5),
       ...clientData
     });
+    
+  scoring.updatePlayerScore(newPlayerId);
 
   //Emit the new player's id to their client
   socket.emit('setClientID', newPlayerId);
@@ -201,6 +210,9 @@ export const disconnectPlayer = (clientId) => {
   delete sp.gameObjects[clientId];
   //Remove the player's data in the player array
   delete sg.players[clientId];
+  //find and remove the player from scoreboard
+  delete sg.scoreboard.splice(sg.scoreboard.indexOf(sg.scoreboard.find(plScore => plScore[0] === clientId)), 1);
+  
   //Emit that a player disconnected
   state.io.emit('removePlayer', clientId);
 }

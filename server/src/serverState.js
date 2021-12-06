@@ -8,10 +8,14 @@ export const SERVER_STATES = {
 export class ServerState extends State {
   constructor(_io) {
     super(_io);
+    this.game = {
+      ...this.game,
+      scoreboard: []
+    };
     this.physics = {
       ...this.physics,
       //Game object unique ID tracker
-      lastGameObjectID: 0,
-    }
+      lastGameObjectID: 0
+    };
   }
 }

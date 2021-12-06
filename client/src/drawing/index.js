@@ -1,6 +1,7 @@
 import { Spritesheet } from './spritesheet';
 import { Background } from './background';
 import engine from 'engine';
+import { CLIENT_STATES } from '../clientState';
 import * as playerRenderer from './playerRenderer';
 import * as circleRenderer from './circleRenderer';
 import * as spriteRenderer from './spriteRenderer';
@@ -102,7 +103,21 @@ export const draw = () => {
 }
 
 export const drawGUI = () => {
-  
+  if (sg.clientState === CLIENT_STATES.PLAYING || sg.clientState === CLIENT_STATES.PAUSED)
+  drawScoreboard(32, 64);
+}
+
+export const drawScoreboard = (x, y) => {
+  const scoreboard = sg.scoreboard;
+  let c = s.ctx;
+  c.save();
+  scoreboard.forEach((playerScore, i) => {
+    if (i > 9) return;
+    drawTextOutline("Sneakiest Sneks", x+136, y-16, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(playerScore[2], x, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(playerScore[1], x+96, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+  });
+  c.restore();
 }
 
 export const createTileLayer = (layerData) => {

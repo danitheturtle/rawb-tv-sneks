@@ -58,6 +58,26 @@ export const reset = () => {
     delete sp.gameObjects[pickupId];
     delete sg.pickups[pickupId];
   });
+  sg.scoreboard = [];
+}
+
+export const updatePlayerScore = (clientId) => {
+  if (!sg.players[clientId]) return;
+  //Find the player in the existing scoreboard
+  let foundIndex;
+  for (let i=0; i<sg.scoreboard.length; i++) {
+    if (clientId == sg.scoreboard[i]?.[0]) {
+      foundIndex = i;
+      break;
+    }
+  }
+  //If player is already in the array of scores, update score
+  if (foundIndex !== undefined) {
+    sg.scoreboard[foundIndex][2] = sg.players[clientId].score;
+  //Else, add new score array for this player
+  } else {
+    sg.scoreboard.push([clientId, sg.players[clientId].name, sg.players[clientId].score])
+  }
 }
 
 export const randomPickupType = () => {
