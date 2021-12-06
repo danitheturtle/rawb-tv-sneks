@@ -92,6 +92,7 @@ export const init = (_state) => {
   });
   
   socket.on('collectedPickup', ({ clientId, pickupId, worth }) => {
+    if (!sg.pickups[pickupId]) return;
     if (clientId && clientId != sg.clientId) {
       sg.players[clientId].score += sg.pickups[pickupId].worth;
       sg.players[clientId].collider.updateBodyWithScore()
