@@ -15,7 +15,7 @@ export const GLOBALS = {
   minViewScale: 70,
   zoomAmountOnCollect: 0.25,
   initialSnakeSize: 5,
-  numPickupsPerMinute: 100,
+  numPickupsPerMinute: 300,
   pickupCap: 500,
   baseMoveSpeed: 20,
   baseAccelSpeed: 80,
@@ -23,7 +23,7 @@ export const GLOBALS = {
   sprintCostPerSecond: 6,
   scoreLengthDivider: 5,
   startTimerLength: 10,
-  roundTimerLength: 900,
+  roundTimerLength: 600,
   gameEndTimerLength: 15
 };
 
