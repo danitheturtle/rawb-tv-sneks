@@ -58,6 +58,7 @@ export class PlayerRenderer {
     
     //Grab player sprites
     const playerHead = si.sprites[`${this.spriteName}Head`];
+    const playerBodyFirst = si.sprites[`${this.spriteName}Body-first`];
     let playerBody = si.sprites[`${this.spriteName}Body`];
     //If no player body, the body is split into multiple sections
     if (!playerBody) {
@@ -93,6 +94,17 @@ export class PlayerRenderer {
         );
         c.rotate(this.parent.vel.horizontalAngle()+Math.PI/2);
         playerHead.draw(
+          s, 
+          c, 
+          -this.radius * sg.gu, 
+          -this.radius * sg.gu, 
+          this.radius * sg.gu * 2, 
+          this.radius * sg.gu * 2
+        );
+      } else if (i === 1 && playerBodyFirst) {
+        c.translate(pos.x, pos.y);
+        c.rotate(snakeBodyRelativePositions[i-1].clone().subtract(pos).horizontalAngle()+Math.PI/2);
+        playerBodyFirst.draw(
           s, 
           c, 
           -this.radius * sg.gu, 

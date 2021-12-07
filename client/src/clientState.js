@@ -68,7 +68,8 @@ export class ClientState extends State {
         dangerRatPlayerSpritesheet: assets.images.dangerRatPlayerSpritesheet,
         cheetohPlayerSpritesheet: assets.images.cheetohPlayerSpritesheet,
         moogliPlayerSpritesheet: assets.images.moogliPlayerSpritesheet,
-        gearsPlayerSpritesheet: assets.images.gearsPlayerSpritesheet
+        gearsPlayerSpritesheet: assets.images.gearsPlayerSpritesheet,
+        koboldPlayerSpritesheet: assets.images.koboldPlayerSpritesheet
       },
       backgroundAssets: {
         rawbBG1: assets.images.rawbBG1,

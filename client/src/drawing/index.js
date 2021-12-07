@@ -352,7 +352,9 @@ export const randomPlayerSprite = () => {
     "dangerRatPlayer",
     "evilMousePlayer",
     "cheetohPlayer",
-    "moogliPlayer"
+    "moogliPlayer",
+    "gearsPlayer",
+    "koboldPlayer"
   ];
   return allSpriteNames[utils.randomInt(0, allSpriteNames.length-1)];
 }

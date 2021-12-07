@@ -14,6 +14,8 @@ import moogliPlayerSpritesheet from './spritesheets/moogliPlayerSpritesheet.png'
 import moogliPlayerSpritesheetData from './spritesheets/moogliPlayerSpritesheet.js';
 import gearsPlayerSpritesheet from './spritesheets/gearsPlayerSpritesheet.png';
 import gearsPlayerSpritesheetData from './spritesheets/gearsPlayerSpritesheet.js';
+import koboldPlayerSpritesheet from './spritesheets/koboldPlayerSpritesheet.png';
+import koboldPlayerSpritesheetData from './spritesheets/koboldPlayerSpritesheet.js';
 import dangerBackground from './backgrounds/bg_danger.png';
 import radicalBackground from './backgrounds/bg_radical.png';
 import tutorialBackground from './backgrounds/tutorial.png';
@@ -31,6 +33,7 @@ const allAssets = {
     cheetohPlayerSpritesheet: [cheetohPlayerSpritesheet, cheetohPlayerSpritesheetData],
     moogliPlayerSpritesheet: [moogliPlayerSpritesheet, moogliPlayerSpritesheetData],
     gearsPlayerSpritesheet: [gearsPlayerSpritesheet, gearsPlayerSpritesheetData],
+    koboldPlayerSpritesheet: [koboldPlayerSpritesheet, koboldPlayerSpritesheetData],
     radicalBackground: [radicalBackground, {}],
     dangerBackground: [dangerBackground, {}],
     tutorialBackground: [tutorialBackground, {}],
