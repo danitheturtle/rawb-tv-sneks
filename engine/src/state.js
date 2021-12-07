@@ -21,7 +21,10 @@ export const GLOBALS = {
   baseAccelSpeed: 80,
   sprintMult: 4,
   sprintCostPerSecond: 6,
-  scoreLengthDivider: 5
+  scoreLengthDivider: 5,
+  startTimerLength: 10,
+  roundTimerLength: 900,
+  gameEndTimerLength: 15
 };
 
 export class State {
@@ -31,6 +34,7 @@ export class State {
     this.game = {
       //Track the game state
       gameState: GAME_STATES.GAME_WAITING_FOR_PLAYERS,
+      gameStateTimer: 0,
       //Store all player objects
       players: {},
       pickups: {}

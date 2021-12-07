@@ -1,5 +1,6 @@
 import engine from 'engine';
 import Victor from 'victor';
+import { SERVER_STATES } from './serverState';
 const Vector = Victor;
 const { Pickup, GLOBALS, CircleCollider, utils } = engine;
 
@@ -62,7 +63,7 @@ export const reset = () => {
 }
 
 export const updatePlayerScore = (clientId) => {
-  if (!sg.players[clientId]) return;
+  if (!sg.players[clientId] || sg.gameState !== SERVER_STATES.GAME_PLAYING) return;
   //Find the player in the existing scoreboard
   let foundIndex;
   for (let i=0; i<sg.scoreboard.length; i++) {

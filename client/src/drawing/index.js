@@ -5,7 +5,7 @@ import { CLIENT_STATES } from '../clientState';
 import * as playerRenderer from './playerRenderer';
 import * as circleRenderer from './circleRenderer';
 import * as spriteRenderer from './spriteRenderer';
-const { utils } = engine;
+const { utils, GLOBALS } = engine;
 let s, sg, si, sv, sp, sl;
 let layers = [];
 
@@ -103,8 +103,140 @@ export const draw = () => {
 }
 
 export const drawGUI = () => {
-  if (sg.clientState === CLIENT_STATES.PLAYING || sg.clientState === CLIENT_STATES.PAUSED)
+  if (sg.clientState === CLIENT_STATES.PLAYING || sg.clientState === CLIENT_STATES.PAUSED);
+  switch (sg.gameState) {
+    case CLIENT_STATES.GAME_WAITING_FOR_PLAYERS:
+      drawWaitingForPlayersGUI();
+      break;
+    case CLIENT_STATES.GAME_STARTING_SOON:
+      drawStartingSoonGUI();
+      break;
+    case CLIENT_STATES.GAME_OVER:
+      drawGameOverGUI();
+      break;
+    case CLIENT_STATES.GAME_RESETTING:
+      drawResetGUI();
+      break;
+    case CLIENT_STATES.GAME_PLAYING:
+    default:
+      drawPlayingGUI();
+      break;
+  }
+}
+
+export const drawWaitingForPlayersGUI = () => {
+  drawTextOutline(
+    "Waitinig for Players (min 3)", 
+    s.viewport.width / 2, 
+    48, 
+    "36px Arial", 
+    'rgb(255, 255, 255)', 
+    'rgb(50, 50, 50)', 
+    1
+  );
+}
+
+export const drawStartingSoonGUI = () => {
+  drawTextOutline(
+    "Starting Soon (unless people leave)", 
+    s.viewport.width / 2, 
+    48, 
+    "36px Arial", 
+    'rgb(255, 255, 255)', 
+    'rgb(50, 50, 50)', 
+    1
+  );
+  drawProgressBar(
+    s.viewport.width / 3, 
+    72, 
+    s.viewport.width / 3, 
+    16, 
+    'rgba(255, 255, 255, 0.5)', 
+    '#7D5BA6', 
+    sg.gameStateTimer, 
+    0, 
+    GLOBALS.startTimerLength
+  );
+}
+
+export const drawGameOverGUI = () => {
+  let c = s.ctx;
+  c.fillStyle = "rgba(0, 0, 0, 0.5)";
+  c.fillRect(0, 0, s.viewport.width, s.viewport.height);
+  drawTextOutline(
+    "Game Over", 
+    s.viewport.width / 2, 
+    48, 
+    "42px Arial", 
+    'rgb(255, 255, 255)', 
+    'rgb(50, 50, 50)', 
+    1
+  );
+  drawProgressBar(
+    s.viewport.width / 3, 
+    72, 
+    s.viewport.width / 3, 
+    16, 
+    'rgba(255, 255, 255, 0.5)', 
+    '#D81159', 
+    sg.gameStateTimer, 
+    GLOBALS.gameEndTimerLength,
+    0
+  );
+  drawTextOutline(
+    "Most Dangerous Noodle:", 
+    s.viewport.width / 2, 
+    s.viewport.height / 2 - 48, 
+    "52px Arial", 
+    'rgb(255, 255, 255)', 
+    'rgb(50, 50, 50)', 
+    2
+  );
+  drawTextOutline(
+    `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`, 
+    s.viewport.width / 2, 
+    s.viewport.height / 2 + 48, 
+    "64px Arial", 
+    'rgb(255, 255, 255)', 
+    'rgb(50, 50, 50)', 
+    2
+  );
+}
+
+export const drawResetGUI = () => {
+  drawTextOutline(
+    "Reseting...", 
+    s.viewport.width / 2, 
+    48, 
+    "36px Arial", 
+    'rgb(255, 255, 255)', 
+    'rgb(50, 50, 50)', 
+    1
+  );
+}
+
+export const drawPlayingGUI = () => {
   drawScoreboard(32, 64);
+  drawTextOutline(
+    "Time Left", 
+    s.viewport.width / 2, 
+    48, 
+    "36px Arial", 
+    'rgb(255, 255, 255)', 
+    'rgb(50, 50, 50)', 
+    1
+  );
+  drawProgressBar(
+    s.viewport.width / 3, 
+    72, 
+    s.viewport.width / 3, 
+    16, 
+    'rgba(255, 255, 255, 0.5)', 
+    '#55D6BE', 
+    sg.gameStateTimer, 
+    GLOBALS.roundTimerLength,
+    0
+  );
 }
 
 export const drawScoreboard = (x, y) => {

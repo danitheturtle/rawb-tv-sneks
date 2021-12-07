@@ -108,6 +108,62 @@ export const updateGame = () => {
     state.io.emit('playerRespawning', deadPlayer.getData());
   }
   scoring.update();
+  
+  switch(sg.gameState) {
+    case SERVER_STATES.GAME_WAITING_FOR_PLAYERS:
+      if (Object.keys(sg.players).length >= 3) {
+        sg.gameState = SERVER_STATES.GAME_STARTING_SOON;
+      }
+      break;
+    case SERVER_STATES.GAME_OVER:
+      if (st.timers.gameEndTimer === undefined) {
+        time.startNewTimer('gameEndTimer');
+      }
+      sg.gameStateTimer = st.timers.gameEndTimer;
+      if (st.timers.gameEndTimer >= GLOBALS.gameEndTimerLength) {
+        delete st.timers.gameEndTimer;
+        if (Object.keys(sg.players).length >= 3) {
+          sg.gameState = SERVER_STATES.GAME_STARTING_SOON;
+        } else {
+          sg.gameState = SERVER_STATES.GAME_WAITING_FOR_PLAYERS;
+        }
+      }
+      break;
+    case SERVER_STATES.GAME_STARTING_SOON:
+      if (st.timers.gameStartTimer === undefined) {
+        time.startNewTimer('gameStartTimer');
+      }
+      if (Object.keys(sg.players).length < 3) {
+        sg.gameState = SERVER_STATES.GAME_WAITING_FOR_PLAYERS;
+        delete st.timers.gameStartTimer;
+      }
+      sg.gameStateTimer = st.timers.gameStartTimer;
+      if (st.timers.gameStartTimer >= GLOBALS.startTimerLength) {
+        delete st.timers.gameStartTimer;
+        sg.gameState = SERVER_STATES.GAME_RESETTING;
+      }
+      break;
+    case SERVER_STATES.GAME_RESETTING:
+      scoring.reset();
+      Object.values(sg.players).forEach(pl => {
+        pl.die();
+        state.io.emit('playerDied', pl.id);
+        sg.scoreboard.push([pl.id, pl.name, pl.score]);
+      });
+      sg.gameState = SERVER_STATES.GAME_PLAYING;
+      break;
+    case SERVER_STATES.GAME_PLAYING:
+    default:
+      if (st.timers.roundTimer === undefined) {
+        time.startNewTimer('roundTimer');
+      }
+      sg.gameStateTimer = st.timers.roundTimer;
+      if (st.timers.roundTimer >= GLOBALS.roundTimerLength || Object.keys(sg.players).length < 2) {
+        delete st.timers.roundTimer;
+        sg.gameState = SERVER_STATES.GAME_OVER;
+      }
+      break;
+  }
 }
 
 /**
@@ -127,9 +183,7 @@ export const updateNetwork = () => {
   //Get game state data
   let updatedGameState = {
     gameState: sg.gameState,
-    gameStartTimer: st.timers.gameStartTimer,
-    gameTimer: st.timers.gameTimer,
-    gameOverTimer: st.timers.gameOverTimer,
+    gameStateTimer: sg.gameStateTimer,
     scoreboard: sg.scoreboard,
     players: playerData
   };
