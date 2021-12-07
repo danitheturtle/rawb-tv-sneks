@@ -111,7 +111,7 @@ export const updateGame = () => {
   
   switch(sg.gameState) {
     case SERVER_STATES.GAME_WAITING_FOR_PLAYERS:
-      if (Object.keys(sg.players).length >= 3) {
+      if (Object.keys(sg.players).length >= 2) {
         sg.gameState = SERVER_STATES.GAME_STARTING_SOON;
       }
       break;
@@ -122,7 +122,7 @@ export const updateGame = () => {
       sg.gameStateTimer = st.timers.gameEndTimer;
       if (st.timers.gameEndTimer >= GLOBALS.gameEndTimerLength) {
         delete st.timers.gameEndTimer;
-        if (Object.keys(sg.players).length >= 3) {
+        if (Object.keys(sg.players).length >= 2) {
           sg.gameState = SERVER_STATES.GAME_STARTING_SOON;
         } else {
           sg.gameState = SERVER_STATES.GAME_WAITING_FOR_PLAYERS;
@@ -133,7 +133,7 @@ export const updateGame = () => {
       if (st.timers.gameStartTimer === undefined) {
         time.startNewTimer('gameStartTimer');
       }
-      if (Object.keys(sg.players).length < 3) {
+      if (Object.keys(sg.players).length < 2) {
         sg.gameState = SERVER_STATES.GAME_WAITING_FOR_PLAYERS;
         delete st.timers.gameStartTimer;
       }
