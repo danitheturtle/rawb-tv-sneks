@@ -4,6 +4,7 @@ import * as drawing from './drawing';
 import * as keys from './keys';
 import * as socket from './socket';
 import * as playerController from './playerController';
+import { CanvasButton } from './drawing/canvasButton';
 const { time, physics, GLOBALS } = engine;
 
 let s, sg, sv, si, sp;
@@ -40,23 +41,29 @@ export const update = () => {
       //Show the loading screen
       updateLoading();
       return;
-      //If viewing tutorial
+    //If viewing tutorial
     case CLIENT_STATES.TUTORIAL_SCREEN:
       //Display tutorial
       updateTutorial();
       return;
-      //If on the start screen
+    //If on the start screen
     case CLIENT_STATES.START_SCREEN:
       //Show start screen
       updateStartScreen();
       return;
-      //If connecting
+    //if selecting character
+    case CLIENT_STATES.CHARACTER_SELECT:
+      //update character select
+      updateCharacterSelect();
+      return;
+    //If connecting
     case CLIENT_STATES.CONNECTING:
       //Show connecting screen
       updateConnecting();
       return;
-      //The default.  Update as normal
+    //The default. Update as normal
     case CLIENT_STATES.PLAYING:
+    default:
       break;
   }
   
@@ -147,38 +154,75 @@ const updateTutorial = () => {
   }
 }
 
+let joinGameButton;
 const updateStartScreen = () => {
   let c = s.ctx;
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   drawing.drawText("Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 160, "60px Arial", "rgba(100, 100, 100, 1.0)");
-
-  c.fillStyle = "rgb(240, 100, 100)";
-  c.strokeStyle = "rgb(100, 100, 100)";
-
-  //TODO: make a canvas button class
-  let buttonX = s.viewport.width / 2 - 200;
-  let buttonY = s.viewport.height / 2 + 60;
-  let buttonWidth = 400;
-  let buttonHeight = 60;
-
-  let mouse = keys.mouse();
   drawing.drawText("Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 40, "24px Arial", "rgba(50, 50, 50, 1.0)");
   if (sg.playerNameValue.length >= 3) {
-    if (mouse[0] > buttonX && mouse[0] < buttonX + buttonWidth && mouse[1] > buttonY && mouse[1] < buttonY + buttonHeight) {
-      c.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
-      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 90, "30px Arial", "rgba(250, 250, 250, 1.0)");
-      if (keys.pressed('mouseButton')) {
-        s.input.style.display = 'none';
-        sg.clientState = CLIENT_STATES.CONNECTING;
-      }
-    } else {
-      c.strokeRect(buttonX, buttonY, buttonWidth, buttonHeight);
-      drawing.drawText("Join Game", s.viewport.width / 2, s.viewport.height / 2 + 90, "30px Arial", "rgba(140, 140, 140, 1.0)");
+    if (!joinGameButton) {
+      joinGameButton = new CanvasButton(
+        s, 
+        s.viewport.width / 2 - 200, 
+        s.viewport.height / 2 + 60, 
+        400, 
+        60, 
+        'rgb(100, 100, 100)', 
+        'rgb(240, 100, 100)',
+        () => {
+          s.input.style.display = 'none';
+          sg.clientState = CLIENT_STATES.CHARACTER_SELECT;
+        }, 
+        undefined, 
+        'Join Game'
+      );
     }
+    joinGameButton.updateAndDraw();
   } else {
     drawing.drawText("(3 character min, then press enter)", s.viewport.width / 2, s.viewport.height / 2 + 36, "12px Arial", "rgba(160, 160, 160, 1.0)");
   }
+}
+
+let characterSelectButtons;
+const updateCharacterSelect = () => {
+  let c = s.ctx;
+  c.fillStyle = "white";
+  c.fillRect(0, 0, s.viewport.width, s.viewport.height);
+  drawing.drawText(
+    "Choose Your Snek", 
+    s.viewport.width / 2, 
+    48, 
+    "36px Arial",
+    'rgb(50, 50, 50)'
+  );
+  const charSelectMargin = 50;
+  if (!characterSelectButtons) {
+    characterSelectButtons = [];
+    const gridSize = 7;
+    for (let i=0; i<drawing.allPlayerSpriteNames.length; i++) {
+      const buttonSize = ((s.viewport.width-charSelectMargin*2) / gridSize) - ((gridSize-1)*charSelectMargin)/gridSize;
+      characterSelectButtons.push(new CanvasButton(
+        s,
+        charSelectMargin+(i % gridSize) * (buttonSize + charSelectMargin),
+        charSelectMargin*2+(Math.floor(i / gridSize)) * (buttonSize + charSelectMargin),
+        buttonSize,
+        buttonSize,
+        'rgb(255, 255, 255)', 
+        'rgb(200, 200, 200)', 
+        () => {
+          sg.playerSpriteValue = drawing.allPlayerSpriteNames[i][0];
+          sg.clientState = CLIENT_STATES.CONNECTING;
+        },
+        si.sprites[`${drawing.allPlayerSpriteNames[i][0]}Head`]
+      ))
+    }
+  }
+  characterSelectButtons.forEach((bt, i) => {
+    bt.updateAndDraw();
+    drawing.drawText(drawing.allPlayerSpriteNames[i][1], bt.x + bt.width / 2, bt.y + bt.height + 16, "20px Arial", 'rgb(50, 50, 50)')
+  });
 }
 
 const updateConnecting = () => {

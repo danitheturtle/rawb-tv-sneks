@@ -134,6 +134,11 @@ export const drawWaitingForPlayersGUI = () => {
     'rgb(50, 50, 50)', 
     1
   );
+  Object.values(sg.players).forEach((player, i) => {
+    if (i > 20) return;
+    drawTextOutline("Sneks in a Lobby", 186, 48, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(player.name, 48, 96+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+  });
 }
 
 export const drawStartingSoonGUI = () => {
@@ -345,16 +350,16 @@ export const randomPalletteColor = () => {
   return allColors[utils.randomInt(0, allColors.length-1)]
 }
 
+export const allPlayerSpriteNames = [
+  ["snakeyMousePlayer", "Snakey Mouse"],
+  ["jimmyTheSnakePlayer", "Jimmy"],
+  ["dangerRatPlayer", "Danger Rat"],
+  ["evilMousePlayer", "Evil Snakey Mouse"],
+  ["cheetohPlayer", "Cheetoh"],
+  ["moogliPlayer", "Moogli"],
+  ["gearsPlayer", "Gears"],
+  ["koboldPlayer", "Kobold"]
+];
 export const randomPlayerSprite = () => {
-  const allSpriteNames = [
-    "snakeyMousePlayer",
-    "jimmyTheSnakePlayer",
-    "dangerRatPlayer",
-    "evilMousePlayer",
-    "cheetohPlayer",
-    "moogliPlayer",
-    "gearsPlayer",
-    "koboldPlayer"
-  ];
-  return allSpriteNames[utils.randomInt(0, allSpriteNames.length-1)];
+  return allPlayerSpriteNames[utils.randomInt(0, allPlayerSpriteNames.length-1)][0];
 }

@@ -9,6 +9,7 @@ export const CLIENT_STATES = {
   LOADING: 'LOADING',
   TUTORIAL_SCREEN: 'TUTORIAL_SCREEN',
   START_SCREEN: 'START_SCREEN',
+  CHARACTER_SELECT: 'CHARACTER_SELECT',
   CONNECTING: 'CONNECTING',
   PLAYING: 'PLAYING',
   ...GAME_STATES
@@ -39,6 +40,7 @@ export class ClientState extends State {
       //How many total assets are loading at runtime?
       numAssetsLoading: 0,
       playerNameValue: "",
+      playerSpriteValue: "",
       //Score. Updated by server
       scoreboard: []
     };
