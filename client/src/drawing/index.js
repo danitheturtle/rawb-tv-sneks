@@ -707,14 +707,20 @@ export const randomPalletteColor = () => {
 }
 
 export const allPlayerSpriteNames = [
-  ["snakeyMousePlayer", "Snakey Mouse"],
-  ["jimmyTheSnakePlayer", "Jimmy"],
-  ["dangerRatPlayer", "Danger Rat"],
-  ["evilMousePlayer", "Evil Snakey Mouse"],
+  ["beepatronPlayer", "Beepatron"],
   ["cheetohPlayer", "Cheetoh"],
+  ["dangerRatPlayer", "Danger Rat"],
+  ["goatPlayer", "Goat"],
+  ["illidanPlayer", "Illidan"],
+  ["jimmyPlayer", "Jimmy"],
+  ["koboldPlayer", "Kobold"],
+  ["monicaPlayer", "Monica"],
   ["moogliPlayer", "Moogli"],
-  ["gearsPlayer", "Gears"],
-  ["koboldPlayer", "Kobold"]
+  ["owlPlayer", "Owl"],
+  ["sleepylilturtlePlayer", "Sleepy Turtle"],
+  ["snakeyMousePlayer", "Snakey Mouse"],
+  ["vampireMonicaPlayer", "Vampire Monica"],
+  ["vampireMousePlayer", "Vampire Mouse"]
 ];
 export const randomPlayerSprite = () => {
   return allPlayerSpriteNames[utils.randomInt(0, allPlayerSpriteNames.length-1)][0];

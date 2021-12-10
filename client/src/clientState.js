@@ -59,25 +59,19 @@ export class ClientState extends State {
     this.image = {
       raw: assets,
       tilesheetAssets: {},
-      spritesheetAssets: {
-        cheeseSpritesheet: assets.images.cheeseSpritesheet,
-        snakeyMousePlayerSpritesheet: assets.images.snakeyMousePlayerSpritesheet,
-        jimmyTheSnakePlayerSpritesheet: assets.images.jimmyTheSnakePlayerSpritesheet,
-        evilMousePlayerSpritesheet: assets.images.evilMousePlayerSpritesheet,
-        dangerRatPlayerSpritesheet: assets.images.dangerRatPlayerSpritesheet,
-        cheetohPlayerSpritesheet: assets.images.cheetohPlayerSpritesheet,
-        moogliPlayerSpritesheet: assets.images.moogliPlayerSpritesheet,
-        gearsPlayerSpritesheet: assets.images.gearsPlayerSpritesheet,
-        koboldPlayerSpritesheet: assets.images.koboldPlayerSpritesheet
-      },
-      backgroundAssets: {
-        rawbBG1: assets.images.rawbBG1,
-        rawbBG2: assets.images.rawbBG2,
-        rawbBG3: assets.images.rawbBG3,
-        dangerBackground: assets.images.dangerBackground,
-        radicalBackground: assets.images.radicalBackground
-      },
-      tutorialImg: assets.images.tutorialBackground,
+      spritesheetAssets: Object.entries(assets.images)
+        .filter(([key]) => key.includes('Spritesheet'))
+        .reduce((acc, [spKey, spVal]) => {
+          acc[spKey] = spVal;
+          return acc;
+        }, {}),
+      backgroundAssets: Object.entries(assets.images)
+        .filter(([key]) => key.includes('Background'))
+        .reduce((acc, [spKey, spVal]) => {
+          acc[spKey] = spVal;
+          return acc;
+        }, {}),
+      tutorialImg: assets.images.tutorialImg,
       tilesheets: {},
       spritesheets: {},
       sprites: {},
