@@ -60,10 +60,10 @@ export const updateGame = (s) => {
     if (Object.keys(sg.players).length < 2) {
       sg.gameStartTimer = undefined;
       sg.gameState = SERVER_STATES.GAME_WAITING_FOR_PLAYERS;
-    } else if ((s.runTime - sg.gameEndTimer) >= GLOBALS.startTimerLength) {
+    } else if ((s.runTime - sg.gameStartTimer) >= GLOBALS.startTimerLength) {
 
       //reset game
-      scoring.resetPickups();
+      scoring.resetPickups(s);
       for (uid in sg.players) {
         let pl = sg.players[uid];
         pl.dead = true;
@@ -194,7 +194,7 @@ export const reset = (s, playerId) => {
 
   s.io.emit('playerDied', playerId);
 
-  scoring.resetPickups();
+  scoring.resetPickups(s);
 }
 
 /**

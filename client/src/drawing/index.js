@@ -102,7 +102,7 @@ export const drawGUI = (s) => {
     {//drawWaitingForPlayersGUI
       drawTextOutline(
         s,
-        "Waitinig for Players (min 3)",
+        "Waiting for Players (min 3)",
         s.viewport.width / 2,
         48,
         "36px Arial",
@@ -138,7 +138,7 @@ export const drawGUI = (s) => {
         16,
         'rgba(255, 255, 255, 0.5)',
         '#7D5BA6',
-        s.serverTime - sg.gameStartTimer,
+        s.serverTime - sg.gameStartTimer,//TODO: fix client timers
         0,
         GLOBALS.startTimerLength
       );
@@ -169,8 +169,8 @@ export const drawGUI = (s) => {
         'rgba(255, 255, 255, 0.5)',
         '#D81159',
         s.serverTime - sg.gameEndTimer,
+        0,
         GLOBALS.gameEndTimerLength,
-        0
       );
       drawTextOutline(
         s,
@@ -233,8 +233,8 @@ export const drawGUI = (s) => {
         'rgba(255, 255, 255, 0.5)',
         '#55D6BE',
         s.serverTime - sg.roundTimer,
+        0,
         GLOBALS.roundTimerLength,
-        0
       );
     }
     break;

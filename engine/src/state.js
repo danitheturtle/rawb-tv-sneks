@@ -137,28 +137,6 @@ export class State {
       //Who won the game
       winners: undefined
     };
-    // //Physics state
-    // this.physics = {
-    //   //Game Objects. Game object ID will be set by the server
-    // };
-
-    //Timer state
-    // this.time = {
-    //   //Delta time
-    //   dt: 0,
-    //   //Total time the app has been running
-    //   runTime: 0,
-    //   //Timestamp of the last update loop
-    //   lastTime: 0,
-    //   //Current frames per second
-    //   fps: 0,
-    //   //Timers for individual clients so that syncing can happen properly
-    //   clientTimers: {},
-    //   //General timers with unique ids
-    //   timers: {}
-    // };
-    // this.level = {
-    // };
   }
 
   updateTimeFromSystem() {
