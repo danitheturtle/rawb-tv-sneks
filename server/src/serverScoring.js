@@ -20,11 +20,11 @@ export const spawnPickup = (s, pickupType, x, y) => {
 
   //remove extra pickups
   if (sg.pickupsTotal > GLOBALS.pickupCap) {
-    let uids = Object.keys(sg.pickups);
+    let ids = Object.keys(sg.pickups);
 
-    let toRemoveId = uids[utils.randomInt(0, uids.length - 1)];
+    let toRemoveId = ids[utils.randomInt(0, ids.length - 1)];
 
-    s.io.emit('collectedPickup', { pickupId: toRemoveId });
+    s.io.emit('collectedPickup', { pickupId: Number(toRemoveId) });
 
     sg.pickupsTotal--;
     delete sg.pickups[toRemoveId];
@@ -37,27 +37,6 @@ export const resetPickups = (s) => {
   s.io.emit('allPickups', []);
 
 }
-
-// export const updatePlayerScore = (s, playerUid) => {
-//   let sg = state.game;
-
-//   if (!sg.players[playerUid] || sg.gameState !== SERVER_STATES.GAME_PLAYING) return;
-//   //Find the player in the existing scoreboard
-//   let foundIndex;
-//   for (let i=0; i<sg.scoreboard.length; i++) {
-//     if (playerUid == sg.scoreboard[i]?.[0]) {
-//       foundIndex = i;
-//       break;
-//     }
-//   }
-//   //If player is already in the array of scores, update score
-//   if (foundIndex !== undefined) {
-//     sg.scoreboard[foundIndex][2] = sg.players[playerUid].score;
-//   //Else, add new score array for this player
-//   } else {
-//     sg.scoreboard.push([playerUid, sg.players[playerUid].name, sg.players[playerUid].score])
-//   }
-// }
 
 let totalOdds = 0;
 for (let i = 0; i < PICKUP_ODDS.length; i++) {

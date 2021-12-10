@@ -99,500 +99,145 @@ export const drawGUI = (s) => {
   if (sg.clientState === CLIENT_STATES.PLAYING || sg.clientState === CLIENT_STATES.PAUSED);
   switch (sg.gameState) {//TODO: there is a minor sync bug here relating to the gameState being updated without being sent the relevant data
     case CLIENT_STATES.GAME_WAITING_FOR_PLAYERS:
-      {//drawWaitingForPlayersGUI
-        drawTextOutline(s,
-          "Waitinig for Players (min 3)",
-    "Waitinig for Players (min 3)",
-          "Waitinig for Players (min 3)",
-    "Waitinig for Players (min 3)",
-          "Waitinig for Players (min 3)",
-    "Waitinig for Players (min 3)",
-          "Waitinig for Players (min 3)",
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-          48,
-    48,
-          48,
-    48,
-          48,
-    48,
-          48,
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-          1
-        );
-        Object.values(sg.players).forEach((player, i) => {
-          if (i > 20) return;
-          drawTextOutline(s, "Sneks in a Lobby", 186, 48, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
-          drawTextOutline(s, player.playerName, 48, 96+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
-        });
-      }
-      break;
+    {//drawWaitingForPlayersGUI
+      drawTextOutline(
+        s,
+        "Waitinig for Players (min 3)",
+        s.viewport.width / 2,
+        48,
+        "36px Arial",
+        'rgb(255, 255, 255)',
+        'rgb(50, 50, 50)',
+        1
+      );
+      Object.values(sg.players).forEach((player, i) => {
+        if (i > 20) return;
+        drawTextOutline(s, "Sneks in a Lobby", 186, 48, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+        drawTextOutline(s, player.playerName, 48, 96+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+      });
+    }
+    break;
 
     case CLIENT_STATES.GAME_STARTING_SOON:
-      {//drawStartingSoonGUI
-        drawTextOutline(s,
-          "Starting Soon (unless people leave)",
-    "Starting Soon (unless people leave)",
-          "Starting Soon (unless people leave)",
-    "Starting Soon (unless people leave)",
-          "Starting Soon (unless people leave)",
-    "Starting Soon (unless people leave)",
-          "Starting Soon (unless people leave)",
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-          48,
-    48,
-          48,
-    48,
-          48,
-    48,
-          48,
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-          1
-        );
-        drawProgressBar(
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-          72,
-    72,
-          72,
-    72,
-          72,
-    72,
-          72,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-          16,
-    16,
-          16,
-    16,
-          16,
-    16,
-          16,
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-          '#7D5BA6',
-    '#7D5BA6',
-          '#7D5BA6',
-    '#7D5BA6',
-          '#7D5BA6',
-    '#7D5BA6',
-          '#7D5BA6',
-          s.serverTime - sg.gameStartTimer,
-          0,
-    0,
-          0,
-    0,
-          0,
-    0,
-          0,
-          GLOBALS.startTimerLength
-        );
-      }
-      break;
+    {//drawStartingSoonGUI
+      drawTextOutline(
+        s,
+        "Starting Soon (unless people leave)",
+        s.viewport.width / 2,
+        48,
+        "36px Arial",
+        'rgb(255, 255, 255)',
+        'rgb(50, 50, 50)',
+        1
+      );
+      drawProgressBar(
+        s,
+        s.viewport.width / 3,
+        72,
+        s.viewport.width / 3,
+        16,
+        'rgba(255, 255, 255, 0.5)',
+        '#7D5BA6',
+        s.serverTime - sg.gameStartTimer,
+        0,
+        GLOBALS.startTimerLength
+      );
+    }
+    break;
 
     case CLIENT_STATES.GAME_OVER:
-      {//drawGameOverGUI
-        let c = s.ctx;
-        c.fillStyle = "rgba(0, 0, 0, 0.5)";
-        c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-        drawTextOutline(s,
-          "Game Over",
-    "Game Over",
-          "Game Over",
-    "Game Over",
-          "Game Over",
-    "Game Over",
-          "Game Over",
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-          48,
-    48,
-          48,
-    48,
-          48,
-    48,
-          48,
-          "42px Arial",
-    "42px Arial",
-          "42px Arial",
-    "42px Arial",
-          "42px Arial",
-    "42px Arial",
-          "42px Arial",
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-          1
-        );
-        drawProgressBar(
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-          72,
-    72,
-          72,
-    72,
-          72,
-    72,
-          72,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-          16,
-    16,
-          16,
-    16,
-          16,
-    16,
-          16,
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-          '#D81159',
-    '#D81159',
-          '#D81159',
-    '#D81159',
-          '#D81159',
-    '#D81159',
-          '#D81159',
-          s.serverTime - sg.gameEndTimer,
-          GLOBALS.gameEndTimerLength,
-          0
-        );
-        drawTextOutline(s,
-          "Most Dangerous Noodle:",
-    "Most Dangerous Noodle:",
-          "Most Dangerous Noodle:",
-    "Most Dangerous Noodle:",
-          "Most Dangerous Noodle:",
-    "Most Dangerous Noodle:",
-          "Most Dangerous Noodle:",
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-          s.viewport.height / 2 - 48,
-    s.viewport.height / 2 - 48,
-          s.viewport.height / 2 - 48,
-    s.viewport.height / 2 - 48,
-          s.viewport.height / 2 - 48,
-    s.viewport.height / 2 - 48,
-          s.viewport.height / 2 - 48,
-          "52px Arial",
-    "52px Arial",
-          "52px Arial",
-    "52px Arial",
-          "52px Arial",
-    "52px Arial",
-          "52px Arial",
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-          2
-        );
-        drawTextOutline(s,
-          `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
-    `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
-          `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
-    `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
-          `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
-    `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
-          `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-          s.viewport.height / 2 + 48,
-    s.viewport.height / 2 + 48,
-          s.viewport.height / 2 + 48,
-    s.viewport.height / 2 + 48,
-          s.viewport.height / 2 + 48,
-    s.viewport.height / 2 + 48,
-          s.viewport.height / 2 + 48,
-          "64px Arial",
-    "64px Arial",
-          "64px Arial",
-    "64px Arial",
-          "64px Arial",
-    "64px Arial",
-          "64px Arial",
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-          2
-        );
-      }
-      break;
+    {//drawGameOverGUI
+      let c = s.ctx;
+      c.fillStyle = "rgba(0, 0, 0, 0.5)";
+      c.fillRect(0, 0, s.viewport.width, s.viewport.height);
+      drawTextOutline(
+        s,
+        "Game Over",
+        s.viewport.width / 2,
+        48,
+        "42px Arial",
+        'rgb(255, 255, 255)',
+        'rgb(50, 50, 50)',
+        1
+      );
+      drawProgressBar(
+        s,
+        s.viewport.width / 3,
+        72,
+        s.viewport.width / 3,
+        16,
+        'rgba(255, 255, 255, 0.5)',
+        '#D81159',
+        s.serverTime - sg.gameEndTimer,
+        GLOBALS.gameEndTimerLength,
+        0
+      );
+      drawTextOutline(
+        s,
+        "Most Dangerous Noodle:",
+        s.viewport.width / 2,
+        s.viewport.height / 2 - 48,
+        "52px Arial",
+        'rgb(255, 255, 255)',
+        'rgb(50, 50, 50)',
+        2
+      );
+      drawTextOutline(
+        s,
+        `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`,
+        s.viewport.width / 2,
+        s.viewport.height / 2 + 48,
+        "64px Arial",
+        'rgb(255, 255, 255)',
+        'rgb(50, 50, 50)',
+        2
+      );
+    }
+    break;
 
     case CLIENT_STATES.GAME_RESETTING:
-      {//drawResetGUI
-        drawTextOutline(s,
-          "Reseting...",
-    "Reseting...",
-          "Reseting...",
-    "Reseting...",
-          "Reseting...",
-    "Reseting...",
-          "Reseting...",
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-          48,
-    48,
-          48,
-    48,
-          48,
-    48,
-          48,
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-          1
-        );
-      }
-      break;
+    {//drawResetGUI
+      drawTextOutline(
+        s,
+        "Reseting...",
+        s.viewport.width / 2,
+        48,
+        "36px Arial",
+        'rgb(255, 255, 255)',
+        'rgb(50, 50, 50)',
+        1
+      );
+    }
+    break;
+
     case CLIENT_STATES.GAME_PLAYING:
     default:
-      {
-        drawScoreboard(s, 32, 64);
-        drawTextOutline(s,
-          "Time Left",
-    "Time Left",
-          "Time Left",
-    "Time Left",
-          "Time Left",
-    "Time Left",
-          "Time Left",
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-    s.viewport.width / 2,
-          s.viewport.width / 2,
-          48,
-    48,
-          48,
-    48,
-          48,
-    48,
-          48,
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-    "36px Arial",
-          "36px Arial",
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-    'rgb(255, 255, 255)',
-          'rgb(255, 255, 255)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-    'rgb(50, 50, 50)',
-          'rgb(50, 50, 50)',
-          1
-        );
-        drawProgressBar(
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-          72,
-    72,
-          72,
-    72,
-          72,
-    72,
-          72,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-    s.viewport.width / 3,
-          s.viewport.width / 3,
-          16,
-    16,
-          16,
-    16,
-          16,
-    16,
-          16,
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-    'rgba(255, 255, 255, 0.5)',
-          'rgba(255, 255, 255, 0.5)',
-          '#55D6BE',
-    '#55D6BE',
-          '#55D6BE',
-    '#55D6BE',
-          '#55D6BE',
-    '#55D6BE',
-          '#55D6BE',
-          s.serverTime - sg.roundTimer,
-          GLOBALS.roundTimerLength,
-          0
-        );
-      }
-      break;
+    {
+      drawScoreboard(s, 32, 64);
+      drawTextOutline(
+        s,
+        "Time Left",
+        s.viewport.width / 2,
+        48,
+        "36px Arial",
+        'rgb(255, 255, 255)',
+        'rgb(50, 50, 50)',
+        1
+      );
+      drawProgressBar(
+        s,
+        s.viewport.width / 3,
+        72,
+        s.viewport.width / 3,
+        16,
+        'rgba(255, 255, 255, 0.5)',
+        '#55D6BE',
+        s.serverTime - sg.roundTimer,
+        GLOBALS.roundTimerLength,
+        0
+      );
+    }
+    break;
   }
 }
 
@@ -634,25 +279,6 @@ export const drawText = (s, string, x, y, css, color, textAlign = "center", text
   c.fillText(string, x, y);
   c.restore();
 }
-
-// export const drawShadowText = (
-//   s,
-//   string,
-//   x,
-//   y,
-//   css,
-//   shadowColor,
-//   textColor,
-//   offsetX = 5,
-//   offsetY = 5,
-//   textAlign = "center",
-//   textBaseline = "middle"
-// ) => {
-//   //Draw shadow
-//   drawText(s, string, x + offsetX, y + offsetY, css, shadowColor, textAlign, textBaseline);
-//   //Draw text
-//   drawText(s, string, x, y, css, textColor, textAlign, textBaseline);
-// }
 
 export const drawTextOutline = (
   s,

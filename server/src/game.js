@@ -112,6 +112,7 @@ export const updateGame = (s) => {
     pl.pointPathY = [];
     pl.dead = false;
 
+    console.debug('playerRespawning', pl.getForRespawnFromServer(Number(playerId)));
     s.io.emit('playerRespawning', pl.getForRespawnFromServer(Number(playerId)));
   }
 
@@ -124,6 +125,7 @@ export const updateGame = (s) => {
 
     //check out of bounds
     if (pl.isOutOfBounds(s)) {
+      console.debug('playerDied', 'outofbounds', Number(playerId));
       playerDied(s, playerId, pl);
     }
   }
@@ -138,12 +140,15 @@ export const updateGame = (s) => {
 
       let code = pl0.checkCollisionWithOtherSnake(pl1);
       if (code == 3) {
+        console.debug('playerDied', 'suicide', playerId0, playerId1);
         playerDied(s, playerId0, pl0);
         playerDied(s, playerId1, pl1);
       } else if (code == 2) {
-        playerDied(s, playerId0, pl);
+        console.debug('playerDied', 'collide0', playerId0, playerId1);
+        playerDied(s, playerId0, pl0);
       } else if (code == 1) {
-        playerDied(s, playerId1, pl);
+        console.debug('playerDied', 'collide1', playerId0, playerId1);
+        playerDied(s, playerId1, pl1);
       }
     }
   }
@@ -217,6 +222,7 @@ export const playerCollectedPickup = (s, { playerId, pickupId }) => {
     pl.score += PICKUP_WORTHS[pk.pickupType];
     pl.updateBodyWithScore();
 
+    console.debug('collectedPickup', { playerId, pickupId, score: pl.score });
     s.io.emit('collectedPickup', { playerId, pickupId, score: pl.score });
 
     sg.pickupsTotal--;
@@ -269,6 +275,7 @@ export const addNewPlayer = (s, socket, clientData) => {
     socket.emit('allPlayers', players);
   }
 
+  console.debug('newPlayer', player.getForSetFromServer(newPlayerId));
   s.io.emit('newPlayer', player.getForSetFromServer(newPlayerId));
 
   return newPlayerId

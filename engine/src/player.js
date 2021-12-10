@@ -115,17 +115,17 @@ export class Player {
 
     //for the sake of game feel we will intentionally not check collision for the last element of pointPath
     const headX0 = this.pos.x;
-    const headX1 = _other.pos.x;
     const headY0 = this.pos.y;
-    const headY1 = _other.pos.y;
     const radius0 = this.radius;
-    const radius1 = _other.radius;
-    const r = radius0 + radius1;
-    const r2 = r*r;
     const pathX0 = this.pointPathX;
     const pathY0 = this.pointPathY;
+    const headX1 = _other.pos.x;
+    const headY1 = _other.pos.y;
+    const radius1 = _other.radius;
     const pathX1 = _other.pointPathX;
     const pathY1 = _other.pointPathY;
+    const r = radius0 + radius1;
+    const r2 = r*r;
     const dx = headX0 - headX1;
     const dy = headY0 - headY1;
     if(dx*dx + dy*dy < r2) {//1 head collide with 0 head

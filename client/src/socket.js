@@ -57,7 +57,6 @@ export const setListeners = (s) => {//TODO: add error logging for malformed pack
 
   //Listen for players leaving
   socket.on('removePlayer', (playerId) => {
-    delete sg.players[playerId];
     //remove from scoreboard
     //TODO: check to make sure an empty scoreboard is handled correctly everywhere
     let hasRemoved = false;
@@ -70,13 +69,17 @@ export const setListeners = (s) => {//TODO: add error logging for malformed pack
     }
     if(hasRemoved) {
       sg.scoreboard.length--;
+    } else {
+      console.debug('scoreboard wasn\'t synced', playerId, sg.players[playerId]);
     }
+    if(!sg.players[playerId]) {
+      console.debug('player removed wasn\'t synced', playerId);
+    }
+    delete sg.players[playerId];
   });
 
   socket.on('playerDied', (playerId) => {
     sg.players[playerId].dead = true;
-    sg.players[playerId].pos.x = 0;
-    sg.players[playerId].pos.y = 0;
   });
 
   socket.on('playerRespawning', (data) => {
@@ -98,11 +101,11 @@ export const setListeners = (s) => {//TODO: add error logging for malformed pack
   });
 
   socket.on('updatePickup', (data) => {
-    // console.log("fgvs", data);
-    if (sg.pickups[data.id]) {
-      sg.pickups[data.id].pickupType = data.pickupType;
-      sg.pickups[data.id].x = data.x;
-      sg.pickups[data.id].y = data.y;
+    let pickup = sg.pickups[data.id];
+    if (pickup) {
+      pickup.pickupType = data.pickupType;
+      pickup.x = data.x;
+      pickup.y = data.y;
     } else {
       sg.pickups[data.id] = new Pickup(data.pickupType, data.x, data.y);
     }
@@ -110,16 +113,16 @@ export const setListeners = (s) => {//TODO: add error logging for malformed pack
 
   socket.on('collectedPickup', ({ playerId, pickupId, score }) => {
     if (!sg.pickups[pickupId]) {
-      if (playerId && playerId != sg.clientId) {
-        //we assume client players stay in sync without these updates
-        let pl = sg.players[playerId];
-        pl.score = score;
-        pl.updateBodyWithScore();
-      }
-      delete sg.pickups[pickupId];
-
+      console.debug('pickup collected that wasn\'t synced', playerId, pickupId);
+    }
+    if (playerId && playerId != sg.clientId) {
+      //we assume client players stay in sync without these updates
+      let pl = sg.players[playerId];
+      pl.score = score;
+      pl.updateBodyWithScore();
       sortScoreboard(sg.scoreboard);
     }
+    delete sg.pickups[pickupId];
   });
 
   //Listen for game state changes
@@ -139,6 +142,7 @@ export const setListeners = (s) => {//TODO: add error logging for malformed pack
       let id = data.id;
       if (!sg.players[id]) {
         //Create the player, this should never be run since we should not receive updates for non-existant players
+        console.debug('player updated that wasn\'t synced', data);
         let pl = new Player();
         pl.updateFromServer(data);
         sg.players[id] = pl;
