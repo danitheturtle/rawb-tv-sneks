@@ -20,6 +20,8 @@ import moogliPlayerSpritesheet from './spritesheets/moogliPlayerSpritesheet.png'
 import moogliPlayerData from './spritesheets/moogliPlayerData.js';
 import owlPlayerSpritesheet from './spritesheets/owlPlayerSpritesheet.png';
 import owlPlayerData from './spritesheets/owlPlayerData.js';
+import rormanPlayerSpritesheet from './spritesheets/rormanPlayerSpritesheet.png';
+import rormanPlayerData from './spritesheets/rormanPlayerData.js';
 import sleepylilturtlePlayerSpritesheet from './spritesheets/sleepylilturtlePlayerSpritesheet.png';
 import sleepylilturtlePlayerData from './spritesheets/sleepylilturtlePlayerData.js';
 import snakeyMousePlayerSpritesheet from './spritesheets/snakeyMousePlayerSpritesheet.png';
@@ -46,6 +48,7 @@ const allAssets = {
     monicaPlayerSpritesheet: [monicaPlayerSpritesheet, monicaPlayerData],
     moogliPlayerSpritesheet: [moogliPlayerSpritesheet, moogliPlayerData],
     owlPlayerSpritesheet: [owlPlayerSpritesheet, owlPlayerData],
+    rormanPlayerSpritesheet: [rormanPlayerSpritesheet, rormanPlayerData],
     sleepylilturtlePlayerSpritesheet: [sleepylilturtlePlayerSpritesheet, sleepylilturtlePlayerData],
     snakeyMousePlayerSpritesheet: [snakeyMousePlayerSpritesheet, snakeyMousePlayerData],
     vampireMonicaPlayerSpritesheet: [vampireMonicaPlayerSpritesheet, vampireMonicaPlayerData],

@@ -361,6 +361,7 @@ export const allPlayerSpriteNames = [
   ["monicaPlayer", "Monica"],
   ["moogliPlayer", "Moogli"],
   ["owlPlayer", "Owl"],
+  ["rormanPlayer", "King Rorman"],
   ["sleepylilturtlePlayer", "Sleepy Turtle"],
   ["snakeyMousePlayer", "Snakey Mouse"],
   ["vampireMonicaPlayer", "Vampire Monica"],
