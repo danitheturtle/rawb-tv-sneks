@@ -3687,6 +3687,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./client/",
           "packageDependencies": [
             ["client", "workspace:client"],
+            ["@babel/cli", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.0"],
             ["@babel/core", "npm:7.16.0"],
             ["@babel/preset-env", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.4"],
             ["@babel/preset-react", "virtual:73cc6d37e9808d26a671e37a19129c9c3cc496a17bb9fb370df764b52a842daa43ef434a64dc776ce558e0034f1500166305395d47e4e576715a0525989781a6#npm:7.16.0"],

@@ -3,19 +3,16 @@ import utils from './utils';
 import time from './time';
 import { GameObject, Manifold } from './physicsObjects';
 const Vector = Victor;
-let state, sp;
+// let , sp;
 
-export const init = (_state) => {
-  state = _state;
-  sp = state.physics;
-}
+// export const init = (_state) => {
+//   state = _state;
+//   sp = state.physics;
+// }
 
-export const start = () => {
-  //additional setup once all modules have been initialized
-}
-
-export const update = () => {
+export const update = (state) => {
   //Update gameObjects
+  let sp = state.physics
   for (const goID in sp.gameObjects) {
     const obj = sp.gameObjects[goID];
     //Update the object
@@ -32,7 +29,7 @@ export const CircleCircle = (col1, col2) => {
   //Get radii
   let radius1 = col1.radius();
   let radius2 = col2.radius();
-  
+
   const dist = center2.clone().subtract(center1);
   if (dist.length() <= radius1 + radius2) {
     m.penetration = Math.abs(radius1 - radius2);

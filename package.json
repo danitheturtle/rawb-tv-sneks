@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "yarn workspace env build && yarn workspace engine build && yarn workspace server build && yarn workspace client build",
-    "start": "node ./dist/server/index.js --env=production"
+    "start": "node ./dist/server/index.js --inspect --env=production"
   },
   "keywords": [],
   "author": "danitheturtle",

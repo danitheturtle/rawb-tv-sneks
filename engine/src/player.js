@@ -1,282 +1,294 @@
 import Victor from 'victor';
-import * as physics from './physics';
-import * as time from './time';
-import { GameObject, CircleCollider } from './physicsObjects';
 import { randomVec, randomInt, norm, lerp, clamp } from './utils';
 import { GLOBALS } from './state';
 const Vector = Victor;
 
-export class SnakeCollider extends CircleCollider {
+export class Player {
   constructor() {
-    super();
-    this.initialRadius = 2;
+    //General
+    this.pos = new Vector(0,0);
+    this.vel = new Vector(0,0);
+
+    //Snake body
+    this.radius = GLOBALS.initialSnakeRadius;
     this.bodyPartCount = GLOBALS.initialSnakeSize;
-    this.pointPath = [];
-    this.type = 'snake';
-    this.name = undefined;
-    this.parent = undefined;
-  }
+    this.pointPathX = [];
+    this.pointPathY = [];
 
-  update() {
-    if (!this.parent) return;
-    if (this.pointPath.length < 1 ) { this.pointPath.push(this.parent.pos.clone()); }
-    //Update radius based on score
-    this.radius = this.initialRadius + Math.min(this.bodyPartCount / 100, 8);
-    //have we reached radius*parent.bodySpacing distance from last set snake point?
-    const scaledRadiusDist = this.initialRadius * this.parent.bodySpacing;
-    const lastPointToPlayerPos = this.parent.pos.clone().subtract(this.pointPath[0]);
-    const distToLastPoint = lastPointToPlayerPos.length();
-    if (distToLastPoint >= scaledRadiusDist) {
-      this.addNextPoint(this.pointPath[0].clone().add(lastPointToPlayerPos.normalize().multiplyScalar(scaledRadiusDist)));
-    }
-  }
-  
-  reset() {
-    this.pointPath = [this.parent.pos.clone()];
-    this.bodyPartCount = GLOBALS.initialSnakeSize;
-    this.radius = this.initialRadius;
-    if (this.parent.renderer) {
-      this.parent.renderer.parts = [];
-    }
-  }
-  
-  updateBodyWithScore() {
-    if (!this.parent) return;
-    const newBodyPartCount = Math.max(
-      GLOBALS.initialSnakeSize, 
-      Math.floor(this.parent.score/GLOBALS.scoreLengthDivider) + 5
-    );
-    if (newBodyPartCount !== this.bodyPartCount) {
-      this.setBodyPartCount(newBodyPartCount);
-    }
-  }
-
-  increaseBodyPartCount(_amount) {
-    this.bodyPartCount += _amount;
-  }
-
-  decreaseBodyPartCount(_amount) {
-    this.bodyPartCount -= _amount;
-    this.pointPath = this.pointPath.slice(0, this.bodyPartCount);
-    if (this.parent.renderer) {
-      this.parent.renderer.parts = this.parent.renderer.parts.slice(0, this.bodyPartCount);
-    }
-  }
-
-  setBodyPartCount(_amount) {
-    this.bodyPartCount = _amount;
-    if (this.pointPath.length >= _amount) {
-      this.pointPath = this.pointPath.slice(0, this.bodyPartCount);
-    }
-    if (this.parent.renderer && this.parent.renderer.parts.length >= _amount) {
-      this.parent.renderer.parts = this.parent.renderer.parts.slice(0, this.bodyPartCount);
-    }
-  }
-
-  addNextPoint(_point) {
-    if (this.pointPath.length >= this.bodyPartCount) {
-      for (let i = this.pointPath.length - 1; i > 0; i--) {
-        this.pointPath[i] = this.pointPath[i - 1];
-      }
-      this.pointPath[0] = _point;
-    } else {
-      this.pointPath.unshift(_point);
-    }
-  }
-
-  checkCollisionWithOtherSnake(_other) {
-    const otherCenter = _other.pointPath[0];
-    const otherRadius = _other.radius;
-    for (let i = 0; i < this.pointPath.length; i++) {
-      const minDistSq = this.radius * this.radius + otherRadius * otherRadius;
-      const partCenter = this.pointPath[i].clone();
-      if (partCenter.subtract(otherCenter).lengthSq() < minDistSq) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  checkCollisionWithPickup(_pickup) {
-    const pickupCenter = _pickup.pos;
-    const pickupRadius = _pickup.collider.radius;
-    const minDistSq = this.radius * this.radius + pickupRadius * pickupRadius;
-    const playerCenter = this.parent.pos.clone();
-    if (playerCenter.subtract(pickupCenter).lengthSq() < minDistSq) {
-      return true;
-    }
-    return false;
-  }
-
-  getData() {
-    return {
-      type: this.type,
-      initialRadius: this.initialRadius,
-      bodyPartCount: this.bodyPartCount,
-      pointPath: this.pointPath.map(p => ([p.x, p.y]))
-    }
-  }
-  
-  getDataForNetworkUpdate() {
-    return {
-      type: this.type,
-      bodyPartCount: this.bodyPartCount
-    }
-  }
-
-  setData(_data, _parent) {
-    this.parent = _parent !== undefined ? _parent : this.parent;
-    this.type = _data.type !== undefined ? _data.type : this.type;
-    this.initialRadius = _data.initialRadius !== undefined ? _data.initialRadius : this.initialRadius;
-    this.bodyPartCount = _data.bodyPartCount !== undefined ? _data.bodyPartCount : this.bodyPartCount;
-    this.pointPath = _data.pointPath !== undefined ? _data.pointPath.map(p => (new Vector(p[0], p[1]))) : this.pointPath;
-    return this;
-  }
-}
-
-export class Player extends GameObject {
-  constructor(_gameStateRef) {
-    super(_gameStateRef);
-    //Did the player recently die?
     this.dead = false;
-    this.respawning = false;
 
     //Player input tracking.  Everything is false/blank by default
     this.moveHeading = randomVec();
     this.sprint = false;
-    this.sprintTimer = 0;
+    this.sprintTimer = undefined;
 
     //snake data
-    this.bodySpacing = 1.8;
-    
+    // this.bodySpacing = 1.8;
+
     //Player sprite
     this.spriteName = undefined;
-    
+    this.playerName = undefined;
+
     //Score
     this.score = 0;
-    
-    //Data storage for diffing socket updates
-    this.lastData = undefined;
+
   }
 
-  update() {
+  update(s, dt) {
     if (!this.dead) {
       //Rotate towards heading, clamp degrees so you can't turn around on the spot
-      this.accel = this.vel.clone().normalize();
-      const angleDiff = (180+this.moveHeading.angleDeg()) - (180+this.accel.angleDeg());
+      let accel = this.vel.clone().normalize();
+      const angleDiff = (180+this.moveHeading.angleDeg()) - (180+accel.angleDeg());
       const angleDir = angleDiff > 0 ? 1 : -1;
       const clampedDegToRotate = clamp(Math.abs(angleDiff), 0, 90)*(Math.abs(angleDiff) > 180 ? -angleDir : angleDir);
-      this.accel.rotateDeg(clampedDegToRotate).multiplyScalar(GLOBALS.baseAccelSpeed);
+      accel.rotateDeg(clampedDegToRotate).multiplyScalar(GLOBALS.baseAccelSpeed);
       //Add acceleration to the velocity scaled by dt.  Limit the velocity so collisions don't break
-      this.vel.add(this.accel.multiplyScalar(time.dt()));
+      this.vel.add(accel.multiplyScalar(dt));
       //limit velocity with current max speed (squared since its cheaper)
-      const currentMaxSpeed = this.sprint && this.collider.pointPath.length > 5 ? 
-        GLOBALS.sprintMult * GLOBALS.sprintMult * GLOBALS.baseMoveSpeed * GLOBALS.baseMoveSpeed : 
+      const currentMaxSpeed = this.sprint && this.pointPathX.length > 5 ?
+        GLOBALS.sprintMult * GLOBALS.sprintMult * GLOBALS.baseMoveSpeed * GLOBALS.baseMoveSpeed :
         GLOBALS.baseMoveSpeed * GLOBALS.baseMoveSpeed;
       if (this.vel.lengthSq() > currentMaxSpeed) {
-        this.vel.normalize().multiplyScalar(this.sprint && this.collider.pointPath.length > 5 ? GLOBALS.baseMoveSpeed * GLOBALS.sprintMult : GLOBALS.baseMoveSpeed);
+        this.vel.normalize().multiplyScalar(this.sprint && this.pointPathX.length > 5 ? GLOBALS.baseMoveSpeed * GLOBALS.sprintMult : GLOBALS.baseMoveSpeed);
       }
       //Add velocity to the position scaled by dt
-      this.pos.add(this.vel.clone().multiplyScalar(time.dt()));
-      
+      this.pos.add(this.vel.clone().multiplyScalar(dt));
+
       //Sprint decreases snake length. If snake is too short, stop sprinting
       if (this.sprint) {
-        if (this.sprintTimer % 30 === 0 && this.score > 0) {
-          this.score = Math.max(0, this.score - GLOBALS.sprintCostPerSecond/2);
-          this.collider.updateBodyWithScore();
+        if (this.sprintTimer === undefined) {
+          this.sprintTimer = s.runTime;
         }
-        this.sprintTimer = (this.sprintTimer + 1) % 30;
+        let secsPerCost = 1.0/GLOBALS.sprintCostPerSecond;
+        if ((s.runTime - this.sprintTimer) > secsPerCost && this.score > 0) {
+          this.sprintTimer += secsPerCost;
+          this.score -= 1;
+          this.updateBodyWithScore();
+        }
       } else {
-        this.sprintTimer = 0;
+        this.sprintTimer = undefined;
       }
-      //Reset acceleration
-      this.accel = new Vector(0.0, 0.0);
-      this.collider?.update();
+
+      if(this.pointPathX.length > 0) {
+        const scaledRadiusDist = GLOBALS.snakeBodySpacing;
+        const lastPointToPlayerPos = this.pos.clone().subtract(new Vector(this.pointPathX[0], this.pointPathY[0]));
+        const distToLastPoint = lastPointToPlayerPos.length();
+        if (distToLastPoint >= scaledRadiusDist) {
+          let px = this.pointPathX[0] + lastPointToPlayerPos.x/distToLastPoint*scaledRadiusDist;
+          let py = this.pointPathY[0] + lastPointToPlayerPos.y/distToLastPoint*scaledRadiusDist;
+          this.pointPathX.unshift(px);
+          this.pointPathY.unshift(py);
+          if (this.pointPathX.length > this.bodyPartCount) {
+            this.pointPathX.length = this.bodyPartCount;
+            this.pointPathY.length = this.bodyPartCount;
+          }
+        }
+      } else {
+        this.pointPathX.unshift(this.pos.x);
+        this.pointPathY.unshift(this.pos.y);
+      }
     }
   }
-  
-  isOutOfBounds() {
-    const xMin = this.pos.x - this.collider.radius;
-    const yMin = this.pos.y - this.collider.radius;
-    const xMax = this.pos.x + this.collider.radius;
-    const yMax = this.pos.y + this.collider.radius;
+
+  updateBodyWithScore() {
+    const newBodyPartCount = GLOBALS.initialSnakeSize + Math.floor(this.score/GLOBALS.scoreLengthDivider);
+
+    if (newBodyPartCount !== this.bodyPartCount) {
+      this.bodyPartCount = newBodyPartCount;
+
+      if (this.pointPathX.length > newBodyPartCount) {
+        this.pointPathX.length = newBodyPartCount;
+      }
+      this.radius = GLOBALS.initialSnakeRadius + Math.min(this.bodyPartCount / 100, 8);
+    }
+  }
+
+  checkCollisionWithPickup(_pickup) {
+    const r = this.radius + GLOBALS.pickupRadius;
+    const dx = this.pos.x - _pickup.x;
+    const dy = this.pos.y - _pickup.y;
+    return dx*dx + dy*dy < r*r;
+  }
+
+  checkCollisionWithOtherSnake(_other) {
+    //returns 0 if no collision, 1 if other's head collided with this' body, 2 if this' head collided with other's body, or 3 if other's head collided with this' head
+
+    //for the sake of game feel we will intentionally not check collision for the last element of pointPath
+    const headX0 = this.pos.x;
+    const headX1 = _other.pos.x;
+    const headY0 = this.pos.y;
+    const headY1 = _other.pos.y;
+    const radius0 = this.radius;
+    const radius1 = _other.radius;
+    const r = radius0 + radius1;
+    const r2 = r*r;
+    const pathX0 = this.pointPathX;
+    const pathY0 = this.pointPathY;
+    const pathX1 = _other.pointPathX;
+    const pathY1 = _other.pointPathY;
+    const dx = headX0 - headX1;
+    const dy = headY0 - headY1;
+    if(dx*dx + dy*dy < r2) {//1 head collide with 0 head
+      return 3
+    }
+    for (let i = 0; i < pathX1.length - 1; i++) {//0 head collide with 1 body
+      const dx = pathX1[i] - headX0;
+      const dy = pathY1[i] - headY0;
+      if (dx*dx + dy*dy < r2) {
+        return 2;
+      }
+    }
+    for (let i = 0; i < pathX0.length - 1; i++) {//1 head collide with 0 body
+      const dx = pathX0[i] - headX1;
+      const dy = pathY0[i] - headY1;
+      if (dx*dx + dy*dy < r2) {
+        return 1;
+      }
+    }
+
+    return 0;
+  }
+
+  isOutOfBounds(s) {
+    const xMin = this.pos.x - this.radius;
+    const yMin = this.pos.y - this.radius;
+    const xMax = this.pos.x + this.radius;
+    const yMax = this.pos.y + this.radius;
     if (
       xMin < 0 ||
       yMin < 0 ||
-      xMax > this.gameStateRef.level?.activeLevelData.guWidth || 
-      yMax > this.gameStateRef.level?.activeLevelData.guHeight
+      xMax > s.game?.activeLevelData.guWidth ||
+      yMax > s.game?.activeLevelData.guHeight
     ) {
       return true;
     } else {
       return false;
     }
   }
-  
-  die() {
-    this.dead = true;
-  }
-  
-  respawn() {
-    this.respawning = true;
-    this.score = 0;
-  }
-  
-  respawned() {
-    this.respawning = false;
-    this.dead = false;
-  }
 
-  getData() {
+
+
+
+  getForRespawnFromServer(id) {
     return {
-      ...super.getData(),
-      name: this.name,
-      dead: this.dead,
-      respawning: this.respawning,
+      id: id,
+      playerName: this.playerName,
+      spriteName: this.spriteName,
+      posX: this.pos.x,
+      posY: this.pos.y,
+      velX: this.vel.x,
+      velY: this.vel.y,
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
-      sprintTimer: this.sprintTimer,
-      spriteName: this.spriteName,
-      score: this.score
-    };
-  }
-  
-  getDataForNetworkUpdate() {
-    return {
-      ...super.getDataForNetworkUpdate(),
-      name: this.name,
-      dead: this.dead,
-      respawning: this.respawning,
-      moveHeadingX: this.moveHeading.x,
-      moveHeadingY: this.moveHeading.y,
-      sprint: this.sprint,
-      sprintTimer: this.sprintTimer,
-      spriteName: this.spriteName,
-      score: this.score
     }
   }
 
-  setData(_data) {
-    this.lastData = this.getDataForNetworkUpdate();
-    super.setData(_data);
-    this.name = _data.name !== undefined ? _data.name : this.name;
-    this.dead = _data.dead !== undefined ? _data.dead : this.dead;
-    this.respawning = _data.respawning !== undefined ? _data.respawning : this.respawning;
-    this.moveHeading = new Vector(
-      _data.moveHeadingX !== undefined ? _data.moveHeadingX : this.moveHeading.x, 
-      _data.moveHeadingY !== undefined ? _data.moveHeadingY : this.moveHeading.y
-    );
-    this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
-    this.sprintTimer = _data.sprintTimer !== undefined ? _data.sprintTimer : this.sprintTimer;
+  respawnFromServer(_data) {//NOTE: this should probably check that the types of things make sense
+    this.playerName = _data.playerName !== undefined ? _data.playerName : this.playerName;
     this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
-    this.score = _data.score !== undefined ? _data.score : this.score;
-    if (this.renderer) {
-      this.renderer.playerName = this.name;
-      this.renderer.spriteName = this.spriteName;
-    }
-    return this;
+    this.dead = false;
+    this.pointPathX = [];
+    this.pointPathY = [];
+
+    this.pos.x = !isNaN(_data.posX) ? _data.posX : this.pos.x;
+    this.pos.y = !isNaN(_data.posY) ? _data.posY : this.pos.y;
+    this.vel.x = !isNaN(_data.velX) ? _data.velX : this.vel.x;
+    this.vel.y = !isNaN(_data.velY) ? _data.velY : this.vel.y;
+    this.moveHeading.x = !isNaN(_data.moveHeadingX) ? _data.moveHeadingX : this.moveHeading.x;
+    this.moveHeading.y = !isNaN(_data.moveHeadingY) ? _data.moveHeadingY : this.moveHeading.y;
+
+    this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
+    this.score = 0;
+    this.updateBodyWithScore();
   }
 
-  setClientData(data) {
+  getForSetFromServer(id) {
+    return {
+      id: id,
+      playerName: this.playerName,
+      spriteName: this.spriteName,
+      dead: this.dead,
+      posX: this.pos.x,
+      posY: this.pos.y,
+      velX: this.vel.x,
+      velY: this.vel.y,
+      moveHeadingX: this.moveHeading.x,
+      moveHeadingY: this.moveHeading.y,
+      pointPathX: this.pointPathX,
+      pointPathY: this.pointPathY,
+      sprint: this.sprint,
+      score: this.score
+    }
+  }
+
+  setFromServer(_data) {//NOTE: this should probably check that the types of things make sense
+    this.playerName = _data.playerName !== undefined ? _data.playerName : this.playerName;
+    this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
+    this.dead = _data.dead !== undefined ? _data.dead : this.dead;
+
+    this.pos.x = !isNaN(_data.posX) ? _data.posX : this.pos.x;
+    this.pos.y = !isNaN(_data.posY) ? _data.posY : this.pos.y;
+    this.vel.x = !isNaN(_data.velX) ? _data.velX : this.vel.x;
+    this.vel.y = !isNaN(_data.velY) ? _data.velY : this.vel.y;
+    this.moveHeading.x = !isNaN(_data.moveHeadingX) ? _data.moveHeadingX : this.moveHeading.x;
+    this.moveHeading.y = !isNaN(_data.moveHeadingY) ? _data.moveHeadingY : this.moveHeading.y;
+
+    this.pointPathX = _data.pointPathX !== undefined ? _data.pointPathX : this.pointPathX;
+    this.pointPathY = _data.pointPathY !== undefined ? _data.pointPathY : this.pointPathY;
+
+    this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
+    if (_data.score !== undefined && _data.score !== this.score) {
+      this.score = _data.score;
+      this.updateBodyWithScore();
+    }
+  }
+
+  getForUpdateFromServer(id) {
+    return {
+      id: id,
+      posX: this.pos.x,
+      posY: this.pos.y,
+      velX: this.vel.x,
+      velY: this.vel.y,
+      moveHeadingX: this.moveHeading.x,
+      moveHeadingY: this.moveHeading.y,
+      sprint: this.sprint,
+    }
+  }
+
+  updateFromServer(_data) {//NOTE: this should probably check that the types of things make sense
+    this.pos.x = !isNaN(_data.posX) ? _data.posX : this.pos.x;
+    this.pos.y = !isNaN(_data.posY) ? _data.posY : this.pos.y;
+    this.vel.x = !isNaN(_data.velX) ? _data.velX : this.vel.x;
+    this.vel.y = !isNaN(_data.velY) ? _data.velY : this.vel.y;
+    this.moveHeading.x = !isNaN(_data.moveHeadingX) ? _data.moveHeadingX : this.moveHeading.x;
+    this.moveHeading.y = !isNaN(_data.moveHeadingY) ? _data.moveHeadingY : this.moveHeading.y;
+
+    this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
+  }
+
+
+  getForUpdateFromClient() {
+    return {
+      posX: this.pos.x,
+      posY: this.pos.y,
+      // velX: this.vel.x,
+      // velY: this.vel.y,
+      moveHeadingX: this.moveHeading.x,
+      moveHeadingY: this.moveHeading.y,
+      sprint: this.sprint,
+    }
+  }
+
+  updateFromClient(_data) {//NOTE: this should probably check that the types of things make sense
+    this.pos.x = !isNaN(_data.posX) ? _data.posX : this.pos.x;
+    this.pos.y = !isNaN(_data.posY) ? _data.posY : this.pos.y;
+    // this.vel.x = !isNaN(_data.velX) ? _data.velX : this.vel.x;
+    // this.vel.y = !isNaN(_data.velY) ? _data.velY : this.vel.y;
+    this.moveHeading.x = !isNaN(_data.moveHeadingX) ? _data.moveHeadingX : this.moveHeading.x;
+    this.moveHeading.y = !isNaN(_data.moveHeadingY) ? _data.moveHeadingY : this.moveHeading.y;
+
+    this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
   }
 }

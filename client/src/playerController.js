@@ -5,16 +5,24 @@ import * as socket from './socket';
 import { CLIENT_STATES } from './clientState';
 const Vector = Victor;
 
-let s, sp, spl, sg, sl, sv;
+let spl = {
+  shouldUpdateServer: false,
+  moveHeading: new Vector(1, 0),
+  sprint: false
+};
+let clientState = CLIENT_STATES.PLAYING;
 let usingKeyboard = false;
+let zoomAmount = 0;
 
-export const init = (_state) => {
-  s = _state;
-  sp = s.physics;
-  spl = s.player;
-  sg = s.game;
-  sl = s.level;
-  sv = s.view;
+export const setListeners = () => {
+
+  keys.keyDown("+", () => {
+    zoomAmount++;
+  });
+
+  keys.keyDown("-", () => {
+    zoomAmount--;
+  });
 
   keys.keyDown("a", "left", () => {
     usingKeyboard = true;
@@ -61,29 +69,33 @@ export const init = (_state) => {
       spl.shouldUpdateServer = true;
     }
   });
-  
+
   keys.mouseMove((coords) => {
     usingKeyboard = false;
   });
 
   keys.keyUp("p", "esc", function() {
-    if (sg.clientState === CLIENT_STATES.PLAYING) {
-      sg.clientState = CLIENT_STATES.PAUSED;
-    } else if (sg.clientState === CLIENT_STATES.PAUSED) {
-      sg.clientState = CLIENT_STATES.PLAYING;
+    if (clientState === CLIENT_STATES.PLAYING) {
+      clientState = CLIENT_STATES.PAUSED;
+    } else if (clientState === CLIENT_STATES.PAUSED) {
+      clientState = CLIENT_STATES.PLAYING;
     }
   });
-  
+
   keys.keyUp("del", () => {
     socket.reset();
   });
 }
 
-export const update = () => {
+export const update = (s) => {
+  let sg = s.game;
+  let sv = s.view;
+
   const me = sg.players[sg.clientId];
-  if (!me) return;
+  // console.log("cowd", spl.moveHeading, me.moveHeading);
+  // if (!me) return;
   if (!usingKeyboard) {
-    const playerPos = sv.active?.getObjectRelativePosition(me, true);
+    const playerPos = sv.active?.getObjectRelativePosition(s, me, true);
     const mouseCoords = keys.mouse();
     const mouseCoordsVec = new Vector(mouseCoords[0], mouseCoords[1]);
     const newMoveHeading = mouseCoordsVec.clone().subtract(playerPos);
@@ -96,7 +108,14 @@ export const update = () => {
   me.moveHeading = spl.moveHeading;
   me.sprint = spl.sprint;
   if (spl.shouldUpdateServer) {
-    socket.updateClientPlayer();
     spl.shouldUpdateServer = false;
+    socket.updateClientPlayer(s);
   }
+
+  if (zoomAmount > 0) {
+    sv.active.zoomIn(s, zoomAmount);
+  } else if (zoomAmount < 0) {
+    sv.active.zoomOut(s, -zoomAmount);
+  }
+  zoomAmount = 0;
 }

@@ -45,11 +45,11 @@ export const rangeContains = (min0, max0, min1, max1) => {
 }
 
 export const randomRange = (min, max) => {
-  return min + Math.random() * (max - min);
+  return min + Math.random()*(max - min);
 }
 
 export const randomInt = (min, max) => {
-  return Math.floor(min + Math.random() * (max - min + 1));
+  return Math.floor(min + Math.random()*(max - min));
 }
 
 export const randomVec = () => {

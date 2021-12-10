@@ -2,15 +2,14 @@ import Victor from 'victor';
 import { GameObject, CircleCollider } from './physicsObjects';
 const Vector = Victor;
 
-export class Pickup extends GameObject {
-  constructor(_gameStateRef) {
-    super(_gameStateRef);
+export class Pickup {
+  constructor() {
     this.pickupType = "regularCheese";
     this.worth = 1;
     this.collectedBy = undefined;
     this.lastData = {};
   }
-  
+
   getData() {
     return {
       ...super.getData(),
@@ -19,7 +18,7 @@ export class Pickup extends GameObject {
       collectedBy: this.collectedBy
     }
   }
-  
+
   setData(_data) {
     this.lastData = this.getData();
     super.setData(_data);

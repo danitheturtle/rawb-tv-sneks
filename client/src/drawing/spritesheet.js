@@ -26,7 +26,7 @@ export class Spritesheet {
     //Cached data about tiles
     this.tiles = {};
   }
-  
+
   load() {
     return new Promise((res, rej) => {
       try {
@@ -45,7 +45,7 @@ export class Spritesheet {
       console.err(err);
     });
   }
-  
+
   cacheTiles() {
     for (let t = 0; t < this.tileCount; t++) {
       let tileID = t;

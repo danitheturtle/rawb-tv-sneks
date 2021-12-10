@@ -5,12 +5,9 @@ import { ClientState, CLIENT_STATES } from './clientState';
 import { View } from './drawing/view';
 import * as keys from './keys';
 import * as socket from './socket';
-import * as view from './drawing/view';
 import * as drawing from './drawing';
 import * as game from './game';
-import * as levelLoader from './clientLevelLoader';
 import * as playerController from './playerController';
-const { time, physics } = engine;
 
 const App = () => {
   const canvasRef = useRef(null);
@@ -38,40 +35,29 @@ const App = () => {
       setConnectionError(e);
     }
   }, []);
-  
+
   //Init
   useEffect(() => {
     if (!connected) return;
     //Initialize all modules in no particular order
-    game.init(gameState);
-    keys.init(gameState);
-    time.init(gameState);
-    physics.init(gameState);
-    socket.init(gameState);
     drawing.init(gameState);
-    view.init(gameState);
-    levelLoader.init(gameState);
-    playerController.init(gameState);
-    // scoring.init();
-    // audio.init();
+    keys.setListeners();
+    playerController.setListeners();
+    socket.setListeners(gameState);
     const resizeListener = gameState.resize.bind(gameState);
     window.addEventListener("resize", resizeListener);
     return () => { window.removeEventListener("resize", resizeListener); }
   }, [gameState, connected]);
-  
+
   //Start
   useEffect(() => {
     if (!canvasRef.current || !nameInputRef.current) return;
     gameState.setCanvas(canvasRef.current);
     gameState.setInput(nameInputRef.current);
-    keys.start();
-    physics.start();
-    socket.start();
-    drawing.start();
-    levelLoader.start();
-    gameState.view.active = new View(0, 0, 100, 100);
+    keys.setMouseListeners(gameState);
+    gameState.view.active = new View(gameState, 0, 0, 100, 100);
     gameState.game.numAssetsLoading = gameState.game.loading.length;
-    
+
     //Bind blur/focus events to pause
     const handleBlurPause = () => {
       if (gameState.game.clientState === CLIENT_STATES.PLAYING) {
@@ -89,10 +75,10 @@ const App = () => {
     window.addEventListener('blur', handleBlurPause);
     window.addEventListener('focus', handleFocusPlay);
     window.addEventListener('contextmenu', handleContextMenu);
-    
+
     //Finally, start the game loop
-    game.start();
-    
+    game.start(gameState);
+
     //unbind events on unmount
     return () => {
       window.removeEventListener('blur', handleBlurPause);

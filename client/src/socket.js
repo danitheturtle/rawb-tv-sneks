@@ -3,130 +3,150 @@ import Victor from 'victor';
 import { CLIENT_STATES } from './clientState';
 import * as levelLoader from './clientLevelLoader';
 import * as drawing from './drawing';
-import { PlayerRenderer } from './drawing/playerRenderer';
-import { SpriteRenderer } from './drawing/spriteRenderer';
-const { Player, SnakeCollider, Pickup, CircleCollider, time, GLOBALS } = engine;
+const { Player, Pickup, GLOBALS } = engine;
 const Vector = Victor;
 
-let s, sg, sp, st, sv, socket;
+export const sortScoreboard = (scoreboard) => {
+  //we expect the scoreboard to be mostly-sorted most of the time, making index sort the fastest choice for sorting
+  for(let i = 0; i < scoreboard.length; i++) {
+    let cur = scoreboard[i];
+    for(let j = i + 1; j < scoreboard.length; j++) {
+      let next = scoreboard[j];
+      if(cur[3] < next[3] || (cur[3] == next[3] && cur[0] > next[0])) {//absolute ordering on players
+        scoreboard[j - 1] = next;
+        scoreboard[j] = cur;
+      } else {
+        break;
+      }
+    }
+  }
+}
 
-export const init = (_state) => {
+export const setListeners = (s) => {//TODO: add error logging for malformed packets
   //Setup shorthand
-  s = _state;
-  sg = s.game;
-  sp = s.physics;
-  st = s.time;
-  sv = s.view;
-  socket = s.io;
+  //This is very bad because now there is not a single authoritative pointer to the current game state, but js does not really make it practical to remove this without a lot of work
+  let sg = s.game;
+  let sv = s.view;
+  let socket = s.io;
 
   //Listen for new players
   socket.on('newPlayer', (data) => {
     //Add the new player to the list
-    if (data.id != sg.clientId) {
-      sp.gameObjects[data.id] = sg.players[data.id] = new Player(s)
-        .addCollider(new SnakeCollider())
-        .addRenderer(new PlayerRenderer())
-        .setData(data);
+    let pl = sg.players[data.id];
+    if (!pl) {//we might already know about this player from allPlayers
+      pl = new Player();
+      sg.players[data.id] = pl;
+      sg.scoreboard.push([data.id, pl.playerName, pl.score]);
+      sortScoreboard(sg.scoreboard);
     }
+    pl.setFromServer(data);
   });
-  
+
   //Listen for all players
   socket.on('allPlayers', (_players) => {
+    sg.players = {};
+    sg.scoreboard = [];
     _players.forEach(data => {
-      sp.gameObjects[data.id] = sg.players[data.id] = new Player(s)
-        .addCollider(new SnakeCollider())
-        .addRenderer(new PlayerRenderer())
-        .setData(data);
+      let pl = new Player();
+      pl.setFromServer(data);
+      sg.players[data.id] = pl;
+      sg.scoreboard.push([data.id, pl.playerName, pl.score]);
+      sortScoreboard(sg.scoreboard);
     });
   });
 
   //Listen for players leaving
-  socket.on('removePlayer', (clientId) => {
-    //Remove that player from the state
-    delete sp.gameObjects[clientId];
-    delete sg.players[clientId];
+  socket.on('removePlayer', (playerId) => {
+    delete sg.players[playerId];
+    //remove from scoreboard
+    //TODO: check to make sure an empty scoreboard is handled correctly everywhere
+    let hasRemoved = false;
+    for(let i = 0; i < sg.scoreboard.length; i++) {
+      if(sg.scoreboard[i][0] == playerId) {
+        hasRemoved = true;
+      } else if(hasRemoved) {
+        sg.scoreboard[i] = sg.scoreboard[i - 1];
+      }
+    }
+    if(hasRemoved) {
+      sg.scoreboard.length--;
+    }
   });
 
-  socket.on('playerDied', (clientId) => {
-    sg.players[clientId]?.die();
+  socket.on('playerDied', (playerId) => {
+    sg.players[playerId].dead = true;
+    sg.players[playerId].pos.x = 0;
+    sg.players[playerId].pos.y = 0;
   });
 
   socket.on('playerRespawning', (data) => {
+    console.log("respawn", data);
     if (!sg.players[data.id]) return;
-    sg.players[data.id].setData(data);
-    sg.players[data.id].respawned();
-    sg.players[data.id].collider.reset();
+    sg.players[data.id].respawnFromServer(data);
     if (data.id == sg.clientId) {
-      updateClientPlayer();
-      sv.active?.reset();
+      sv.active?.reset(s);
       console.dir('broadcasted respawn');
     }
+    sortScoreboard(sg.scoreboard);
   });
-  
-  const updatePickup = (pickupData) => {
-    if (sg.pickups[pickupData.id]) {
-      sg.pickups[pickupData.id].setData(pickupData);
-    } else {
-      sp.gameObjects[pickupData.id] = sg.pickups[pickupData.id] = new Pickup(s)
-        .addCollider(new CircleCollider())
-        .addRenderer(new SpriteRenderer())
-        .setData({
-          ...pickupData,
-          renderer: { radius: 1, spriteName: pickupData.pickupType }
-        });
-    }
-  }
-  
+
   socket.on('allPickups', (pickupsData) => {
-    Object.keys(sg.pickups).forEach(pickupId => {
-      delete sp.gameObjects[pickupId];
-      delete sg.pickups[pickupId];
-    });
-    pickupsData.forEach(pickupData => {
-      updatePickup(pickupData);
+    sg.pickups = {};
+    pickupsData.forEach(data => {
+      sg.pickups[data.id] = new Pickup(data.pickupType, data.x, data.y);
     });
   });
-  
-  socket.on('updatePickup', (pickupData) => {
-    updatePickup(pickupData);
-  });
-  
-  socket.on('collectedPickup', ({ clientId, pickupId, worth }) => {
-    if (!sg.pickups[pickupId]) return;
-    if (clientId && clientId != sg.clientId) {
-      sg.players[clientId].score += sg.pickups[pickupId].worth;
-      sg.players[clientId].collider.updateBodyWithScore()
+
+  socket.on('updatePickup', (data) => {
+    // console.log("fgvs", data);
+    if (sg.pickups[data.id]) {
+      sg.pickups[data.id].pickupType = data.pickupType;
+      sg.pickups[data.id].x = data.x;
+      sg.pickups[data.id].y = data.y;
+    } else {
+      sg.pickups[data.id] = new Pickup(data.pickupType, data.x, data.y);
     }
-    delete sp.gameObjects[pickupId];
-    delete sg.pickups[pickupId];
+  });
+
+  socket.on('collectedPickup', ({ playerId, pickupId, score }) => {
+    if (!sg.pickups[pickupId]) {
+      if (playerId && playerId != sg.clientId) {
+        //we assume client players stay in sync without these updates
+        let pl = sg.players[playerId];
+        pl.score = score;
+        pl.updateBodyWithScore();
+      }
+      delete sg.pickups[pickupId];
+
+      sortScoreboard(sg.scoreboard);
+    }
   });
 
   //Listen for game state changes
-  socket.on("updateGameState", (newState) => {
+  socket.on('updateGameState', (newState) => {//TODO: send these updates with data depending on the current game state
     //Update things based on server-authoritative state
-    s.game.gameState = newState.gameState;
-    s.game.gameStateTimer = newState.gameStateTimer;
-    s.game.scoreboard = newState.scoreboard?.sort(([_, __, plScore1], [___, ____, plScore2]) => plScore1 > plScore2 ? -1 : 1);
-    s.score.winner = newState.winnerID;
-    
+    sg.gameState = newState.gameState;
+    sg.gameStartTimer = newState.gameStartTimer;
+    sg.gameEndTimer = newState.gameEndTimer;
+    sg.roundTimer = newState.roundTimer;
+    sg.serverTime = newState.serverTime;
+    // s.score.winner = newState.winnerID;
+
     //Update players
     //Loop through every player in the data
-    for (const clientId in newState.players) {
+    for (const data in newState.players) {
       //If a player sent by the server doesn't exist on the client
-      if (!sg.players[clientId]) {
-        //Create that player
-        sp.gameObjects[clientId] = sg.players[clientId] = new Player(s)
-          .addCollider(new SnakeCollider())
-          .addRenderer(new PlayerRenderer())
-          .setData(newState.players[clientId]);
+      let id = data.id;
+      if (!sg.players[id]) {
+        //Create the player, this should never be run since we should not receive updates for non-existant players
+        let pl = new Player();
+        pl.updateFromServer(data);
+        sg.players[id] = pl;
       } else {
-        //If the player is not the client player
-        if (sg.clientId == clientId) {
-          //Set data but remain client-authoritative
-          sg.players[clientId].setClientData(newState.players[clientId]);
+        if (sg.clientId == id) {
+          //remain client-authoritative
         } else {
-          //Set the data
-          sg.players[clientId].setData(newState.players[clientId]);
+          sg.players[id].updateFromServer(data);
         }
       }
     }
@@ -142,23 +162,25 @@ export const init = (_state) => {
   });
 
   socket.on('loadLevel', (levelName) => {
-    levelLoader.loadLevel(levelName);
+    levelLoader.loadLevel(s, levelName);
     //update game state to move on from connecting
     sg.clientState = CLIENT_STATES.PLAYING
   });
 }
 
 
-export const start = () => {}
-
-export const reset = () => {
+export const reset = (s) => {
+  let sg = s.game;
+  let socket = s.io;
   socket.emit('reset', sg.clientId);
 }
 
-export const createNewPlayer = (_playerNameValue) => {
+export const createNewPlayer = (s, _playerNameValue) => {
+  let sg = s.game;
+  let socket = s.io;
   console.dir('joining game');
   //client-defined player data
-  const clientPlayerData = { name: _playerNameValue, spriteName: sg.playerSpriteValue || drawing.randomPlayerSprite() };
+  const clientPlayerData = { playerName: _playerNameValue, spriteName: sg.playerSpriteValue || drawing.randomPlayerSprite() };
   //notify server there is a new player
   socket.emit('createNewPlayer', clientPlayerData);
 }
@@ -166,15 +188,16 @@ export const createNewPlayer = (_playerNameValue) => {
 /**
  * Called by the client to update the server (and everyone else) of changes
  */
-export const updateClientPlayer = () => {
-  //Get the client player data
-  const playerData = sg.players[sg.clientId].getDataForNetworkUpdate();
-  //Emit an update
-  socket.emit('updatePlayer', playerData);
+export const updateClientPlayer = (s) => {
+  let sg = s.game;
+  let socket = s.io;
+
+  socket.emit('updatePlayer', sg.players[sg.clientId].getForUpdateFromClient());
 }
 
-export const playerCollectedPickup = (clientId, pickupId) => {
-  socket.emit('playerCollectedPickup', { clientId, pickupId });
-  delete sp.gameObjects[pickupId];
-  delete sg.pickups[pickupId];
+export const playerCollectedPickup = (s, clientId, pickupId) => {
+  let sg = s.game;
+  let socket = s.io;
+
+  socket.emit('playerCollectedPickup', { playerId: clientId, pickupId: pickupId });
 }

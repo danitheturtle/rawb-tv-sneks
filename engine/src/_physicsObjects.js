@@ -10,123 +10,130 @@ export class Manifold {
   }
 }
 
-export class Collider {
+// export class Collider {
+//   constructor() {
+//     this.type = 'point';
+//   }
+
+//   get center() {
+//     return this.parent.pos.clone();
+//   }
+
+//   getData() {
+//     return {
+//       type: this.type
+//     }
+//   }
+
+//   getDataForNetworkUpdate() {
+//     return this.getData();
+//   }
+
+//   setData(_data, _parent) {
+//     this.parent = _parent !== undefined ? _parent : this.parent;
+//     return this;
+//   }
+// }
+
+export class CircleCollider {
   constructor() {
-    this.type = 'point';
-  }
-
-  get center() {
-    return this.parent.pos.clone();
-  }
-
-  getData() {
-    return {
-      type: this.type
-    }
-  }
-  
-  getDataForNetworkUpdate() {
-    return this.getData();
-  }
-
-  setData(_data, _parent) {
-    this.parent = _parent !== undefined ? _parent : this.parent;
-    return this;
-  }
-}
-
-export class CircleCollider extends Collider {
-  constructor() {
-    super();
     this.radius = 2;
-    this.type = "circle";
-  }
-
-  getData() {
-    return {
-      type: this.type,
-      radius: this.radius
-    }
-  }
-  
-  getDataForNetworkUpdate() {
-    return this.getData();
-  }
-
-  setData(_data, _parent) {
-    super.setData(_data, _parent);
-    this.radius = _data.radius !== undefined ? _data.radius : this.radius;
-    return this;
   }
 }
 
-export class BoxCollider extends Collider {
-  constructor() {
-    super();
-    this.width = 1;
-    this.height = 1;
-    this.type = "boundingBox";
-  }
 
-  get center() {
-    return this.parent.pos.clone().add(new Vector(this.width / 2, this.height / 2));
-  }
+// export class CircleCollider extends Collider {
+//   constructor() {
+//     super();
+//     this.radius = 2;
+//     this.type = "circle";
+//   }
 
-  get centerToCorner() {
-    return this.center.subtract(this.parent.pos);
-  }
+//   getData() {
+//     return {
+//       type: this.type,
+//       radius: this.radius
+//     }
+//   }
 
-  xMin(set = undefined) {
-    if (set === undefined) {
-      return this.parent.pos.x;
-    } else {
-      this.parent.pos.x = set;
-    }
-  }
+//   getDataForNetworkUpdate() {
+//     return this.getData();
+//   }
 
-  xMax(set = undefined) {
-    if (set === undefined) {
-      return this.parent.pos.x + this.width;
-    } else {
-      this.parent.pos.x = set - this.width;
-    }
-  }
+//   setData(_data, _parent) {
+//     super.setData(_data, _parent);
+//     this.radius = _data.radius !== undefined ? _data.radius : this.radius;
+//     return this;
+//   }
+// }
 
-  yMin(set = undefined) {
-    if (set == undefined) {
-      return this.parent.pos.y;
-    } else {
-      this.parent.pos.y = set;
-    }
-  }
+// export class BoxCollider extends Collider {
+//   constructor() {
+//     super();
+//     this.width = 1;
+//     this.height = 1;
+//     this.type = "boundingBox";
+//   }
 
-  yMax(set = undefined) {
-    if (set == undefined) {
-      return this.parent.pos.y + this.height;
-    } else {
-      this.parent.pos.y = set - this.height;
-    }
-  }
+//   get center() {
+//     return this.parent.pos.clone().add(new Vector(this.width / 2, this.height / 2));
+//   }
 
-  getData() {
-    return {
-      type: this.type,
-      width: this.width,
-      height: this.height
-    }
-  }
-  
-  getDataForNetworkUpdate() {
-    return this.getData();
-  }
+//   get centerToCorner() {
+//     return this.center.subtract(this.parent.pos);
+//   }
 
-  setData(_data, _parent) {
-    this.width = _data.width !== undefined ? _data.width : this.width;
-    this.height = _data.height !== undefined ? _data.height : this.height;
-    this.parent = _parent !== undefined ? _parent : this.parent;
-    return this;
-  }
-}
+//   xMin(set = undefined) {
+//     if (set === undefined) {
+//       return this.parent.pos.x;
+//     } else {
+//       this.parent.pos.x = set;
+//     }
+//   }
+
+//   xMax(set = undefined) {
+//     if (set === undefined) {
+//       return this.parent.pos.x + this.width;
+//     } else {
+//       this.parent.pos.x = set - this.width;
+//     }
+//   }
+
+//   yMin(set = undefined) {
+//     if (set == undefined) {
+//       return this.parent.pos.y;
+//     } else {
+//       this.parent.pos.y = set;
+//     }
+//   }
+
+//   yMax(set = undefined) {
+//     if (set == undefined) {
+//       return this.parent.pos.y + this.height;
+//     } else {
+//       this.parent.pos.y = set - this.height;
+//     }
+//   }
+
+//   getData() {
+//     return {
+//       type: this.type,
+//       width: this.width,
+//       height: this.height
+//     }
+//   }
+
+//   getDataForNetworkUpdate() {
+//     return this.getData();
+//   }
+
+//   setData(_data, _parent) {
+//     this.width = _data.width !== undefined ? _data.width : this.width;
+//     this.height = _data.height !== undefined ? _data.height : this.height;
+//     this.parent = _parent !== undefined ? _parent : this.parent;
+//     return this;
+//   }
+// }
 
 export class GameObject {
   constructor(_gameStateRef) {
@@ -139,18 +146,18 @@ export class GameObject {
     this.collider = undefined;
     this.renderer = undefined;
   }
-  
+
   assignId(_id) {
     this.id = _id;
     return this;
   }
-  
+
   addCollider(_collider) {
     this.collider = _collider;
     this.collider.parent = this;
     return this;
   }
-  
+
   addRenderer(_renderer) {
     this.renderer = _renderer;
     this.renderer.parent = this;
@@ -170,7 +177,7 @@ export class GameObject {
     //Reset acceleration
     this.accel = new Vector(0.0, 0.0);
   }
-  
+
   draw() {
     if (this.renderer) {
       this.renderer.draw();

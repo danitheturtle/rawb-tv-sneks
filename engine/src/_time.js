@@ -1,11 +1,11 @@
 import * as utils from './utils';
 
-let s, st;
+// let s, st;
 
-export const init = (state) => {
-  s = state;
-  st = s.time;
-}
+// export const init = (state) => {
+//   s = state;
+//   st = s.time;
+// }
 
 export const calculateDeltaTime = () => {
   //Get time in ms

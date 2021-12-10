@@ -8,10 +8,6 @@ export const init = (_state) => {
   sl = state.level;
 }
 
-export const start = () => {
-  
-}
-
 export const loadLevel = (levelName) => {
   sl.activeLevelData = levels[levelName];
 }

@@ -1,10 +1,11 @@
 {
+  "type": "module",
   "name": "server",
   "version": "0.0.1",
   "description": "",
   "scripts": {
     "start:compiled": "node ../dist/server/index.js",
-    "start": "nodemon --watch ./src ./src/index.js --exec babel-node",
+    "start": "nodemon --watch ./src ./src/index.js --exec babel-node --experimental-specifier-resolution=node index.js",
     "debug": "nodemon --inspect --watch ./src ./src/index.js --exec babel-node --env=development",
     "build": "rm -rf ../dist/server && NODE_ENV=production && babel ./src --out-dir ../dist/server"
   },

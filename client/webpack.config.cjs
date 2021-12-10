@@ -23,10 +23,10 @@ module.exports = function config(envArg) {
   }
   //profiling prod environment to debug issues?
   const isEnvProductionProfile = isEnvProduction && process.argv.includes("--profile");
-  
+
   process.env.BABEL_ENV = isEnvDevelopment ? 'development' : 'production';
   process.env.BROWSERSLIST_ENV = isEnvDevelopment ? 'development' : 'production';
-  
+
   /**
    * Client-side application bundle.
    *
@@ -173,7 +173,7 @@ module.exports = function config(envArg) {
           {}
         )
       ),
-      !isDevServer &&
+      !isDevServer && false &&
         new CopyWebpackPlugin({
           patterns: [
             {

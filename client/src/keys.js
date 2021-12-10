@@ -7,10 +7,9 @@ const keys = {
 };
 const scrollCallbacks = [];
 const mouseMoveCallbacks = [];
-let state, mouseCoords, isMouseDown;
+let mouseCoords, isMouseDown;
 
-export const init = (_state) => {
-  state = _state;
+export const setListeners = () => {
   //Add an event listener for keydown
   window.addEventListener("keydown", function(e) {
     //If this key isn't in the object, create data for it
@@ -65,12 +64,12 @@ export const init = (_state) => {
 /**
  * Bind mouse click events to canvas
  */
-export const start = () => {
-  state.canvas.addEventListener('mousedown', function() {
+export const setMouseListeners = (s) => {
+  s.canvas.addEventListener('mousedown', function() {
     keys.mouseButton.pressed = true;
     keys.mouseButton.keyDown.forEach((cb) => cb());
   });
-  state.canvas.addEventListener('mouseup', function() {
+  s.canvas.addEventListener('mouseup', function() {
     keys.mouseButton.pressed = false;
     keys.mouseButton.keyUp.forEach((cb) => cb());
   });

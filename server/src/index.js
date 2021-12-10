@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import axios from 'axios';
 import router from './router';
 import * as game from './game';
+import { ServerState } from './serverState';
 
 //Express app
 let app = express();
@@ -13,6 +14,8 @@ let app = express();
 let server = http.createServer(app);
 //Socket server
 let io = new Server(server);
+
+let state = new ServerState(io);
 
 //Hook in the app router
 app.use(router);
@@ -28,26 +31,26 @@ io.on('connection', (socket) => {
   //Bind createNewPlayer for when the client requests a player
   socket.on('createNewPlayer', (clientPlayerData) => {
     //Add a new player to the game and store the ID on this socket
-    socket.clientId = game.addNewPlayer(socket, clientPlayerData);
-  
+    socket.clientId = game.addNewPlayer(state, socket, clientPlayerData);
+
     //Listen to player updates from the client
     socket.on('updatePlayer', (data) => {
-      game.updatePlayerFromClient(socket, data);
+      game.updatePlayerFromClient(state, socket, data);
     });
-    
+
     socket.on('playerCollectedPickup', (data) => {
-      game.playerCollectedPickup(data);
+      game.playerCollectedPickup(state, data);
     });
-    
+
     //Listen for a reset game call for debugging
     socket.on('reset', (clientId) => {
-      game.reset(clientId);
+      game.reset(state, clientId);
     });
-  
+
     //Only bind disconnect if the player was created in the first place
     //Disconnect the player
     socket.on('disconnect', () => {
-      game.disconnectPlayer(socket.clientId);
+      game.disconnectPlayer(state, socket.clientId);
     });
   });
 });
@@ -60,12 +63,10 @@ let port = process.env.SERVER_PORT || 8000;
 server.listen(port, () => {
   console.log("Server listening on " + server.address().port);
   //Initialize the game.  Pass in our socket server instance
-  game.init(io);
-  game.start();
+  game.init(state);
+  // game.start(state);
   //Start the game loop
-  game.updateGame();
-  //Start the network loop
-  game.updateNetwork();
+  game.updateGame(state);
 });
 
 const handleException = async (err, a) => {

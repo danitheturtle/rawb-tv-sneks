@@ -41,16 +41,13 @@ export class ClientState extends State {
       numAssetsLoading: 0,
       playerNameValue: "",
       playerSpriteValue: "",
-      //Score. Updated by server
+
       scoreboard: []
     };
-    
-    this.player = {
-      shouldUpdateServer: false,
-      moveHeading: new Vector(1, 0),
-      sprint: false
-    };
-    
+
+
+    this.serverTime = 0;
+
     this.audio = {
       audioCtx: undefined,
       soundNames: [
@@ -58,7 +55,7 @@ export class ClientState extends State {
       ],
       sounds: {}
     };
-    
+
     this.image = {
       raw: assets,
       tilesheetAssets: {},
@@ -86,38 +83,34 @@ export class ClientState extends State {
       sprites: {},
       backgrounds: {}
     };
-    
-    this.level = {
-      ...this.level,
-      activeBackgrounds: []
-    };
-    
+
     this.view = {
       active: undefined
     };
     //Non-nested vars
+    this.activeBackgrounds = [];
     this.viewport = getViewport();
     this.canvas = null;
     this.ctx = null;
   }
-  
+
   setCanvas(_canvas) {
     this.canvas = _canvas;
   }
-  
+
   setInput(_input) {
     this.input = _input;
   }
-  
+
   resize() {
     if (!this.canvas) return;
     this.viewport = getViewport();
-    
+
     if (this.view?.active) {
       this.view.active.width = this.viewport.width;
       this.view.active.height = this.viewport.height;
       //Re-scale game units based on the active view
-      this.view.active?.rescaleGU();
+      this.view.active?.rescaleGU(this);
     }
     //Resize the canvas to be 100vwX100vh
     this.canvas.setAttribute("width", this.viewport.width);
