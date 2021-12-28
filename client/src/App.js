@@ -44,16 +44,9 @@ const App = () => {
     if (!connected) return;
     //Initialize all modules in no particular order
     game.init(gameState);
-    keys.init(gameState);
-    time.init(gameState);
-    physics.init(gameState);
     socket.init(gameState);
     drawing.init(gameState);
     view.init(gameState);
-    levelLoader.init(gameState);
-    playerController.init(gameState);
-    // scoring.init();
-    // audio.init();
     const resizeListener = gameState.resize.bind(gameState);
     window.addEventListener("resize", resizeListener);
     return () => { window.removeEventListener("resize", resizeListener); }
@@ -64,12 +57,9 @@ const App = () => {
     if (!canvasRef.current || !nameInputRef.current) return;
     gameState.setCanvas(canvasRef.current);
     gameState.setInput(nameInputRef.current);
-    keys.start();
-    physics.start();
-    socket.start();
-    drawing.start();
-    levelLoader.start();
-    gameState.view.active = new View(0, 0, 100, 100);
+    keys.addListeners(gameState);
+    playerController.addListeners(gameState);
+    gameState.view.active = new View(gameState, 0, 0, 100, 100);
     gameState.game.numAssetsLoading = gameState.game.loading.length;
     
     //Bind blur/focus events to pause
@@ -91,7 +81,7 @@ const App = () => {
     window.addEventListener('contextmenu', handleContextMenu);
     
     //Finally, start the game loop
-    game.start();
+    game.start(gameState);
     
     //unbind events on unmount
     return () => {

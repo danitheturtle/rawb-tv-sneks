@@ -15,6 +15,7 @@ export const GLOBALS = {
   minViewScale: 70,
   zoomAmountOnCollect: 0.25,
   initialSnakeSize: 5,
+  pickupRadius: 6,
   numPickupsPerMinute: 300,
   pickupCap: 500,
   baseMoveSpeed: 20,

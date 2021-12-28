@@ -5,18 +5,18 @@ import * as levelLoader from './clientLevelLoader';
 import * as drawing from './drawing';
 import { PlayerRenderer } from './drawing/playerRenderer';
 import { SpriteRenderer } from './drawing/spriteRenderer';
-const { Player, SnakeCollider, Pickup, CircleCollider, time, GLOBALS } = engine;
+const { Player, physics: { SnakeCollider, CircleCollider }, Pickup, time, GLOBALS } = engine;
 const Vector = Victor;
 
-let s, sg, sp, st, sv, socket;
+let socket;
 
 export const init = (_state) => {
   //Setup shorthand
-  s = _state;
-  sg = s.game;
-  sp = s.physics;
-  st = s.time;
-  sv = s.view;
+  const s = _state;
+  const sg = s.game;
+  const sp = s.physics;
+  const st = s.time;
+  const sv = s.view;
   socket = s.io;
 
   //Listen for new players
@@ -57,8 +57,8 @@ export const init = (_state) => {
     sg.players[data.id].respawned();
     sg.players[data.id].collider.reset();
     if (data.id == sg.clientId) {
-      updateClientPlayer();
-      sv.active?.reset();
+      updateClientPlayer(s);
+      sv.active?.reset(s);
       console.dir('broadcasted respawn');
     }
   });
@@ -67,7 +67,7 @@ export const init = (_state) => {
     if (sg.pickups[pickupData.id]) {
       sg.pickups[pickupData.id].setData(pickupData);
     } else {
-      sp.gameObjects[pickupData.id] = sg.pickups[pickupData.id] = new Pickup(s)
+      sp.gameObjects[pickupData.id] = sg.pickups[pickupData.id] = new Pickup()
         .addCollider(new CircleCollider())
         .addRenderer(new SpriteRenderer())
         .setData({
@@ -123,7 +123,7 @@ export const init = (_state) => {
         //If the player is not the client player
         if (sg.clientId == clientId) {
           //Set data but remain client-authoritative
-          sg.players[clientId].setClientData(newState.players[clientId]);
+          sg.players[clientId].setData(newState.players[clientId]);
         } else {
           //Set the data
           sg.players[clientId].setData(newState.players[clientId]);
@@ -142,23 +142,20 @@ export const init = (_state) => {
   });
 
   socket.on('loadLevel', (levelName) => {
-    levelLoader.loadLevel(levelName);
+    levelLoader.loadLevel(s, levelName);
     //update game state to move on from connecting
     sg.clientState = CLIENT_STATES.PLAYING
   });
 }
 
-
-export const start = () => {}
-
-export const reset = () => {
-  socket.emit('reset', sg.clientId);
+export const reset = (_state) => {
+  socket.emit('reset', _state.game.clientId);
 }
 
-export const createNewPlayer = (_playerNameValue) => {
+export const createNewPlayer = (_state, _playerNameValue) => {
   console.dir('joining game');
   //client-defined player data
-  const clientPlayerData = { name: _playerNameValue, spriteName: sg.playerSpriteValue || drawing.randomPlayerSprite() };
+  const clientPlayerData = { name: _playerNameValue, spriteName: _state.game.playerSpriteValue || drawing.randomPlayerSprite() };
   //notify server there is a new player
   socket.emit('createNewPlayer', clientPlayerData);
 }
@@ -166,15 +163,15 @@ export const createNewPlayer = (_playerNameValue) => {
 /**
  * Called by the client to update the server (and everyone else) of changes
  */
-export const updateClientPlayer = () => {
+export const updateClientPlayer = (_state) => {
   //Get the client player data
-  const playerData = sg.players[sg.clientId].getDataForNetworkUpdate();
+  const playerData = _state.game.players[_state.game.clientId].getData();
   //Emit an update
   socket.emit('updatePlayer', playerData);
 }
 
-export const playerCollectedPickup = (clientId, pickupId) => {
-  socket.emit('playerCollectedPickup', { clientId, pickupId });
-  delete sp.gameObjects[pickupId];
-  delete sg.pickups[pickupId];
+export const playerCollectedPickup = (_state, _clientId, _pickupId) => {
+  socket.emit('playerCollectedPickup', { clientId: _clientId, pickupId: _pickupId });
+  delete _state.physics.gameObjects[pickupId];
+  delete _state.game.pickups[pickupId];
 }

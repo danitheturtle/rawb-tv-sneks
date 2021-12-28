@@ -1,8 +1,7 @@
 import { Sprite } from './sprite';
 
 export class Spritesheet {
-  constructor(_stateRef, _imageSrc, _stylesheetData) {
-    this.stateRef = _stateRef;
+  constructor(_imageSrc, _stylesheetData) {
     //Is the spritesheet ready?
     this.ready = false;
     this.src = _imageSrc;
@@ -27,14 +26,14 @@ export class Spritesheet {
     this.tiles = {};
   }
   
-  load() {
+  load(_state) {
     return new Promise((res, rej) => {
       try {
         this.image = new Image();
         this.image.onload = () => {
           this.ready = true;
           this.cacheTiles();
-          this.makeSprites();
+          this.makeSprites(_state);
           res(this);
         }
         this.image.src = this.src;
@@ -65,10 +64,10 @@ export class Spritesheet {
     }
   }
 
-  makeSprites() {
+  makeSprites(_state) {
     if (this.sprites) {
       for (const spr in this.sprites) {
-        this.stateRef.image.sprites[spr] = new Sprite(spr, this, this.sprites[spr], this.animationSpeed);
+        _state.image.sprites[spr] = new Sprite(_state, spr, this, this.sprites[spr], this.animationSpeed);
       }
     }
   }

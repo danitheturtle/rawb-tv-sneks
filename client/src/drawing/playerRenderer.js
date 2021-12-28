@@ -1,14 +1,7 @@
 import Victor from 'victor';
 import { drawTextOutline } from './index';
 const Vector = Victor;
-let s, spl, sg, sv, si;
-export const init = (_state) => {
-  s = _state;
-  sg = s.game;
-  spl = s.player;
-  sv = s.view;
-  si = s.image;
-}
+
 export class PlayerRenderer {
   constructor() {
     this.radius = 2.66;
@@ -17,7 +10,11 @@ export class PlayerRenderer {
     this.parent = undefined;
     this.parts = [];
   }
-  draw() {
+  draw(_state) {
+    const s = _state;
+    const sg = s.game;
+    const sv = s.view;
+    const si = s.image;
     if (!this.parent || !this.parent?.collider) return;
     //update radius based on length
     this.radius = this.parent.collider.radius * 1.33;
@@ -29,7 +26,7 @@ export class PlayerRenderer {
       this.parts[0] = new Vector(this.parent.pos.x, this.parent.pos.y);
     }
     const lastPointToPlayerPos = this.parent.pos.clone().subtract(this.parent.collider.pointPath[0]);
-    const scaledRadiusDist  = this.parent.collider.initialRadius*this.parent.bodySpacing;
+    const scaledRadiusDist = this.parent.collider.initialRadius * this.parent.bodySpacing;
     const partDistFromNextPoint = Math.max(scaledRadiusDist - lastPointToPlayerPos.length(), 0);
     const colliderRef = this.parent.collider;
     for (let i = 0; i < colliderRef.bodyPartCount - 1; i++) {
@@ -55,7 +52,7 @@ export class PlayerRenderer {
         this.parts[i + 1] = new Vector(partLocation.x, partLocation.y);
       }
     }
-    
+
     //Grab player sprites
     const playerHead = si.sprites[`${this.spriteName}Head`];
     const playerBodyFirst = si.sprites[`${this.spriteName}Body-first`];
@@ -64,7 +61,7 @@ export class PlayerRenderer {
     if (!playerBody) {
       playerBody = [];
       //max of 4 sections and a "last" part currently
-      for (let i=0; i<4; i++) {
+      for (let i = 0; i < 4; i++) {
         const nextSpriteRef = si.sprites[`${this.spriteName}Body-${i}`];
         if (nextSpriteRef) {
           playerBody.push(nextSpriteRef)
@@ -74,58 +71,56 @@ export class PlayerRenderer {
       }
     }
     const playerBodyLast = si.sprites[`${this.spriteName}Body-last`];
-    
+
     const c = s.ctx;
     const snakeBodyRelativePositions = this.parts
-      .map(partPos => sv.active?.getObjectRelativePosition(partPos, true));
-    for (let i=snakeBodyRelativePositions.length-1; i>=0; i--) {
+      .map(partPos => sv.active?.getObjectRelativePosition(s, partPos, true));
+    for (let i = snakeBodyRelativePositions.length - 1; i >= 0; i--) {
       const pos = snakeBodyRelativePositions[i];
       c.save();
       if (i === 0) {
         c.translate(pos.x, pos.y);
         drawTextOutline(
-          this.playerName, 
-          0, 
-          -1*(2.5+this.parent.collider.radius)*sg.gu, 
-          `${(1.5*sg.gu)+4}px Arial`, 
-          "rgb(255, 255, 255)", 
+          s,
+          this.playerName,
+          0,
+          -1 * (2.5 + this.parent.collider.radius) * sg.gu,
+          `${(1.5*sg.gu)+4}px Arial`,
+          "rgb(255, 255, 255)",
           "rgb(30, 30, 30)",
           0.75
         );
-        c.rotate(this.parent.vel.horizontalAngle()+Math.PI/2);
+        c.rotate(this.parent.vel.horizontalAngle() + Math.PI / 2);
         playerHead.draw(
-          s, 
-          c, 
-          -this.radius * sg.gu, 
-          -this.radius * sg.gu, 
-          this.radius * sg.gu * 2, 
+          s,
+          -this.radius * sg.gu,
+          -this.radius * sg.gu,
+          this.radius * sg.gu * 2,
           this.radius * sg.gu * 2
         );
       } else if (i === 1 && playerBodyFirst) {
         c.translate(pos.x, pos.y);
-        c.rotate(snakeBodyRelativePositions[i-1].clone().subtract(pos).horizontalAngle()+Math.PI/2);
+        c.rotate(snakeBodyRelativePositions[i - 1].clone().subtract(pos).horizontalAngle() + Math.PI / 2);
         playerBodyFirst.draw(
-          s, 
-          c, 
-          -this.radius * sg.gu, 
-          -this.radius * sg.gu, 
-          this.radius * sg.gu * 2, 
+          s,
+          -this.radius * sg.gu,
+          -this.radius * sg.gu,
+          this.radius * sg.gu * 2,
           this.radius * sg.gu * 2
         );
-      } else if (i === snakeBodyRelativePositions.length-1 && playerBodyLast) {
+      } else if (i === snakeBodyRelativePositions.length - 1 && playerBodyLast) {
         c.translate(pos.x, pos.y);
-        c.rotate(snakeBodyRelativePositions[i-1].clone().subtract(pos).horizontalAngle()+Math.PI/2);
+        c.rotate(snakeBodyRelativePositions[i - 1].clone().subtract(pos).horizontalAngle() + Math.PI / 2);
         playerBodyLast.draw(
-          s, 
-          c, 
-          -this.radius * sg.gu, 
-          -this.radius * sg.gu, 
-          this.radius * sg.gu * 2, 
+          s,
+          -this.radius * sg.gu,
+          -this.radius * sg.gu,
+          this.radius * sg.gu * 2,
           this.radius * sg.gu * 2
         );
       } else {
         c.translate(pos.x, pos.y);
-        c.rotate(snakeBodyRelativePositions[i-1].clone().subtract(pos).horizontalAngle()+Math.PI/2);
+        c.rotate(snakeBodyRelativePositions[i - 1].clone().subtract(pos).horizontalAngle() + Math.PI / 2);
         let selectedSprite;
         if (playerBody instanceof Array) {
           const spriteIndex = i % playerBody.length;
@@ -134,11 +129,10 @@ export class PlayerRenderer {
           selectedSprite = playerBody;
         }
         selectedSprite.draw(
-          s, 
-          c, 
-          -this.radius * sg.gu, 
-          -this.radius * sg.gu, 
-          this.radius * sg.gu * 2, 
+          s,
+          -this.radius * sg.gu,
+          -this.radius * sg.gu,
+          this.radius * sg.gu * 2,
           this.radius * sg.gu * 2
         );
       }
@@ -153,11 +147,7 @@ export class PlayerRenderer {
       parts: this.parts.map(p => ([p.x, p.y]))
     };
   }
-  
-  getDataForNetworkUpdate() {
-    return {}
-  }
-  
+
   setData(_data, _parent) {
     this.radius = _data.radius !== undefined ? _data.radius : this.radius;
     this.parent = _parent !== undefined ? _parent : this.parent;

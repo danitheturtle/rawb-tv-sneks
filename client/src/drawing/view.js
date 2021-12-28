@@ -3,28 +3,22 @@ import engine from 'engine';
 import Victor from 'victor';
 const Vector = Victor;
 const { utils, GLOBALS } = engine;
-let s, sg, sl, sv, gu;
 
 export const init = (_state) => {
-  s = _state;
-  sg = s.game;
-  sv = s.view;
-  sl = s.level;
-  gu = sg.gu;
-
+  const sv = _state.view;
   keys.keyDown("+", () => {
     if (!sv.active) return;
-    sv.active.zoomIn();
+    sv.active.zoomIn(_state);
   });
 
   keys.keyDown("-", () => {
     if (!sv.active) return;
-    sv.active.zoomOut();
+    sv.active.zoomOut(_state);
   });
 };
 
 export class View {
-  constructor(_x, _y, _width, _height) {
+  constructor(_state, _x, _y, _width, _height) {
     this.x = _x;
     this.y = _y;
     this.width = _width;
@@ -35,9 +29,9 @@ export class View {
 
     //Limits
     this.xLimitMin = 0;
-    this.xLimitMax = sl.activeLevelData?.guWidth ? sl.activeLevelData.guWidth : 100;
+    this.xLimitMax = _state.level.activeLevelData?.guWidth ? _state.level.activeLevelData.guWidth : 100;
     this.yLimitMin = 0;
-    this.yLimitMax = sl.activeLevelData?.guHeight ? sl.activeLevelData.guHeight : 100;
+    this.yLimitMax = _state.level.activeLevelData?.guHeight ? _state.level.activeLevelData.guHeight : 100;
 
     //Buffer
     this.xBuffer = 0.49;
@@ -74,19 +68,19 @@ export class View {
     }
   }
   
-  zoomIn(amount=1) {
+  zoomIn(_state, amount=1) {
     this.viewScale = Math.max(this.viewScale-amount, GLOBALS.minViewScale);
-    this.rescaleGU();
+    this.rescaleGU(_state);
   }
   
-  zoomOut(amount=1) {
+  zoomOut(_state, amount=1) {
     this.viewScale = Math.min(this.viewScale+amount, GLOBALS.maxViewScale);
-    this.rescaleGU();
+    this.rescaleGU(_state);
   }
   
-  reset() {
+  reset(_state) {
     this.viewScale = GLOBALS.initialViewScale;
-    this.rescaleGU();
+    this.rescaleGU(_state);
   }
 
   center(set) {
@@ -156,11 +150,13 @@ export class View {
     this.yLimitMax = _yMax;
   }
 
-  setLimitsGU(_xMinGU, _xMaxGU, _yMinGU, _yMaxGU) {
+  setLimitsGU(_state, _xMinGU, _xMaxGU, _yMinGU, _yMaxGU) {
+    const sg = _state.game;
     this.setLimitsPixels(_xMinGU * sg.gu, _xMaxGU * sg.gu, _yMinGU * sg.gu, _yMaxGU * sg.gu);
   }
 
-  getObjectRelativePosition(obj, multiplyByGU) {
+  getObjectRelativePosition(_state, obj, multiplyByGU) {
+    const sg = _state.game;
     if (obj.pos === undefined) {
       return new Vector(obj.x * (multiplyByGU ? sg.gu : 1) - this.xMin(), obj.y * (multiplyByGU ? sg.gu : 1) - this.yMin());
     } else {
@@ -176,19 +172,20 @@ export class View {
     }
   }
 
-  rescaleGU() {
-    sg.gu = Math.round(Math.max(this.width, this.height) / this.viewScale);
+  rescaleGU(_state) {
+    _state.game.gu = Math.round(Math.max(this.width, this.height) / this.viewScale);
     //Re-define position limits for the view
     this.setLimitsGU(
+      _state,
       0, 
-      sl.activeLevelData?.guWidth ? sl.activeLevelData.guWidth : 100,
+      _state.level.activeLevelData?.guWidth ? _state.level.activeLevelData.guWidth : 100,
       0, 
-      sl.activeLevelData?.guHeight ? sl.activeLevelData.guHeight : 100
+      _state.level.activeLevelData?.guHeight ? _state.level.activeLevelData.guHeight : 100
     );
     //Make sure they didn't zoom out past the world border
-    sv.active.xMin(sv.active.xMin());
-    sv.active.xMax(sv.active.xMax());
-    sv.active.yMin(sv.active.yMin());
-    sv.active.yMax(sv.active.yMax());
+    _state.view.active.xMin(_state.view.active.xMin());
+    _state.view.active.xMax(_state.view.active.xMax());
+    _state.view.active.yMin(_state.view.active.yMin());
+    _state.view.active.yMax(_state.view.active.yMax());
   }
 }

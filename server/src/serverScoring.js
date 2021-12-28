@@ -2,24 +2,20 @@ import engine from 'engine';
 import Victor from 'victor';
 import { SERVER_STATES } from './serverState';
 const Vector = Victor;
-const { Pickup, GLOBALS, CircleCollider, utils } = engine;
-
-let s, sg, sl, sp;
-export const init = (_state) => {
-  s = _state;
-  sg = s.game;
-  sl = s.level;
-  sp = s.physics;
-}
+const { Pickup, GLOBALS, physics: { CircleCollider }, utils } = engine;
 
 let loopCount = 0;
-export const update = () => {
+export const update = (_state) => {
+  const s = _state;
+  const sg = s.game;
+  const sl = s.level;
+  const sp = s.physics;
   if (!sl.activeLevelData) return;
   
   if (loopCount % (3600 / GLOBALS.numPickupsPerMinute) === 0) {
     const newPos = {
-      x: utils.randomRange(0, s.level.activeLevelData.guWidth),
-      y: utils.randomRange(0, s.level.activeLevelData.guHeight)
+      x: utils.randomRange(0, sl.activeLevelData.guWidth),
+      y: utils.randomRange(0, sl.activeLevelData.guHeight)
     }
     const newPickupId = `pickup-${newPos.x}-${newPos.y}`;
     if (sg.pickups[newPickupId]) { delete sg.pickups[newPickupId]; }
@@ -53,7 +49,10 @@ export const update = () => {
   loopCount = loopCount % 3600;
 }
 
-export const reset = () => {
+export const reset = (_state) => {
+  const s = _state;
+  const sp = s.physics;
+  const sg = s.game;
   s.io.emit('allPickups', []);
   Object.keys(sg.pickups).forEach(pickupId => {
     delete sp.gameObjects[pickupId];
@@ -62,7 +61,10 @@ export const reset = () => {
   sg.scoreboard = [];
 }
 
-export const updatePlayerScore = (clientId) => {
+export const updatePlayerScore = (_state, clientId) => {
+  const s = _state;
+  const sg = s.game;
+  
   if (!sg.players[clientId] || sg.gameState !== SERVER_STATES.GAME_PLAYING) return;
   //Find the player in the existing scoreboard
   let foundIndex;

@@ -1,17 +1,6 @@
 import * as levels from './levels';
 
-let state, sg, sl;
 let playedLevelNames = [];
-export const init = (_state) => {
-  state = _state;
-  sg = state.game;
-  sl = state.level;
-}
-
-export const start = () => {
-  
-}
-
-export const loadLevel = (levelName) => {
-  sl.activeLevelData = levels[levelName];
+export const loadLevel = (_state, levelName) => {
+  _state.level.activeLevelData = levels[levelName];
 }

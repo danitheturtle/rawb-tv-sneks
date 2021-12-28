@@ -1,28 +1,9 @@
 import engine from 'engine';
 const { levelLoader, levels, utils } = engine;
 const { randomInt } = utils;
-let s, sp, si, sg, io;
 let playedLevelNames = [];
-export const init = (_state) => {
-  s = _state;
-  sp = s.physics;
-  sg = s.game;
-  si = s.image;
-  io = s.io;
-  
-  levelLoader.init(_state);
-}
 
-export const start = () => {
-  levelLoader.start();
-  loadRandomLevel();
-}
-
-export const restart = () => {
-  loadRandomLevel();
-}
-
-export const loadRandomLevel = () => {
+export const loadRandomLevel = (_state) => {
   //select level from ones available
   let possibleNextLevels = Object.entries(levels)
     .filter(([levelName]) => (!playedLevelNames.includes(levelName)));
@@ -33,7 +14,7 @@ export const loadRandomLevel = () => {
   }
   const selectedIndex = randomInt(0, possibleNextLevels.length - 1);
   const nextLevelName = possibleNextLevels[selectedIndex][0];
-  levelLoader.loadLevel(nextLevelName);
+  levelLoader.loadLevel(_state, nextLevelName);
   playedLevelNames.push(nextLevelName);
-  io.emit('loadLevel', nextLevelName)
+  _state.io.emit('loadLevel', nextLevelName)
 }

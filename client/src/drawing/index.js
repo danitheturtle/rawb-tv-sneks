@@ -3,45 +3,39 @@ import { Background } from './background';
 import engine from 'engine';
 import { CLIENT_STATES } from '../clientState';
 import * as playerRenderer from './playerRenderer';
-import * as circleRenderer from './circleRenderer';
 import * as spriteRenderer from './spriteRenderer';
 const { utils, GLOBALS } = engine;
-let s, sg, si, sv, sp, sl;
 let layers = [];
 
 export const init = (_state) => {
-  s = _state;
-  sg = s.game;
-  si = s.image;
-  sv = s.view;
-  sp = s.physics;
-  sl = s.level;
+  const s = _state;
+  const sg = s.game;
+  const si = s.image;
 
   //load assets
   Object.entries(si.tilesheetAssets).forEach(([sheetName, tilesheet]) => {
-    si.tilesheets[sheetName] = new Spritesheet(s, tilesheet[0], tilesheet[1]);
-    sg.loading.push(si.tilesheets[sheetName].load());
+    si.tilesheets[sheetName] = new Spritesheet(tilesheet[0], tilesheet[1]);
+    sg.loading.push(si.tilesheets[sheetName].load(s));
   });
   Object.entries(si.spritesheetAssets).forEach(([sheetName, spritesheet]) => {
-    si.spritesheets[sheetName] = new Spritesheet(s, spritesheet[0], spritesheet[1]);
-    sg.loading.push(si.spritesheets[sheetName].load());
+    si.spritesheets[sheetName] = new Spritesheet(spritesheet[0], spritesheet[1]);
+    sg.loading.push(si.spritesheets[sheetName].load(s));
   });
   Object.entries(si.backgroundAssets).forEach(([bgName, bgFile]) => {
     si.backgrounds[bgName] = new Background(bgName, bgFile[0], bgFile[1]);
-    sg.loading.push(si.backgrounds[bgName].load());
+    sg.loading.push(si.backgrounds[bgName].load(s));
   })
 
   si.tutorialImg = new Background('tutorialImg', si.tutorialImg[0], si.tutorialImg[1]);
   sg.loading.push(si.tutorialImg.load());
-  
-  playerRenderer.init(s);
-  circleRenderer.init(s);
-  spriteRenderer.init(s);
 }
 
-export const start = () => {}
-
-export const draw = () => {
+export const draw = (_state) => {
+  const s = _state;
+  const sg = s.game;
+  const sv = s.view;
+  const sp = s.physics;
+  const sl = s.level;
   //draw background
   const backs = sl.activeBackgrounds;
   backs.forEach(back => {
@@ -78,7 +72,7 @@ export const draw = () => {
         continue;
       }
 
-      let destPos = sv.active.getObjectRelativePosition({
+      let destPos = sv.active.getObjectRelativePosition(s, {
         x: x,
         y: y
       }, false);
@@ -98,34 +92,38 @@ export const draw = () => {
   }
   //draw game objects
   for (const go in sp.gameObjects) {
-    sp.gameObjects[go].draw();
+    sp.gameObjects[go].draw(s);
   }
 }
 
-export const drawGUI = () => {
+export const drawGUI = (_state) => {
+  const sg = _state.game;
   if (sg.clientState === CLIENT_STATES.PLAYING || sg.clientState === CLIENT_STATES.PAUSED);
   switch (sg.gameState) {
     case CLIENT_STATES.GAME_WAITING_FOR_PLAYERS:
-      drawWaitingForPlayersGUI();
+      drawWaitingForPlayersGUI(_state);
       break;
     case CLIENT_STATES.GAME_STARTING_SOON:
-      drawStartingSoonGUI();
+      drawStartingSoonGUI(_state);
       break;
     case CLIENT_STATES.GAME_OVER:
-      drawGameOverGUI();
+      drawGameOverGUI(_state);
       break;
     case CLIENT_STATES.GAME_RESETTING:
-      drawResetGUI();
+      drawResetGUI(_state);
       break;
     case CLIENT_STATES.GAME_PLAYING:
     default:
-      drawPlayingGUI();
+      drawPlayingGUI(_state);
       break;
   }
 }
 
-export const drawWaitingForPlayersGUI = () => {
+export const drawWaitingForPlayersGUI = (_state) => {
+  const s = _state;
+  const sg = s.game;
   drawTextOutline(
+    s,
     "Waitinig for Players (min 3)", 
     s.viewport.width / 2, 
     48, 
@@ -136,13 +134,16 @@ export const drawWaitingForPlayersGUI = () => {
   );
   Object.values(sg.players).forEach((player, i) => {
     if (i > 20) return;
-    drawTextOutline("Sneks in a Lobby", 186, 48, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
-    drawTextOutline(player.name, 48, 96+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, "Sneks in a Lobby", 186, 48, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(s, player.name, 48, 96+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
   });
 }
 
-export const drawStartingSoonGUI = () => {
+export const drawStartingSoonGUI = (_state) => {
+  const s = _state;
+  const sg = s.game;
   drawTextOutline(
+    s,
     "Starting Soon (unless people leave)", 
     s.viewport.width / 2, 
     48, 
@@ -152,6 +153,7 @@ export const drawStartingSoonGUI = () => {
     1
   );
   drawProgressBar(
+    s,
     s.viewport.width / 3, 
     72, 
     s.viewport.width / 3, 
@@ -164,11 +166,14 @@ export const drawStartingSoonGUI = () => {
   );
 }
 
-export const drawGameOverGUI = () => {
+export const drawGameOverGUI = (_state) => {
+  const s = _state;
+  const sg = s.game;
   let c = s.ctx;
   c.fillStyle = "rgba(0, 0, 0, 0.5)";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   drawTextOutline(
+    s,
     "Game Over", 
     s.viewport.width / 2, 
     48, 
@@ -178,6 +183,7 @@ export const drawGameOverGUI = () => {
     1
   );
   drawProgressBar(
+    s,
     s.viewport.width / 3, 
     72, 
     s.viewport.width / 3, 
@@ -189,6 +195,7 @@ export const drawGameOverGUI = () => {
     0
   );
   drawTextOutline(
+    s,
     "Most Dangerous Noodle:", 
     s.viewport.width / 2, 
     s.viewport.height / 2 - 48, 
@@ -198,6 +205,7 @@ export const drawGameOverGUI = () => {
     2
   );
   drawTextOutline(
+    s,
     `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`, 
     s.viewport.width / 2, 
     s.viewport.height / 2 + 48, 
@@ -208,10 +216,11 @@ export const drawGameOverGUI = () => {
   );
 }
 
-export const drawResetGUI = () => {
+export const drawResetGUI = (_state) => {
   drawTextOutline(
+    _state,
     "Reseting...", 
-    s.viewport.width / 2, 
+    _state.viewport.width / 2, 
     48, 
     "36px Arial", 
     'rgb(255, 255, 255)', 
@@ -220,9 +229,12 @@ export const drawResetGUI = () => {
   );
 }
 
-export const drawPlayingGUI = () => {
-  drawScoreboard(32, 64);
+export const drawPlayingGUI = (_state) => {
+  const s = _state;
+  const sg = s.game;
+  drawScoreboard(s, 32, 64);
   drawTextOutline(
+    s,
     "Time Left", 
     s.viewport.width / 2, 
     48, 
@@ -232,6 +244,7 @@ export const drawPlayingGUI = () => {
     1
   );
   drawProgressBar(
+    s,
     s.viewport.width / 3, 
     72, 
     s.viewport.width / 3, 
@@ -244,15 +257,17 @@ export const drawPlayingGUI = () => {
   );
 }
 
-export const drawScoreboard = (x, y) => {
+export const drawScoreboard = (_state, x, y) => {
+  const s = _state;
+  const sg = s.game;
   const scoreboard = sg.scoreboard;
   let c = s.ctx;
   c.save();
   scoreboard.forEach((playerScore, i) => {
     if (i > 9) return;
-    drawTextOutline("Sneakiest Sneks", x+136, y-16, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
-    drawTextOutline(playerScore[2], x, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
-    drawTextOutline(playerScore[1], x+96, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, "Sneakiest Sneks", x+136, y-16, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(s, playerScore[2], x, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, playerScore[1], x+96, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
   });
   c.restore();
 }
@@ -261,7 +276,9 @@ export const createTileLayer = (layerData) => {
   layers.push(layerData);
 }
 
-export const getSheet = (tileID) => {
+export const getSheet = (_state, tileID) => {
+  const s = _state;
+  const si = s.image;
   for (const sid in si.tilesheets) {
     if (tileID - si.tilesheets[sid].tileStart < si.tilesheets[sid].tileCount) {
       return si.tilesheets[sid];
@@ -270,8 +287,8 @@ export const getSheet = (tileID) => {
   return undefined;
 }
 
-export const drawText = (string, x, y, css, color, textAlign = "center", textBaseline = "middle") => {
-  let c = s.ctx;
+export const drawText = (_state, string, x, y, css, color, textAlign = "center", textBaseline = "middle") => {
+  let c = _state.ctx;
   c.save();
   c.font = css;
   c.fillStyle = color;
@@ -282,6 +299,7 @@ export const drawText = (string, x, y, css, color, textAlign = "center", textBas
 }
 
 export const drawShadowText = (
+  _state,
   string, 
   x, 
   y, 
@@ -294,12 +312,13 @@ export const drawShadowText = (
   textBaseline = "middle"
 ) => {
   //Draw shadow
-  drawText(string, x + offsetX, y + offsetY, css, shadowColor, textAlign, textBaseline);
+  drawText(_state, string, x + offsetX, y + offsetY, css, shadowColor, textAlign, textBaseline);
   //Draw text
-  drawText(string, x, y, css, textColor, textAlign, textBaseline);
+  drawText(_state, string, x, y, css, textColor, textAlign, textBaseline);
 }
 
 export const drawTextOutline = (
+  _state,
   string, 
   x, 
   y, 
@@ -310,7 +329,7 @@ export const drawTextOutline = (
   textAlign = "center", 
   textBaseline = "middle"
 ) => {
-  let c = s.ctx;
+  let c = _state.ctx;
   c.save();
   c.font = css;
   c.fillStyle = color;
@@ -323,8 +342,8 @@ export const drawTextOutline = (
   c.restore();
 }
 
-export const drawProgressBar = (x, y, width, height, backColor, frontColor, val, minVal, maxVal) => {
-  let c = s.ctx;
+export const drawProgressBar = (_state, x, y, width, height, backColor, frontColor, val, minVal, maxVal) => {
+  let c = _state.ctx;
   c.save();
   c.fillStyle = backColor;
   c.fillRect(x, y, width, height);

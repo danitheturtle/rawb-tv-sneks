@@ -7,18 +7,13 @@ import * as playerController from './playerController';
 import { CanvasButton } from './drawing/canvasButton';
 const { time, physics, GLOBALS } = engine;
 
-let s, sg, sv, si, sp;
-
 export const init = (_state) => {
-  s = _state;
-  sg = s.game;
-  sv = s.view;
-  si = s.image;
-  sp = s.physics;
-  sg.clientState = CLIENT_STATES.LOADING;
+  _state.game.clientState = CLIENT_STATES.LOADING;
 }
 
-export const start = () => {
+export const start = (_state) => {
+  const s = _state;
+  const sg = s.game;
   Promise.all(sg.loading).then(() => {
     //Set the state to display the start screen
     sg.clientState = CLIENT_STATES.TUTORIAL_SCREEN;
@@ -28,38 +23,40 @@ export const start = () => {
   s.input.addEventListener('change', (e) => {
     sg.playerNameValue = e.target.value;
   });
-  update();
+  update(_state);
 }
 
-export const update = () => {
+export const update = (_state) => {
+  const sg = _state.game;
+  const sv = _state.view;
   //Start the animation loop
-  sg.animationID = requestAnimationFrame(update);
+  sg.animationID = requestAnimationFrame(() => update(_state));
   //Switch based on client state
   switch (sg.clientState) {
     //If assets are still loading
     case CLIENT_STATES.LOADING:
       //Show the loading screen
-      updateLoading();
+      updateLoading(_state);
       return;
     //If viewing tutorial
     case CLIENT_STATES.TUTORIAL_SCREEN:
       //Display tutorial
-      updateTutorial();
+      updateTutorial(_state);
       return;
     //If on the start screen
     case CLIENT_STATES.START_SCREEN:
       //Show start screen
-      updateStartScreen();
+      updateStartScreen(_state);
       return;
     //if selecting character
     case CLIENT_STATES.CHARACTER_SELECT:
       //update character select
-      updateCharacterSelect();
+      updateCharacterSelect(_state);
       return;
     //If connecting
     case CLIENT_STATES.CONNECTING:
       //Show connecting screen
-      updateConnecting();
+      updateConnecting(_state);
       return;
     //The default. Update as normal
     case CLIENT_STATES.PLAYING:
@@ -68,22 +65,22 @@ export const update = () => {
   }
   
   //Game is currently playing and all player setup is now finished
-  time.update();
-  physics.update();
-  playerController.update();
+  time.update(_state);
+  physics.update(_state);
+  playerController.update(_state);
   
   //Check for pickups
   
   //Store the drawing context shorthand
-  let c = s.ctx;
+  let c = _state.ctx;
   //Re-draw the background
   c.fillStyle = "white";
-  c.fillRect(0, 0, s.viewport.width, s.viewport.height);
+  c.fillRect(0, 0, _state.viewport.width, _state.viewport.height);
   
-  for (const p in s.players) {
+  for (const p in _state.players) {
     const player = sg.players[p];
     player.update();
-    const relativePos = sv.active?.getObjectRelativePosition(player, true);
+    const relativePos = sv.active?.getObjectRelativePosition(_state, player, true);
   }
   
   //Check for pickups
@@ -97,8 +94,8 @@ export const update = () => {
         sg.pickups[pickupId].collectedBy = self.id;
         self.score += sg.pickups[pickupId].worth;
         self.collider.updateBodyWithScore();
-        sv.active.zoomOut(GLOBALS.zoomAmountOnCollect);
-        socket.playerCollectedPickup(self.id, pickupId);
+        sv.active.zoomOut(_state, GLOBALS.zoomAmountOnCollect);
+        socket.playerCollectedPickup(_state, self.id, pickupId);
       }
     }
   }
@@ -107,23 +104,25 @@ export const update = () => {
     sv.active.follow(sg.players[sg.clientId].collider.center.clone().multiplyScalar(sg.gu));
   }
   
-  drawing.draw();
-  drawing.drawGUI();
+  drawing.draw(_state);
+  drawing.drawGUI(_state);
   
   if (sg.clientState === CLIENT_STATES.PAUSED) {
-    updatePaused();
+    updatePaused(_state);
   }
 }
 
-const updateLoading = () => {
-  let c = s.ctx;
+const updateLoading = (s) => {
+  const c = s.ctx;
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText("Loading...", s.viewport.width / 2, s.viewport.height / 2, "48px Arial", "rgba(100, 100, 100, 1.0)");
+  drawing.drawText(s, "Loading...", s.viewport.width / 2, s.viewport.height / 2, "48px Arial", "rgba(100, 100, 100, 1.0)");
 }
 
-const updateTutorial = () => {
-  let c = s.ctx;
+const updateTutorial = (s) => {
+  const si = s.image;
+  const sg = s.game;
+  const c = s.ctx;
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
 
@@ -155,16 +154,16 @@ const updateTutorial = () => {
 }
 
 let joinGameButton;
-const updateStartScreen = () => {
-  let c = s.ctx;
+const updateStartScreen = (s) => {
+  const sg = s.game;
+  const c = s.ctx;
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText("Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 160, "60px Arial", "rgba(100, 100, 100, 1.0)");
-  drawing.drawText("Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 40, "24px Arial", "rgba(50, 50, 50, 1.0)");
+  drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 160, "60px Arial", "rgba(100, 100, 100, 1.0)");
+  drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 40, "24px Arial", "rgba(50, 50, 50, 1.0)");
   if (sg.playerNameValue.length >= 3) {
     if (!joinGameButton) {
       joinGameButton = new CanvasButton(
-        s, 
         s.viewport.width / 2 - 200, 
         s.viewport.height / 2 + 60, 
         400, 
@@ -179,18 +178,21 @@ const updateStartScreen = () => {
         'Join Game'
       );
     }
-    joinGameButton.updateAndDraw();
+    joinGameButton.updateAndDraw(s);
   } else {
-    drawing.drawText("(3 character min, then press enter)", s.viewport.width / 2, s.viewport.height / 2 + 36, "12px Arial", "rgba(160, 160, 160, 1.0)");
+    drawing.drawText(s, "(3 character min, then press enter)", s.viewport.width / 2, s.viewport.height / 2 + 36, "12px Arial", "rgba(160, 160, 160, 1.0)");
   }
 }
 
 let characterSelectButtons;
-const updateCharacterSelect = () => {
-  let c = s.ctx;
+const updateCharacterSelect = (s) => {
+  const si = s.image;
+  const sg = s.game;
+  const c = s.ctx;
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   drawing.drawText(
+    s,
     "Choose Your Snek", 
     s.viewport.width / 2, 
     48, 
@@ -204,7 +206,6 @@ const updateCharacterSelect = () => {
     for (let i=0; i<drawing.allPlayerSpriteNames.length; i++) {
       const buttonSize = ((s.viewport.width-charSelectMargin*2) / gridSize) - ((gridSize-1)*charSelectMargin)/gridSize;
       characterSelectButtons.push(new CanvasButton(
-        s,
         charSelectMargin+(i % gridSize) * (buttonSize + charSelectMargin),
         charSelectMargin*2+(Math.floor(i / gridSize)) * (buttonSize + charSelectMargin),
         buttonSize,
@@ -220,26 +221,27 @@ const updateCharacterSelect = () => {
     }
   }
   characterSelectButtons.forEach((bt, i) => {
-    bt.updateAndDraw();
-    drawing.drawText(drawing.allPlayerSpriteNames[i][1], bt.x + bt.width / 2, bt.y + bt.height + 16, "20px Arial", 'rgb(50, 50, 50)')
+    bt.updateAndDraw(s);
+    drawing.drawText(s, drawing.allPlayerSpriteNames[i][1], bt.x + bt.width / 2, bt.y + bt.height + 16, "20px Arial", 'rgb(50, 50, 50)')
   });
 }
 
-const updateConnecting = () => {
+const updateConnecting = (s) => {
+  const sg = s.game;
+  const c = s.ctx;
   if (!sg.joinedGame && !sg.joiningGame) {
     //Tell the server to add a new player
-    socket.createNewPlayer(sg.playerNameValue);
+    socket.createNewPlayer(s, sg.playerNameValue);
     sg.joiningGame = true;
   }
-  const c = s.ctx;
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText("Connecting...", s.viewport.width / 2, s.viewport.height / 2, "60px Arial", "rgba(100, 100, 100, 1.0)");
+  drawing.drawText(s, "Connecting...", s.viewport.width / 2, s.viewport.height / 2, "60px Arial", "rgba(100, 100, 100, 1.0)");
 }
 
-const updatePaused = () => {
-  let c = s.ctx;
+const updatePaused = (s) => {
+  const c = s.ctx;
   c.fillStyle = "rgba(0, 0, 0, 0.5)";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText("Paused", s.viewport.width / 2, s.viewport.height / 2, "60px Arial", "rgba(200, 200, 200, 1.0)");
+  drawing.drawText(s, "Paused", s.viewport.width / 2, s.viewport.height / 2, "60px Arial", "rgba(200, 200, 200, 1.0)");
 }

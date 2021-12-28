@@ -111,7 +111,7 @@ export class ClientState extends State {
       this.view.active.width = this.viewport.width;
       this.view.active.height = this.viewport.height;
       //Re-scale game units based on the active view
-      this.view.active?.rescaleGU();
+      this.view.active?.rescaleGU(this);
     }
     //Resize the canvas to be 100vwX100vh
     this.canvas.setAttribute("width", this.viewport.width);

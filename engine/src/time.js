@@ -1,13 +1,7 @@
 import * as utils from './utils';
 
-let s, st;
-
-export const init = (state) => {
-  s = state;
-  st = s.time;
-}
-
-export const calculateDeltaTime = () => {
+export const calculateDeltaTime = (_state) => {
+  const st = _state.time;
   //Get time in ms
   const now = Date.now();
   //Get instant FPS (from last frame to this frame)
@@ -18,9 +12,10 @@ export const calculateDeltaTime = () => {
   return 1 / st.fps;
 }
 
-export const update = () => {
+export const update = (_state) => {
+  const st = _state.time;
   //Get the delta time
-  st.dt = calculateDeltaTime();
+  st.dt = calculateDeltaTime(_state);
   //Add the delta to the total runtime
   st.runTime += st.dt;
   //Add the delta to all client timers
@@ -33,22 +28,22 @@ export const update = () => {
   }
 }
 
-export const startClientTimer = (_id, _serverTime) => {
+export const startClientTimer = (_state, _id, _serverTime) => {
   st.clientTimers[_id] = _serverTime;
 }
 
-export const startNewTimer = (_id) => {
-  st.timers[_id] = 0;
+export const startNewTimer = (_state, _id) => {
+  _state.time.timers[_id] = 0;
 }
 
-export const dt = () => {
-  return st.dt;
+export const dt = (_state) => {
+  return _state.time.dt;
 }
 
-export const runTime = () => {
-  return st.runTime;
+export const runTime = (_state) => {
+  return _state.time.runTime;
 }
 
-export const fps = () => {
-  return st.fps;
+export const fps = (_state) => {
+  return _state.time.fps;
 }

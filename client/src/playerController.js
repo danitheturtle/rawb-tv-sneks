@@ -8,13 +8,13 @@ const Vector = Victor;
 let s, sp, spl, sg, sl, sv;
 let usingKeyboard = false;
 
-export const init = (_state) => {
-  s = _state;
-  sp = s.physics;
-  spl = s.player;
-  sg = s.game;
-  sl = s.level;
-  sv = s.view;
+export const addListeners = (_state) => {
+  const s = _state;
+  const sp = s.physics;
+  const spl = s.player;
+  const sg = s.game;
+  const sl = s.level;
+  const sv = s.view;
 
   keys.keyDown("a", "left", () => {
     usingKeyboard = true;
@@ -79,11 +79,15 @@ export const init = (_state) => {
   });
 }
 
-export const update = () => {
+export const update = (_state) => {
+  const s = _state;
+  const sg = s.game;
+  const sv = s.view;
   const me = sg.players[sg.clientId];
+  const spl = s.player;
   if (!me) return;
   if (!usingKeyboard) {
-    const playerPos = sv.active?.getObjectRelativePosition(me, true);
+    const playerPos = sv.active?.getObjectRelativePosition(s, me, true);
     const mouseCoords = keys.mouse();
     const mouseCoordsVec = new Vector(mouseCoords[0], mouseCoords[1]);
     const newMoveHeading = mouseCoordsVec.clone().subtract(playerPos);
@@ -96,7 +100,7 @@ export const update = () => {
   me.moveHeading = spl.moveHeading;
   me.sprint = spl.sprint;
   if (spl.shouldUpdateServer) {
-    socket.updateClientPlayer();
+    socket.updateClientPlayer(s);
     spl.shouldUpdateServer = false;
   }
 }
