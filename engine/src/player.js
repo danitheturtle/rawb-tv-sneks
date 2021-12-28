@@ -95,6 +95,34 @@ export class Player extends GameObject {
       score: this.score
     };
   }
+  
+  getServerData() {
+    return this.getData();
+  }
+  
+  getServerUpdateData() {
+    return this.getData();
+    // return {
+    //   ...super.getServerUpdateData(),
+    //   moveHeadingX: this.moveHeading.x,
+    //   moveHeadingY: this.moveHeading.y,
+    //   sprint: this.sprint
+    // };
+  }
+  
+  getClientUpdateData() {
+    return this.getData();
+    // return {
+    //   ...super.getClientUpdateData(),
+    //   moveHeadingX: this.moveHeading.x,
+    //   moveHeadingY: this.moveHeading.y,
+    //   sprint: this.sprint
+    // };
+  }
+  
+  setClientDataFromServer(_data) {
+    this.setData(_data);
+  }
 
   setData(_data) {
     super.setData(_data);
@@ -102,8 +130,8 @@ export class Player extends GameObject {
     this.dead = _data.dead !== undefined ? _data.dead : this.dead;
     this.respawning = _data.respawning !== undefined ? _data.respawning : this.respawning;
     this.moveHeading = new Vector(
-      _data.moveHeadingX !== undefined ? _data.moveHeadingX : this.moveHeading.x, 
-      _data.moveHeadingY !== undefined ? _data.moveHeadingY : this.moveHeading.y
+      !isNaN(_data.moveHeadingX) ? _data.moveHeadingX : this.moveHeading.x, 
+      !isNaN(_data.moveHeadingY) ? _data.moveHeadingY : this.moveHeading.y
     );
     this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
     this.sprintTimer = _data.sprintTimer !== undefined ? _data.sprintTimer : this.sprintTimer;

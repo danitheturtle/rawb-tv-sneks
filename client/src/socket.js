@@ -123,7 +123,7 @@ export const init = (_state) => {
         //If the player is not the client player
         if (sg.clientId == clientId) {
           //Set data but remain client-authoritative
-          sg.players[clientId].setData(newState.players[clientId]);
+          sg.players[clientId].setClientDataFromServer(newState.players[clientId]);
         } else {
           //Set the data
           sg.players[clientId].setData(newState.players[clientId]);
@@ -165,13 +165,13 @@ export const createNewPlayer = (_state, _playerNameValue) => {
  */
 export const updateClientPlayer = (_state) => {
   //Get the client player data
-  const playerData = _state.game.players[_state.game.clientId].getData();
+  const playerData = _state.game.players[_state.game.clientId].getClientUpdateData();
   //Emit an update
   socket.emit('updatePlayer', playerData);
 }
 
 export const playerCollectedPickup = (_state, _clientId, _pickupId) => {
   socket.emit('playerCollectedPickup', { clientId: _clientId, pickupId: _pickupId });
-  delete _state.physics.gameObjects[pickupId];
-  delete _state.game.pickups[pickupId];
+  delete _state.physics.gameObjects[_pickupId];
+  delete _state.game.pickups[_pickupId];
 }

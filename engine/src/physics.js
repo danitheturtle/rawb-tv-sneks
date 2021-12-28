@@ -268,17 +268,36 @@ time
       renderer: this.renderer?.getData()
     }
   }
+  
+  getServerUpdateData() {
+    return {
+      id: this.id,
+      x: this.pos.x,
+      y: this.pos.y,
+      velX: this.vel.x,
+      velY: this.vel.y
+    };
+  }
+  
+  getClientUpdateData() {
+    return {
+      id: this.id,
+      x: this.pos.x,
+      y: this.pos.y
+    };
+  }
+  
   setData(data) {
     //If id is unset, set it
     if (!this.id) {
       this.id = data.id;
     }
-    this.pos.x = data.x !== undefined ? data.x : this.pos.x;
-    this.pos.y = data.y !== undefined ? data.y : this.pos.y;
-    this.vel.x = data.velX !== undefined ? data.velX : this.vel.x;
-    this.vel.y = data.velY !== undefined ? data.velY : this.vel.y;
-    this.accel.x = data.accelX !== undefined ? data.accelX : this.accel.x;
-    this.accel.y = data.accelY !== undefined ? data.accelY : this.accel.y;
+    this.pos.x = !isNaN(data.x) ? data.x : this.pos.x;
+    this.pos.y = !isNaN(data.y) ? data.y : this.pos.y;
+    this.vel.x = !isNaN(data.velX) ? data.velX : this.vel.x;
+    this.vel.y = !isNaN(data.velY) ? data.velY : this.vel.y;
+    this.accel.x = !isNaN(data.accelX) ? data.accelX : this.accel.x;
+    this.accel.y = !isNaN(data.accelY) ? data.accelY : this.accel.y;
     this.hasCollisions = data.hasCollisions !== undefined ? data.hasCollisions : this.hasCollisions;
     if (!this.collider && data.collider) {
       switch (data.collider.type) {

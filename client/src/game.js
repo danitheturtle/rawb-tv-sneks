@@ -79,7 +79,7 @@ export const update = (_state) => {
   
   for (const p in _state.players) {
     const player = sg.players[p];
-    player.update();
+    player.update(_state);
     const relativePos = sv.active?.getObjectRelativePosition(_state, player, true);
   }
   

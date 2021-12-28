@@ -48,8 +48,17 @@ export const updateGame = (_state) => {
     //find collision with other players
     for (const otherId in sg.players) {
       if (otherId === clientId || sg.players[otherId].dead) continue;
-      if (sg.players[clientId].collider.checkCollisionWithOtherSnake(sg.players[otherId].collider)) {
+      const collisionResult = sg.players[clientId].collider.checkCollisionWithOtherSnake(sg.players[otherId].collider);
+      if (collisionResult === 1) {
         sg.players[otherId].die();
+        s.io.emit('playerDied', otherId);
+      } else if (collisionResult === 2) {
+        sg.players[clientId].die();
+        s.io.emit('playerDied', clientId);
+      } else if (collisionResult === 3) {
+        sg.players[clientId].die();
+        sg.players[otherId].die();
+        s.io.emit('playerDied', clientId);
         s.io.emit('playerDied', otherId);
       }
     }
@@ -88,7 +97,7 @@ export const updateGame = (_state) => {
     deadPlayer.collider.reset(s);
     deadPlayer.respawn(s);
     scoring.updatePlayerScore(s, clientId);
-    s.io.emit('playerRespawning', deadPlayer.getData());
+    s.io.emit('playerRespawning', deadPlayer.getServerData());
   }
   scoring.update(s);
   
@@ -162,7 +171,7 @@ export const updateNetwork = (_state) => {
   //Grab player data to send to clients
   let playerData = {};
   for (const clientId in sg.players) {
-    playerData[clientId] = sg.players[clientId].getData();
+    playerData[clientId] = sg.players[clientId].getServerUpdateData();
   }
   
   //Get game state data
@@ -237,9 +246,9 @@ export const addNewPlayer = (_state, socket, clientData) => {
     //Emit all pickup objects
     socket.emit('allPickups', Object.values(_state.game.pickups).map(pickupRef => pickupRef.getData()))
     //Emit all players
-    socket.emit('allPlayers', Object.values(_state.game.players).map(playerRef => playerRef.getData()))
+    socket.emit('allPlayers', Object.values(_state.game.players).map(playerRef => playerRef.getServerData()))
   }
-  const newData = _state.game.players[newPlayerId].getData()
+  const newData = _state.game.players[newPlayerId].getServerData()
   //Emit the new player to all connected clients
   _state.io.emit('newPlayer', newData);
 
