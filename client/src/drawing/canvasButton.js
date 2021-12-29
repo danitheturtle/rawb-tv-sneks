@@ -28,6 +28,12 @@ export class CanvasButton {
     this.textColor = _textColor;
     this.textColorHover = _textColorHover;
     this.sprite = _sprite;
+    keys.keyUp("mouseButton", () => {
+      const mouse = keys.mouse();
+      if (this.action !== undefined && mouse[0] > this.x && mouse[0] < this.x + this.width && mouse[1] > this.y && mouse[1] < this.y + this.height) {
+        this.action();
+      }
+    });
   }
   
   updateAndDraw(_state) {
@@ -44,9 +50,6 @@ export class CanvasButton {
       }
       if (this.text !== undefined) {
         drawing.drawText(s, this.text, this.x + this.width / 2, this.y + this.height / 2, this.font, this.textColorHover);
-      }
-      if (keys.pressed('mouseButton') && this.action !== undefined) {
-        this.action();
       }
     } else {
       c.strokeRect(this.x, this.y, this.width, this.height);

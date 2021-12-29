@@ -38,11 +38,11 @@ export class Player extends GameObject {
       //Add acceleration to the velocity scaled by dt.  Limit the velocity so collisions don't break
       this.vel.add(this.accel.multiplyScalar(time.dt(_state)));
       //limit velocity with current max speed (squared since its cheaper)
-      const currentMaxSpeed = this.sprint && this.collider.pointPath.length > 5 ? 
+      const currentMaxSpeed = this.sprint ? 
         GLOBALS.sprintMult * GLOBALS.sprintMult * GLOBALS.baseMoveSpeed * GLOBALS.baseMoveSpeed : 
         GLOBALS.baseMoveSpeed * GLOBALS.baseMoveSpeed;
       if (this.vel.lengthSq() > currentMaxSpeed) {
-        this.vel.normalize().multiplyScalar(this.sprint && this.collider.pointPath.length > 5 ? GLOBALS.baseMoveSpeed * GLOBALS.sprintMult : GLOBALS.baseMoveSpeed);
+        this.vel.normalize().multiplyScalar(this.sprint ? GLOBALS.baseMoveSpeed * GLOBALS.sprintMult : GLOBALS.baseMoveSpeed);
       }
       //Add velocity to the position scaled by dt
       this.pos.add(this.vel.clone().multiplyScalar(time.dt(_state)));
@@ -66,27 +66,12 @@ export class Player extends GameObject {
   isOutOfBounds(_state) {
     return this.collider.isOutOfBounds(_state);
   }
-  
-  die() {
-    this.dead = true;
-  }
-  
-  respawn() {
-    this.respawning = true;
-    this.score = 0;
-  }
-  
-  respawned() {
-    this.respawning = false;
-    this.dead = false;
-  }
 
   getData() {
     return {
       ...super.getData(),
-      name: this.name,
       dead: this.dead,
-      respawning: this.respawning,
+      name: this.name,
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
@@ -101,34 +86,31 @@ export class Player extends GameObject {
   }
   
   getServerUpdateData() {
-    return this.getData();
-    // return {
-    //   ...super.getServerUpdateData(),
-    //   moveHeadingX: this.moveHeading.x,
-    //   moveHeadingY: this.moveHeading.y,
-    //   sprint: this.sprint
-    // };
+    return {
+      ...super.getServerUpdateData(),
+      dead: this.dead,
+      moveHeadingX: this.moveHeading.x,
+      moveHeadingY: this.moveHeading.y,
+      sprint: this.sprint,
+      score: this.score,
+      sprintTimer: this.sprintTimer
+    };
   }
   
   getClientUpdateData() {
-    return this.getData();
-    // return {
-    //   ...super.getClientUpdateData(),
-    //   moveHeadingX: this.moveHeading.x,
-    //   moveHeadingY: this.moveHeading.y,
-    //   sprint: this.sprint
-    // };
-  }
-  
-  setClientDataFromServer(_data) {
-    this.setData(_data);
+    return {
+      ...super.getClientUpdateData(),
+      moveHeadingX: this.moveHeading.x,
+      moveHeadingY: this.moveHeading.y,
+      sprint: this.sprint,
+      sprintTimer: this.sprintTimer
+    };
   }
 
   setData(_data) {
     super.setData(_data);
     this.name = _data.name !== undefined ? _data.name : this.name;
     this.dead = _data.dead !== undefined ? _data.dead : this.dead;
-    this.respawning = _data.respawning !== undefined ? _data.respawning : this.respawning;
     this.moveHeading = new Vector(
       !isNaN(_data.moveHeadingX) ? _data.moveHeadingX : this.moveHeading.x, 
       !isNaN(_data.moveHeadingY) ? _data.moveHeadingY : this.moveHeading.y

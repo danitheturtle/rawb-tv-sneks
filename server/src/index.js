@@ -39,6 +39,11 @@ io.on('connection', (socket) => {
       game.updatePlayerFromClient(gameState, socket, data);
     });
     
+    //Listen for players announcing they've successfully respawned
+    socket.on('playerRespawned', (clientId) => {
+      game.playerRespawned(gameState, clientId);
+    });
+    
     socket.on('playerCollectedPickup', (data) => {
       game.playerCollectedPickup(gameState, data);
     });
@@ -67,8 +72,6 @@ server.listen(port, () => {
   levelLoader.loadRandomLevel(gameState);
   //Start the game loop
   game.updateGame(gameState);
-  //Start the network loop
-  game.updateNetwork(gameState);
 });
 
 const handleException = async (err, a) => {

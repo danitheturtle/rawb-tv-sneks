@@ -19,7 +19,7 @@ export const GLOBALS = {
   numPickupsPerMinute: 300,
   pickupCap: 500,
   baseMoveSpeed: 20,
-  baseAccelSpeed: 80,
+  baseAccelSpeed: 110,
   sprintMult: 4,
   sprintCostPerSecond: 6,
   scoreLengthDivider: 5,

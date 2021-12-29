@@ -271,11 +271,7 @@ time
   
   getServerUpdateData() {
     return {
-      id: this.id,
-      x: this.pos.x,
-      y: this.pos.y,
-      velX: this.vel.x,
-      velY: this.vel.y
+      id: this.id
     };
   }
   
@@ -283,7 +279,9 @@ time
     return {
       id: this.id,
       x: this.pos.x,
-      y: this.pos.y
+      y: this.pos.y,
+      velX: this.vel.x,
+      velY: this.vel.y
     };
   }
   

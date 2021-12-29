@@ -20,10 +20,45 @@ const {
 // ref variables so I can type quicker
 let players;
 
+export const playerDied = (_state, clientId) => {
+  const s = _state;
+  const sg = s.game;
+  const sp = s.physics;
+  const sl = s.level;
+  const deadPlayer = sg.players[clientId];
+  if (!deadPlayer) return;
+  deadPlayer.collider.pointPath?.forEach(point => {
+    const newPickupId = `pickup-${point.x}-${point.y}`;
+    if (!sg.pickups[newPickupId]) { 
+      const pickupType = scoring.randomPickupType();
+      sp.gameObjects[newPickupId] = sg.pickups[newPickupId] = new Pickup()
+        .addCollider(new CircleCollider())
+        .setData({
+          id: newPickupId,
+          x: point.x,
+          y: point.y,
+          pickupType: pickupType[0],
+          worth: pickupType[1],
+          collider: {
+            radius: 1
+          }
+        });
+      s.io.emit('updatePickup', sg.pickups[newPickupId].getData());
+    }
+  });
+  deadPlayer.score = 0;
+  deadPlayer.pos.x = utils.randomInt(5, sl.activeLevelData.guWidth - 5);
+  deadPlayer.pos.y = utils.randomInt(5, sl.activeLevelData.guHeight - 5);
+  deadPlayer.collider.reset(s);
+  scoring.updatePlayerScore(s, clientId);
+  s.io.emit('playerDied', deadPlayer.getServerData());
+}
+
 /**
  * The game update loop
  * Runs at 60fps on the server
  */
+let networkUpdateTicker = 0;
 export const updateGame = (_state) => {
   const s = _state;
   const sg = s.game;
@@ -41,8 +76,7 @@ export const updateGame = (_state) => {
     if (sg.players[clientId].dead) continue;
     //check out of bounds
     if (sg.players[clientId].isOutOfBounds(s)) {
-      sg.players[clientId].die();
-      s.io.emit('playerDied', clientId);
+      playerDied(s, clientId);
       continue;
     }
     //find collision with other players
@@ -50,16 +84,12 @@ export const updateGame = (_state) => {
       if (otherId === clientId || sg.players[otherId].dead) continue;
       const collisionResult = sg.players[clientId].collider.checkCollisionWithOtherSnake(sg.players[otherId].collider);
       if (collisionResult === 1) {
-        sg.players[otherId].die();
-        s.io.emit('playerDied', otherId);
+        playerDied(s, otherId);
       } else if (collisionResult === 2) {
-        sg.players[clientId].die();
-        s.io.emit('playerDied', clientId);
+        playerDied(s, clientId);
       } else if (collisionResult === 3) {
-        sg.players[clientId].die();
-        sg.players[otherId].die();
-        s.io.emit('playerDied', clientId);
-        s.io.emit('playerDied', otherId);
+        playerDied(s, clientId);
+        playerDied(s, otherId);
       }
     }
     //If sprinting, update score
@@ -68,37 +98,6 @@ export const updateGame = (_state) => {
     }
   }
   
-  //Reset dead players and spawn pickups where they died
-  for (const clientId in sg.players) {
-    const deadPlayer = sg.players[clientId];
-    //If player isn't dead, or if code has already run for them, skip
-    if (!deadPlayer.dead || (deadPlayer.dead && deadPlayer.respawning)) continue;
-    deadPlayer.collider.pointPath?.forEach(point => {
-      const newPickupId = `pickup-${point.x}-${point.y}`;
-      if (!sg.pickups[newPickupId]) { 
-        const pickupType = scoring.randomPickupType();
-        sp.gameObjects[newPickupId] = sg.pickups[newPickupId] = new Pickup(s)
-        .addCollider(new CircleCollider())
-        .setData({
-          id: newPickupId,
-          x: point.x,
-          y: point.y,
-          pickupType: pickupType[0],
-          worth: pickupType[1],
-          collider: {
-            radius: 1
-          }
-        });
-        s.io.emit('updatePickup', sg.pickups[newPickupId].getData());
-      }
-    });
-    deadPlayer.pos.x = utils.randomInt(5, sl.activeLevelData.guWidth - 5);
-    deadPlayer.pos.y = utils.randomInt(5, sl.activeLevelData.guHeight - 5);
-    deadPlayer.collider.reset(s);
-    deadPlayer.respawn(s);
-    scoring.updatePlayerScore(s, clientId);
-    s.io.emit('playerRespawning', deadPlayer.getServerData());
-  }
   scoring.update(s);
   
   switch(sg.gameState) {
@@ -138,8 +137,7 @@ export const updateGame = (_state) => {
     case SERVER_STATES.GAME_RESETTING:
       scoring.reset(s);
       Object.values(sg.players).forEach(pl => {
-        pl.die();
-        s.io.emit('playerDied', pl.id);
+        playerDied(s, pl.id);
         sg.scoreboard.push([pl.id, pl.name, pl.score]);
       });
       sg.gameState = SERVER_STATES.GAME_PLAYING;
@@ -156,38 +154,29 @@ export const updateGame = (_state) => {
       }
       break;
   }
-}
-
-/**
- * The network update Loop
- * updates clients of changes at 30fps
- */
-export const updateNetwork = (_state) => {
-  const s = _state;
-  const sg = s.game;
-  //Set timeout to call this method again
-  setTimeout(() => updateNetwork(s), (1000 / 30));
-
-  //Grab player data to send to clients
-  let playerData = {};
-  for (const clientId in sg.players) {
-    playerData[clientId] = sg.players[clientId].getServerUpdateData();
+  //Network update at 1/3 speed - 20 fps
+  networkUpdateTicker = networkUpdateTicker + 1 > 3 ? 0 : networkUpdateTicker + 1;
+  if (networkUpdateTicker % 3 === 0) {
+    //Grab player data to send to clients
+    let playerData = {};
+    for (const clientId in sg.players) {
+      playerData[clientId] = sg.players[clientId].getServerUpdateData();
+    }
+    
+    //Get game state data
+    let updatedGameState = {
+      gameState: sg.gameState,
+      gameStateTimer: sg.gameStateTimer,
+      scoreboard: sg.scoreboard,
+      players: playerData
+    };
+    //Emit up-to-date game state to all clients
+    s.io.emit('updateGameState', updatedGameState);
   }
-  
-  //Get game state data
-  let updatedGameState = {
-    gameState: sg.gameState,
-    gameStateTimer: sg.gameStateTimer,
-    scoreboard: sg.scoreboard,
-    players: playerData
-  };
-  //Emit up-to-date game state to all clients
-  s.io.emit('updateGameState', updatedGameState);
 }
 
 export const reset = (_state, clientId) => {
-  _state.game.players[clientId].die();
-  _state.io.emit('playerDied', clientId);
+  playerDied(_state, clientId)
   scoring.reset(_state);
 }
 
@@ -197,7 +186,7 @@ export const reset = (_state, clientId) => {
  */
 export const updatePlayerFromClient = (_state, socket, data) => {
   const sg = _state.game;
-  if (!sg.players[data.id].dead || (sg.players[data.id].dead && sg.players[data.id].respawning)) {
+  if (!sg.players[data.id].dead) {
     sg.players[data.id].setData(data);
   }
 }
@@ -219,9 +208,15 @@ export const playerCollectedPickup = (_state, { clientId, pickupId }) => {
 }
 
 /**
+ * Player respawned
+ */
+export const playerRespawned = (_state, clientId) => {
+  _state.game.players[clientId].dead = false;
+}
+
+/**
  * Creates and adds a new player to the game.  Sends that player their client ID
  */
-
 export const addNewPlayer = (_state, socket, clientData) => {
   //Create an ID for this player
   let newPlayerId = _state.physics.lastGameObjectID++;

@@ -124,7 +124,7 @@ export const drawWaitingForPlayersGUI = (_state) => {
   const sg = s.game;
   drawTextOutline(
     s,
-    "Waitinig for Players (min 3)", 
+    "Waitinig for Players (min 2)", 
     s.viewport.width / 2, 
     48, 
     "36px Arial", 
@@ -206,7 +206,7 @@ export const drawGameOverGUI = (_state) => {
   );
   drawTextOutline(
     s,
-    `${sg.scoreboard[0][1]} with ${sg.scoreboard[0][2]} points!`, 
+    `${sg.scoreboard?.[0]?.[1]} with ${sg.scoreboard?.[0]?.[2]} points!`, 
     s.viewport.width / 2, 
     s.viewport.height / 2 + 48, 
     "64px Arial", 
@@ -373,6 +373,7 @@ export const allPlayerSpriteNames = [
   ["beepatronPlayer", "Beepatron"],
   ["cheetohPlayer", "Cheetoh"],
   ["dangerRatPlayer", "Danger Rat"],
+  ["dangerRatColonyPlayer", "Oops All Rats"],
   ["goatPlayer", "Goat"],
   ["illidanPlayer", "Illidan"],
   ["jimmyPlayer", "Jimmy"],

@@ -6,6 +6,7 @@ import cheetohPlayerSpritesheet from './spritesheets/cheetohPlayerSpritesheet.pn
 import cheetohPlayerData from './spritesheets/cheetohPlayerData.js';
 import dangerRatPlayerSpritesheet from './spritesheets/dangerRatPlayerSpritesheet.png';
 import dangerRatPlayerData from './spritesheets/dangerRatPlayerData.js';
+import dangerRatColonyPlayerData from './spritesheets/dangerRatColonyPlayerData.js';
 import goatPlayerSpritesheet from './spritesheets/goatPlayerSpritesheet.png';
 import goatPlayerData from './spritesheets/goatPlayerData.js';
 import illidanPlayerSpritesheet from './spritesheets/illidanPlayerSpritesheet.png';
@@ -41,6 +42,7 @@ const allAssets = {
     beepatronPlayerSpritesheet: [beepatronPlayerSpritesheet, beepatronPlayerData],
     cheetohPlayerSpritesheet: [cheetohPlayerSpritesheet, cheetohPlayerData],
     dangerRatPlayerSpritesheet: [dangerRatPlayerSpritesheet, dangerRatPlayerData],
+    dangerRatColonyPlayerSpritesheet: [dangerRatPlayerSpritesheet, dangerRatColonyPlayerData],
     goatPlayerSpritesheet: [goatPlayerSpritesheet, goatPlayerData],
     illidanPlayerSpritesheet: [illidanPlayerSpritesheet, illidanPlayerData],
     jimmyPlayerSpritesheet: [jimmyPlayerSpritesheet, jimmyPlayerData],
