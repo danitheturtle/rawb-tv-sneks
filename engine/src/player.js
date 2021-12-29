@@ -10,7 +10,7 @@ export class Player extends GameObject {
     super();
     //Did the player recently die?
     this.dead = false;
-    this.respawning = false;
+    this.invincibleTimer = 0;
 
     //Player input tracking.  Everything is false/blank by default
     this.moveHeading = randomVec();
@@ -93,6 +93,8 @@ export class Player extends GameObject {
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
       score: this.score,
+      spriteName: this.spriteName,
+      name: this.name,
       sprintTimer: this.sprintTimer
     };
   }
@@ -103,6 +105,8 @@ export class Player extends GameObject {
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
+      spriteName: this.spriteName,
+      name: this.name,
       sprintTimer: this.sprintTimer
     };
   }
