@@ -47,11 +47,6 @@ io.on('connection', (socket) => {
     socket.on('playerCollectedPickup', (data) => {
       game.playerCollectedPickup(gameState, data);
     });
-    
-    //Listen for a reset game call for debugging
-    socket.on('reset', (clientId) => {
-      game.reset(gameState, clientId);
-    });
   
     //Only bind disconnect if the player was created in the first place
     //Disconnect the player

@@ -195,6 +195,13 @@ export class SnakeCollider extends CircleCollider {
       pointPath: this.pointPath.map(p => ([p.x, p.y]))
     }
   }
+  
+  getServerUpdateData() {
+    return {
+      type: this.type,
+      bodyPartCount: this.bodyPartCount
+    };
+  }
 
   setData(_data, _parent) {
     this.parent = _parent !== undefined ? _parent : this.parent;
@@ -243,7 +250,7 @@ export class GameObject {
     }
     //Add velocity to the position scaled by dt
     this.pos.add(this.vel.clone().multiplyScalar(time.dt(_state)));
-time
+
     //Reset acceleration
     this.accel = new Vector(0.0, 0.0);
   }
@@ -269,22 +276,6 @@ time
     }
   }
   
-  getServerUpdateData() {
-    return {
-      id: this.id
-    };
-  }
-  
-  getClientUpdateData() {
-    return {
-      id: this.id,
-      x: this.pos.x,
-      y: this.pos.y,
-      velX: this.vel.x,
-      velY: this.vel.y
-    };
-  }
-  
   setData(data) {
     //If id is unset, set it
     if (!this.id) {
@@ -299,9 +290,6 @@ time
     this.hasCollisions = data.hasCollisions !== undefined ? data.hasCollisions : this.hasCollisions;
     if (!this.collider && data.collider) {
       switch (data.collider.type) {
-        case 'snake':
-          this.collider = new SnakeCollider().setData(data.collider, this);
-          break;
         case 'circle':
           this.collider = new CircleCollider().setData(data.collider, this);
           break;

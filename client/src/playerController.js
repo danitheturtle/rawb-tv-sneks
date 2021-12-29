@@ -73,10 +73,6 @@ export const addListeners = (_state) => {
       sg.clientState = CLIENT_STATES.PLAYING;
     }
   });
-  
-  keys.keyUp("del", () => {
-    socket.reset();
-  });
 }
 
 export const update = (_state) => {

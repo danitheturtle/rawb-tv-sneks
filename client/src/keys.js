@@ -98,6 +98,19 @@ export const keyDown = (...args) => {
 }
 
 /**
+ * Unbind a function from one or more key's keyDown events
+ */
+export const unbindKeyDown = (...args) => {
+  //loop through every argument and remove the callback from the keyDown array
+  for (let i=0; i<args.length - 1; i++) {
+    //Get the key code
+    let keyCode = getKeyCode(args[i]);
+    if (typeof(keys[keyCode]) === "undefined") continue;
+    keys[keyCode].keyDown.splice(keys[keyCode].keyDown.indexOf(args[args.length - 1]), 1);
+  }
+}
+
+/**
  * Bind a function to one or more keys to be called when the key(s) is/are released.
  * Accepts char code or a string representing the key(s)
  * The first n arguments are keys to bind to
@@ -118,6 +131,19 @@ export const keyUp = (...args) => {
     }
     //Push the callback function to the array
     keys[keyCode].keyUp.push(args[args.length - 1]);
+  }
+}
+
+/**
+ * Unbind a function from one or more key's keyUp events
+ */
+export const unbindKeyUp = (...args) => {
+  //loop through every argument and remove the callback from the keyUp array
+  for (let i=0; i<args.length - 1; i++) {
+    //Get the key code
+    let keyCode = getKeyCode(args[i]);
+    if (typeof(keys[keyCode]) === "undefined") continue;
+    keys[keyCode].keyUp.splice(keys[keyCode].keyUp.indexOf(args[args.length - 1]), 1);
   }
 }
 

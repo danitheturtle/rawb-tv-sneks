@@ -114,14 +114,14 @@ export const init = (_state) => {
           .addRenderer(new PlayerRenderer())
           .setData(newState.players[clientId]);
       } else {
-        //Set the data
-        sg.players[clientId].setData(newState.players[clientId]);
-        // //If the player is not the client player
-        // if (sg.clientId == clientId) {
-        //   //Set data but remain client-authoritative
-        //   sg.players[clientId].setClientDataFromServer(newState.players[clientId]);
-        // } else {
-        // }
+        //If the player is not the client player
+        if (sg.clientId == clientId) {
+          //Set data but remain client-authoritative
+          sg.players[clientId].setClientDataFromServerUpdate(newState.players[clientId]);
+        } else {
+          //Set the data
+          sg.players[clientId].setData(newState.players[clientId]);
+        }
       }
     }
   });
@@ -140,10 +140,6 @@ export const init = (_state) => {
     //update game state to move on from connecting
     sg.clientState = CLIENT_STATES.PLAYING
   });
-}
-
-export const reset = (_state) => {
-  socket.emit('reset', _state.game.clientId);
 }
 
 export const createNewPlayer = (_state, _playerNameValue) => {

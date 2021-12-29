@@ -72,45 +72,54 @@ export class Player extends GameObject {
       ...super.getData(),
       dead: this.dead,
       name: this.name,
+      spriteName: this.spriteName,
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
       sprintTimer: this.sprintTimer,
-      spriteName: this.spriteName,
       score: this.score
     };
   }
   
-  getServerData() {
-    return this.getData();
-  }
-  
   getServerUpdateData() {
     return {
-      ...super.getServerUpdateData(),
+      id: this.id,
+      name: this.name,
+      spriteName: this.spriteName,
       dead: this.dead,
+      x: this.pos.x,
+      y: this.pos.y,
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
+      sprintTimer: this.sprintTimer,
       score: this.score,
-      spriteName: this.spriteName,
-      name: this.name,
-      sprintTimer: this.sprintTimer
+      collider: this.collider?.getServerUpdateData()
     };
   }
   
   getClientUpdateData() {
     return {
-      ...super.getClientUpdateData(),
+      id: this.id,
+      x: this.pos.x,
+      y: this.pos.y,
+      velX: this.vel.x,
+      velY: this.vel.y,
+      name: this.name,
+      spriteName: this.spriteName,
       moveHeadingX: this.moveHeading.x,
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
-      spriteName: this.spriteName,
-      name: this.name,
       sprintTimer: this.sprintTimer
     };
   }
-
+  
+  setClientDataFromServerUpdate(_data) {
+    this.dead = _data.dead !== undefined ? _data.dead : this.dead;
+    this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
+    this.score = _data.score !== undefined ? _data.score : this.score;
+  }
+  
   setData(_data) {
     super.setData(_data);
     this.name = _data.name !== undefined ? _data.name : this.name;
@@ -126,6 +135,7 @@ export class Player extends GameObject {
     if (this.renderer) {
       this.renderer.playerName = this.name;
       this.renderer.spriteName = this.spriteName;
+      this.renderer.parent = this;
     }
     return this;
   }

@@ -186,6 +186,10 @@ const updateStartScreen = (s) => {
 
 let characterSelectButtons;
 const updateCharacterSelect = (s) => {
+  if (joinGameButton) {
+    joinGameButton.destroy();
+    joinGameButton = undefined;
+  }
   const si = s.image;
   const sg = s.game;
   const c = s.ctx;
@@ -227,6 +231,13 @@ const updateCharacterSelect = (s) => {
 }
 
 const updateConnecting = (s) => {
+  if (characterSelectButtons) {
+    for (let i=0; i<characterSelectButtons.length; i++) {
+      characterSelectButtons[i].destroy();
+      delete characterSelectButtons[i];
+    }
+    characterSelectButtons = undefined;
+  }
   const sg = s.game;
   const c = s.ctx;
   if (!sg.joinedGame && !sg.joiningGame) {

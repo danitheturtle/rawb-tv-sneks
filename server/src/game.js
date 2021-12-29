@@ -51,7 +51,7 @@ export const playerDied = (_state, clientId) => {
   deadPlayer.pos.y = utils.randomInt(5, sl.activeLevelData.guHeight - 5);
   deadPlayer.collider.reset(s);
   scoring.updatePlayerScore(s, clientId);
-  s.io.emit('playerDied', deadPlayer.getServerData());
+  s.io.emit('playerDied', deadPlayer.getData());
 }
 
 /**
@@ -175,11 +175,6 @@ export const updateGame = (_state) => {
   }
 }
 
-export const reset = (_state, clientId) => {
-  playerDied(_state, clientId)
-  scoring.reset(_state);
-}
-
 /**
  * This function will update the server's version of a specific player's data from
  * their game client.
@@ -241,9 +236,9 @@ export const addNewPlayer = (_state, socket, clientData) => {
     //Emit all pickup objects
     socket.emit('allPickups', Object.values(_state.game.pickups).map(pickupRef => pickupRef.getData()))
     //Emit all players
-    socket.emit('allPlayers', Object.values(_state.game.players).map(playerRef => playerRef.getServerData()))
+    socket.emit('allPlayers', Object.values(_state.game.players).map(playerRef => playerRef.getData()))
   }
-  const newData = _state.game.players[newPlayerId].getServerData()
+  const newData = _state.game.players[newPlayerId].getData();
   //Emit the new player to all connected clients
   _state.io.emit('newPlayer', newData);
 
