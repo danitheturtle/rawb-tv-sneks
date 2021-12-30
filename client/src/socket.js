@@ -50,6 +50,7 @@ export const init = (_state) => {
   socket.on('playerDied', (data) => {
     if (!sg.players[data.id]) return;
     sg.players[data.id].setData(data);
+    sg.players[data.id].renderer.parts = [];
     if (data.id == sg.clientId) {
       sv.active?.reset(s);
       sg.players[data.id].dead = false;
