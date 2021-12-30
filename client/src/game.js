@@ -177,6 +177,7 @@ const updateStartScreen = (s) => {
       'rgb(240, 100, 100)',
       () => {
         sg.playerNameValue = s.input.value;
+        s.input.blur();
       }, 
       undefined, 
       'Save',
