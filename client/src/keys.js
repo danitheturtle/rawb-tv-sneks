@@ -3,11 +3,20 @@ const keys = {
     pressed: false,
     keyDown: [],
     keyUp: []
+  },
+  touches: {
+    pressed: false,
+    keyDown: [],
+    keyUp: [],
+    refs: {}
   }
 };
 const scrollCallbacks = [];
 const mouseMoveCallbacks = [];
-let mouseCoords, isMouseDown;
+const touchMoveCallbacks = {
+  all: []
+};
+let mouseCoords;
 
 /**
  * Bind mouse click events to canvas
@@ -71,6 +80,54 @@ export const addListeners = (_state) => {
     //Loop through all callbacks
     scrollCallbacks.forEach(cb => cb(delta < 0 ? -1 : 1));
   });
+  
+  //Add event listener for touch start event
+  window.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    for (let i=0; i<e.targetTouches.length; i++) {
+      const touchEvent = e.targetTouches[i];
+      keys.touches.refs[touchEvent.identifier] = touchEvent;
+    }
+    keys.touches.pressed = true;
+    keys.touches.keyDown.forEach(cb => {
+      for (let j=0; j<e.targetTouches.length; j++) {
+        cb(e.targetTouches[j]);
+      }
+    });
+  }, { passive: false });
+  
+  //Add event listener for touch end event
+  window.addEventListener("touchend", function(e) {
+    e.preventDefault();
+    for (let i=0; i<e.changedTouches.length; i++) {
+      const touchEvent = e.changedTouches[i];
+      delete keys.touches.refs[touchEvent.identifier];
+      delete touchMoveCallbacks[touchEvent.identifier];
+    }
+    keys.touches.pressed = Object.keys(keys.touches.refs).length > 0 ? true : false;
+    keys.touches.keyUp.forEach(cb => {
+      for (let j=0; j<e.changedTouches.length; j++) {
+        cb(e.changedTouches[j]);
+      }
+    });
+  }, { passive: false });
+  
+  //Add event listener for touch move event
+  window.addEventListener("touchmove", function(e) {
+    e.preventDefault();
+    for (let i=0; i<e.changedTouches.length; i++) {
+      const touchEvent = e.changedTouches[i];
+      if (touchMoveCallbacks[touchEvent.identifier] !== undefined && touchMoveCallbacks[touchEvent.identifier].length > 0) {
+        touchMoveCallbacks[touchEvent.identifier].forEach(cb => {
+          cb(touchEvent);
+        });
+        touchMoveCallbacks.all.forEach(cb => {
+          cb(touchEvent);
+        });
+      }
+      keys.touches.refs[touchEvent.identifier] = touchEvent;
+    }
+  }, { passive: false });
 }
 
 /**
@@ -182,6 +239,7 @@ export const scroll = callback => {
  */
 export const getKeyCode = (key) => {
   if (key === 'mouseButton') return key;
+  if (key === 'touches') return key;
   let keyCode = key;
   if (typeof key === 'string') {
     //This is probably inefficient
@@ -254,4 +312,28 @@ export const mouse = () => {
 
 export const mouseMove = (cb) => {
   mouseMoveCallbacks.push(cb);
+}
+
+export const touch = (id) => {
+  return keys.touches.refs[id];
+}
+
+export const touchMove = (cb, id = undefined) => {
+  if (id === undefined) {
+    touchMoveCallbacks.all.push(cb);
+    return;
+  }
+  if (typeof touchMoveCallbacks[id] === Array) {
+    touchMoveCallbacks[id].push(cb);
+  } else {
+    touchMoveCallbacks[id] = [cb];
+  }
+}
+
+export const unbindTouchMove = (cb, id) => {
+  if (!id) {
+    touchMoveCallbacks.all.splice(touchMoveCallbacks.all.indexOf(cb), 1);
+    return;
+  }
+  touchMoveCallbacks[id].splice(touchMoveCallbacks[id].indexOf(cb), 1);
 }

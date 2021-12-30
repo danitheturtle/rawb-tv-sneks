@@ -35,6 +35,8 @@ import rawbRadical1Background from './backgrounds/rawbRadical1Background.jpg';
 import rawbRadical2Background from './backgrounds/rawbRadical2Background.png';
 import rawbRadical3Background from './backgrounds/rawbRadical3Background.png';
 import tutorialImg from './backgrounds/tutorialImg.jpg';
+import sprintIconSpritesheet from './spritesheets/sprintIconSpritesheet.png';
+import sprintIconData from './spritesheets/sprintIconData.js';
 
 const allAssets = {
   images: {
@@ -55,6 +57,7 @@ const allAssets = {
     snakeyMousePlayerSpritesheet: [snakeyMousePlayerSpritesheet, snakeyMousePlayerData],
     vampireMonicaPlayerSpritesheet: [vampireMonicaPlayerSpritesheet, vampireMonicaPlayerData],
     vampireMousePlayerSpritesheet: [vampireMousePlayerSpritesheet, vampireMousePlayerData],
+    sprintIconSpritesheet: [sprintIconSpritesheet, sprintIconData],
     tutorialImg: [tutorialImg, {}],
     rawbRadical1Background: [rawbRadical1Background, {}],
     rawbRadical2Background: [rawbRadical2Background, {}],

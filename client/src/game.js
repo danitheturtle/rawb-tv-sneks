@@ -1,5 +1,5 @@
 import engine from 'engine';
-import { CLIENT_STATES } from './clientState';
+import { CLIENT_STATES, CONTROL_TYPES } from './clientState';
 import * as drawing from './drawing';
 import * as keys from './keys';
 import * as socket from './socket';
@@ -152,14 +152,14 @@ const updateTutorial = (s) => {
   c.drawImage(img.image, dx, dy, dWidth, dHeight);
 
   //If the user clicks, go to the start screen
-  if (keys.pressed('mouseButton')) {
+  if (keys.pressed('mouseButton') || keys.pressed('touches')) {
     s.input.style.display = 'initial';
     s.input.focus();
     sg.clientState = CLIENT_STATES.START_SCREEN;
   }
 }
 
-let joinGameButton;
+let joinGameButton, saveNameButton;
 const updateStartScreen = (s) => {
   const sg = s.game;
   const c = s.ctx;
@@ -167,6 +167,23 @@ const updateStartScreen = (s) => {
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 160, "60px Arial", "rgba(100, 100, 100, 1.0)");
   drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 40, "24px Arial", "rgba(50, 50, 50, 1.0)");
+  if (!saveNameButton) {
+    saveNameButton = new CanvasButton(
+      s.viewport.width / 2 + 176, 
+      s.viewport.height / 2 - 16, 
+      64, 
+      32, 
+      'rgb(100, 100, 100)', 
+      'rgb(240, 100, 100)',
+      () => {
+        sg.playerNameValue = s.input.value;
+      }, 
+      undefined, 
+      'Save',
+      "14px Arial"
+    );
+  }
+  saveNameButton.updateAndDraw(s);
   if (sg.playerNameValue.length >= 3) {
     if (!joinGameButton) {
       joinGameButton = new CanvasButton(

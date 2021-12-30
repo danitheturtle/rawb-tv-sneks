@@ -1,7 +1,7 @@
 import { Spritesheet } from './spritesheet';
 import { Background } from './background';
 import engine from 'engine';
-import { CLIENT_STATES } from '../clientState';
+import { CLIENT_STATES, CONTROL_TYPES } from '../clientState';
 import * as playerRenderer from './playerRenderer';
 import * as spriteRenderer from './spriteRenderer';
 const { utils, GLOBALS } = engine;
@@ -98,24 +98,29 @@ export const draw = (_state) => {
 
 export const drawGUI = (_state) => {
   const sg = _state.game;
-  if (sg.clientState === CLIENT_STATES.PLAYING || sg.clientState === CLIENT_STATES.PAUSED);
-  switch (sg.gameState) {
-    case CLIENT_STATES.GAME_WAITING_FOR_PLAYERS:
+  if (sg.clientState === CLIENT_STATES.PLAYING || sg.clientState === CLIENT_STATES.PAUSED) {
+    switch (sg.gameState) {
+      case CLIENT_STATES.GAME_WAITING_FOR_PLAYERS:
       drawWaitingForPlayersGUI(_state);
       break;
-    case CLIENT_STATES.GAME_STARTING_SOON:
+      case CLIENT_STATES.GAME_STARTING_SOON:
       drawStartingSoonGUI(_state);
       break;
-    case CLIENT_STATES.GAME_OVER:
+      case CLIENT_STATES.GAME_OVER:
       drawGameOverGUI(_state);
       break;
-    case CLIENT_STATES.GAME_RESETTING:
+      case CLIENT_STATES.GAME_RESETTING:
       drawResetGUI(_state);
       break;
-    case CLIENT_STATES.GAME_PLAYING:
-    default:
+      case CLIENT_STATES.GAME_PLAYING:
+      default:
       drawPlayingGUI(_state);
       break;
+    }
+    
+    if (sg.controlType === CONTROL_TYPES.TOUCH) {
+      sg.touchButtons.forEach(touchButton => touchButton.updateAndDraw(_state))
+    }
   }
 }
 
@@ -124,7 +129,7 @@ export const drawWaitingForPlayersGUI = (_state) => {
   const sg = s.game;
   drawTextOutline(
     s,
-    "Waitinig for Players (min 2)", 
+    "Waiting for Players (min 2)", 
     s.viewport.width / 2, 
     48, 
     "36px Arial", 

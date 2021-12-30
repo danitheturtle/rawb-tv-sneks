@@ -5,6 +5,12 @@ import assets from './assets';
 const Vector = Victor;
 const { State, GAME_STATES } = engine;
 
+export const CONTROL_TYPES = {
+  KEYBOARD: 'KEYBOARD',
+  MOUSE: 'MOUSE',
+  TOUCH: 'TOUCH'
+};
+
 export const CLIENT_STATES = {
   LOADING: 'LOADING',
   TUTORIAL_SCREEN: 'TUTORIAL_SCREEN',
@@ -42,7 +48,10 @@ export class ClientState extends State {
       playerNameValue: "",
       playerSpriteValue: "",
       //Score. Updated by server
-      scoreboard: []
+      scoreboard: [],
+      //Control type the client is using
+      controlType: CONTROL_TYPES.MOUSE,
+      touchButtons: []
     };
     
     this.player = {

@@ -2,12 +2,13 @@ import engine from 'engine';
 import Victor from 'victor';
 import * as keys from './keys';
 import * as socket from './socket';
-import { CLIENT_STATES } from './clientState';
+import { CanvasTouchTarget } from './drawing/canvasButton';
+import { CONTROL_TYPES, CLIENT_STATES } from './clientState';
 const Vector = Victor;
 
-let s, sp, spl, sg, sl, sv;
+let controlType = CONTROL_TYPES.MOUSE;
 let usingKeyboard = false;
-
+let touchControlButtons = [];
 export const addListeners = (_state) => {
   const s = _state;
   const sp = s.physics;
@@ -17,7 +18,7 @@ export const addListeners = (_state) => {
   const sv = s.view;
 
   keys.keyDown("a", "left", () => {
-    usingKeyboard = true;
+    sg.controlType = CONTROL_TYPES.KEYBOARD;
     if (!spl.moveLeft) {
       spl.moveHeading = new Vector(-1.0, 0.0);
       spl.shouldUpdateServer = true;
@@ -25,7 +26,7 @@ export const addListeners = (_state) => {
   });
 
   keys.keyDown("d", "right", () => {
-    usingKeyboard = true;
+    sg.controlType = CONTROL_TYPES.KEYBOARD;
     if (!spl.moveRight) {
       spl.moveHeading = new Vector(1.0, 0.0);
       spl.shouldUpdateServer = true;
@@ -33,7 +34,7 @@ export const addListeners = (_state) => {
   });
 
   keys.keyDown("w", "up", () => {
-    usingKeyboard = true;
+    sg.controlType = CONTROL_TYPES.KEYBOARD;
     if (!spl.moveUp) {
       spl.moveHeading = new Vector(0.0, -1.0);
       spl.shouldUpdateServer = true;
@@ -41,7 +42,7 @@ export const addListeners = (_state) => {
   });
 
   keys.keyDown("s", "down", () => {
-    usingKeyboard = true;
+    sg.controlType = CONTROL_TYPES.KEYBOARD;
     if (!spl.moveDown) {
       spl.moveHeading = new Vector(0.0, 1.0);
       spl.shouldUpdateServer = true;
@@ -62,8 +63,17 @@ export const addListeners = (_state) => {
     }
   });
   
+  keys.keyDown("touches", (touchEvent) => {
+    sg.controlType = CONTROL_TYPES.TOUCH;
+    sg.touchButtons.forEach(btn => btn.handleTouchStart(s, touchEvent));
+  });
+  
+  keys.keyUp("touches", (touchEvent) => {
+    sg.touchButtons.forEach(btn => btn.handleTouchEnd(touchEvent));
+  });
+  
   keys.mouseMove((coords) => {
-    usingKeyboard = false;
+    sg.controlType = CONTROL_TYPES.MOUSE;
   });
 
   keys.keyUp("p", "esc", function() {
@@ -81,8 +91,9 @@ export const update = (_state) => {
   const sv = s.view;
   const me = sg.players[sg.clientId];
   const spl = s.player;
+  const si = s.image;
   if (!me) return;
-  if (!usingKeyboard) {
+  if (sg.controlType === CONTROL_TYPES.MOUSE) {
     const playerPos = sv.active?.getObjectRelativePosition(s, me, true);
     const mouseCoords = keys.mouse();
     const mouseCoordsVec = new Vector(mouseCoords[0], mouseCoords[1]);
@@ -92,6 +103,41 @@ export const update = (_state) => {
       spl.moveHeading = newMoveHeading.normalize();
       spl.shouldUpdateServer = true;
     }
+  } else if (sg.controlType === CONTROL_TYPES.TOUCH) {
+    if (sg.touchButtons.length < 1) {
+      sg.touchButtons.push(
+        new CanvasTouchTarget(
+          -128,-128, 96, 96, 
+          undefined, si.sprites[`sprintTouchIcon`], 
+          () => { 
+            if (!spl.sprint) {
+              spl.sprint = true;
+              spl.shouldUpdateServer = true;
+            }
+          }, 
+          () => {
+            if (spl.sprint) {
+              spl.sprint = false;
+              spl.shouldUpdateServer = true;
+            }
+          }
+        )
+      );
+      sg.touchButtons.push(
+        new CanvasTouchTarget(
+          128, -256, 128, 128, 
+          'white', undefined, 
+          undefined, 
+          undefined,
+          (e) => {
+            const newMoveHeading = new Vector(e.clientX, e.clientY).subtract(new Vector(192, s.viewport.height - 192));
+            spl.moveHeading = newMoveHeading.normalize();
+            spl.shouldUpdateServer = true;
+          }
+        )
+      );
+    }
+    // sg.touchButtons.forEach(touchButton => touchButton.updateAndDraw(s))
   }
   me.moveHeading = spl.moveHeading;
   me.sprint = spl.sprint;
