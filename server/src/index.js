@@ -86,7 +86,7 @@ const handleException = async (err, a) => {
 				"Content-Type": "application/json",
 			},
 			data: JSON.stringify({
-				content: "**SNAKEY MOUSE CRASHED**\n<@138345057072840704>```json\n" + err.stack + "\n```",
+				content: "**SNAKEY MOUSE CRASHED**\n<@207290381291880448>```json\n" + err.stack + "\n```",
 			}),
 		}).then(() => console.log("sent crash report"));
 		await Promise.all([discord, Promise.race([shutdown, timeout])]);
