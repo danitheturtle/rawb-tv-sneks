@@ -130,14 +130,14 @@ export const updateGame = (_state) => {
       }
       break;
     case SERVER_STATES.GAME_STARTING_SOON:
-      if (time.getTimer('gameStartTimer') === undefined) {
+      if (time.getTimer(s, 'gameStartTimer') === undefined) {
         time.startNewTimer(s, 'gameStartTimer');
       }
       if (Object.keys(sg.players).length < 2) {
         sg.gameState = SERVER_STATES.GAME_WAITING_FOR_PLAYERS;
         time.stopTimer(s, 'gameStartTimer');
       }
-      sg.gameStateTimer = time.getTimer('gameStartTimer');
+      sg.gameStateTimer = time.getTimer(s, 'gameStartTimer');
       if (time.getTimer(s, 'gameStartTimer') >= GLOBALS.startTimerLength) {
         time.stopTimer(s, 'gameStartTimer');
         sg.gameState = SERVER_STATES.GAME_RESETTING;
