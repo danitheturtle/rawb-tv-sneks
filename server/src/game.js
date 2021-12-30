@@ -171,13 +171,21 @@ export const updateGame = (_state) => {
     for (const clientId in sg.players) {
       playerData[clientId] = sg.players[clientId].getServerUpdateData();
     }
+    //Grab changed pickup data to send to clients
+    let pickupData = {};
+    for (const pickupId in sg.pickups) {
+      if (sg.pickups[pickupId].dirty) {
+        pickupData[pickupId] = sg.pickups[pickupId].getServerUpdateData();
+      }
+    }
     
     //Get game state data
     let updatedGameState = {
       gameState: sg.gameState,
       gameStateTimer: sg.gameStateTimer,
       scoreboard: sg.scoreboard,
-      players: playerData
+      players: playerData,
+      pickups: pickupData
     };
     //Emit up-to-date game state to all clients
     s.io.emit('updateGameState', updatedGameState);
@@ -192,6 +200,17 @@ export const updatePlayerFromClient = (_state, socket, data) => {
   const sg = _state.game;
   if (!sg.players[data.id].dead) {
     sg.players[data.id].setData(data);
+  }
+}
+
+/**
+ * This function updates a pickup on the server using data from the client
+ */
+export const updatePickupFromClient = (_state, _pickupId, _data) => {
+  const sg = _state.game;
+  if (sg.pickups[_pickupId]) {
+    sg.pickups[_pickupId].setData(_data);
+    sg.pickups[_pickupId].dirty = true;
   }
 }
 

@@ -124,12 +124,16 @@ export class SnakeCollider extends CircleCollider {
   checkCollisionWithPickup(_pickup) {
     const pickupCenter = _pickup.pos;
     const pickupRadius = _pickup.collider.radius;
-    const minDistSq = this.radius * this.radius + pickupRadius * pickupRadius + GLOBALS.pickupRadius;
+    const minPickupDistSq = this.radius * this.radius + pickupRadius * pickupRadius + GLOBALS.pickupRadius * GLOBALS.pickupRadius;
+    const minAttractDistSq = this.radius * this.radius + pickupRadius * pickupRadius + GLOBALS.attractRadius * GLOBALS.attractRadius;
     const playerCenter = this.parent.pos.clone();
-    if (playerCenter.subtract(pickupCenter).lengthSq() < minDistSq) {
-      return true;
+    const distToPickupSq = playerCenter.subtract(pickupCenter).lengthSq();
+    if (distToPickupSq < minPickupDistSq) {
+      return 2;
+    } else if (distToPickupSq < minAttractDistSq) {
+      return 1;
     }
-    return false;
+    return 0;
   }
 
   checkCollisionWithOtherSnake(_other) {
@@ -250,9 +254,10 @@ export class GameObject {
     }
     //Add velocity to the position scaled by dt
     this.pos.add(this.vel.clone().multiplyScalar(time.dt(_state)));
-
-    //Reset acceleration
-    this.accel = new Vector(0.0, 0.0);
+    // if (this.accel.x) {
+    //   debugger;
+    //   console.dir('test');
+    // }
   }
   
   draw(_state) {

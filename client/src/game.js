@@ -69,8 +69,6 @@ export const update = (_state) => {
   physics.update(_state);
   playerController.update(_state);
   
-  //Check for pickups
-  
   //Store the drawing context shorthand
   let c = _state.ctx;
   //Re-draw the background
@@ -90,12 +88,20 @@ export const update = (_state) => {
     const pickupsCollected = [];
     for (const pickupId in sg.pickups) {
       if (sg.pickups[pickupId].collectedBy !== undefined) continue;
-      if (self.collider.checkCollisionWithPickup(sg.pickups[pickupId])) {
+      
+      const collisionResult = self.collider.checkCollisionWithPickup(sg.pickups[pickupId]);
+      //If player is actually close enough to pick it up
+      if (collisionResult === 2) {
         sg.pickups[pickupId].collectedBy = self.id;
         self.score += sg.pickups[pickupId].worth;
         self.collider.updateBodyWithScore();
         sv.active.zoomOut(_state, GLOBALS.zoomAmountOnCollect);
         socket.playerCollectedPickup(_state, self.id, pickupId);
+      } else if (collisionResult === 1) {
+        const pickupAccelVec = self.pos.clone().add(self.moveHeading.clone().multiplyScalar(5)).subtract(sg.pickups[pickupId].pos).normalize().multiplyScalar(GLOBALS.pickupAccelSpeed);
+        const pickupUpdateData = { accelTowards: self.id, accelX: pickupAccelVec.x, accelY: pickupAccelVec.y };
+        sg.pickups[pickupId].setData(pickupUpdateData);
+        socket.updatePickup(_state, pickupId, pickupUpdateData);
       }
     }
   }

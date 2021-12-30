@@ -125,6 +125,10 @@ export const init = (_state) => {
         }
       }
     }
+    //Update pickups
+    for (const pickupId in newState.pickups) {
+      updatePickup(pickupId);
+    }
   });
 
   //Listen for the server sending this client its ID
@@ -165,4 +169,8 @@ export const playerCollectedPickup = (_state, _clientId, _pickupId) => {
   socket.emit('playerCollectedPickup', { clientId: _clientId, pickupId: _pickupId });
   delete _state.physics.gameObjects[_pickupId];
   delete _state.game.pickups[_pickupId];
+}
+
+export const updatePickup = (_state, _pickupId, _pickupData) => {
+  socket.emit('updatePickup', { pickupId: _pickupId, data: _pickupData });
 }

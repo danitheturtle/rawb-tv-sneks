@@ -39,6 +39,11 @@ io.on('connection', (socket) => {
       game.updatePlayerFromClient(gameState, socket, data);
     });
     
+    //Listen to pickup updates from the client (for gravitating pickups towards players)
+    socket.on('updatePickup', ({ pickupId, data }) => {
+      game.updatePickupFromClient(gameState, pickupId, data);
+    });
+    
     //Listen for players announcing they've successfully respawned
     socket.on('playerRespawned', (clientId) => {
       game.playerRespawned(gameState, clientId);

@@ -15,7 +15,8 @@ export const GLOBALS = {
   minViewScale: 70,
   zoomAmountOnCollect: 0.25,
   initialSnakeSize: 5,
-  pickupRadius: 6,
+  pickupRadius: 2.5,
+  attractRadius: 13,
   numPickupsPerMinute: 300,
   pickupCap: 500,
   baseMoveSpeed: 20,
@@ -26,7 +27,8 @@ export const GLOBALS = {
   startTimerLength: 10,
   roundTimerLength: 600,
   gameEndTimerLength: 15,
-  invincibleSecondsOnDeath: 5
+  invincibleSecondsOnDeath: 5,
+  pickupAccelSpeed: 60
 };
 
 export class State {
