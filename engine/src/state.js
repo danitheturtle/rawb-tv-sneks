@@ -25,7 +25,8 @@ export const GLOBALS = {
   scoreLengthDivider: 5,
   startTimerLength: 10,
   roundTimerLength: 600,
-  gameEndTimerLength: 15
+  gameEndTimerLength: 15,
+  invincibleSecondsOnDeath: 5
 };
 
 export class State {
@@ -54,14 +55,11 @@ export class State {
     this.time = {
       //Delta time
       dt: 0,
-      //Total time the app has been running
-      runTime: 0,
+      gameStartTime: Date.now(),
       //Timestamp of the last update loop
-      lastTime: 0,
+      lastUpdateTime: 0,
       //Current frames per second
       fps: 0,
-      //Timers for individual clients so that syncing can happen properly
-      clientTimers: {},
       //General timers with unique ids
       timers: {}
     };

@@ -12,7 +12,6 @@ export class SpriteRenderer {
     const sg = s.game;
     const sv = s.view;
     const si = s.image;
-    // console.dir(this.parent.collider);
     if (!this.parent || !this.parent?.collider) return;
     if (!sv.active.isInView(this.parent, true)) return;
     const c = s.ctx;

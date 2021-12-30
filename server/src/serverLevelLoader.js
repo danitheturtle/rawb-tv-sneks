@@ -1,5 +1,5 @@
 import engine from 'engine';
-const { levelLoader, levels, utils } = engine;
+const { levels, utils } = engine;
 const { randomInt } = utils;
 let playedLevelNames = [];
 
@@ -14,7 +14,7 @@ export const loadRandomLevel = (_state) => {
   }
   const selectedIndex = randomInt(0, possibleNextLevels.length - 1);
   const nextLevelName = possibleNextLevels[selectedIndex][0];
-  levelLoader.loadLevel(_state, nextLevelName);
+  _state.level.activeLevelData = levels[nextLevelName];
   playedLevelNames.push(nextLevelName);
   _state.io.emit('loadLevel', nextLevelName)
 }

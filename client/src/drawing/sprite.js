@@ -15,7 +15,7 @@ export class Sprite {
   
   draw(state, dx, dy, dWidth, dHeight) {
     const c = state.ctx;
-    let drawIndex = Math.floor(state.time.timers[this.name] / this.animSpeed);
+    let drawIndex = Math.floor(time.getTimer(state, this.name) / this.animSpeed);
     if (drawIndex > this.frameArray.length - 1) {
       drawIndex = 0;
       time.startNewTimer(state, this.name);

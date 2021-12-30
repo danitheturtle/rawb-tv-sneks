@@ -50,6 +50,7 @@ export const playerDied = (_state, clientId) => {
   deadPlayer.pos.x = utils.randomInt(5, sl.activeLevelData.guWidth - 5);
   deadPlayer.pos.y = utils.randomInt(5, sl.activeLevelData.guHeight - 5);
   deadPlayer.collider.reset(s);
+  deadPlayer.invincibleTimer = GLOBALS.invincibleSecondsOnDeath;
   scoring.updatePlayerScore(s, clientId);
   s.io.emit('playerDied', deadPlayer.getData());
 }
@@ -81,7 +82,15 @@ export const updateGame = (_state) => {
     }
     //find collision with other players
     for (const otherId in sg.players) {
-      if (otherId === clientId || sg.players[otherId].dead) continue;
+      if (
+        otherId === clientId || 
+        sg.players[otherId].dead || 
+        sg.players[clientId].dead || 
+        sg.players[clientId].invincibleTimer > 0.01 || 
+        sg.players[otherId].invincibleTimer > 0.01
+      ) {
+        continue;
+      }
       const collisionResult = sg.players[clientId].collider.checkCollisionWithOtherSnake(sg.players[otherId].collider);
       if (collisionResult === 1) {
         playerDied(s, otherId);
@@ -107,12 +116,12 @@ export const updateGame = (_state) => {
       }
       break;
     case SERVER_STATES.GAME_OVER:
-      if (st.timers.gameEndTimer === undefined) {
+      if (time.getTimer(s, 'gameEndTimer') === undefined) {
         time.startNewTimer(s, 'gameEndTimer');
       }
-      sg.gameStateTimer = st.timers.gameEndTimer;
-      if (st.timers.gameEndTimer >= GLOBALS.gameEndTimerLength) {
-        delete st.timers.gameEndTimer;
+      sg.gameStateTimer = time.getTimer(s, 'gameEndTimer');
+      if (time.getTimer(s, 'gameEndTimer') >= GLOBALS.gameEndTimerLength) {
+        time.stopTimer(s, 'gameEndTimer');
         if (Object.keys(sg.players).length >= 2) {
           sg.gameState = SERVER_STATES.GAME_STARTING_SOON;
         } else {
@@ -121,16 +130,16 @@ export const updateGame = (_state) => {
       }
       break;
     case SERVER_STATES.GAME_STARTING_SOON:
-      if (st.timers.gameStartTimer === undefined) {
+      if (time.getTimer('gameStartTimer') === undefined) {
         time.startNewTimer(s, 'gameStartTimer');
       }
       if (Object.keys(sg.players).length < 2) {
         sg.gameState = SERVER_STATES.GAME_WAITING_FOR_PLAYERS;
-        delete st.timers.gameStartTimer;
+        time.stopTimer(s, 'gameStartTimer');
       }
-      sg.gameStateTimer = st.timers.gameStartTimer;
-      if (st.timers.gameStartTimer >= GLOBALS.startTimerLength) {
-        delete st.timers.gameStartTimer;
+      sg.gameStateTimer = time.getTimer('gameStartTimer');
+      if (time.getTimer(s, 'gameStartTimer') >= GLOBALS.startTimerLength) {
+        time.stopTimer(s, 'gameStartTimer');
         sg.gameState = SERVER_STATES.GAME_RESETTING;
       }
       break;
@@ -144,12 +153,12 @@ export const updateGame = (_state) => {
       break;
     case SERVER_STATES.GAME_PLAYING:
     default:
-      if (st.timers.roundTimer === undefined) {
+      if (time.getTimer(s, 'roundTimer') === undefined) {
         time.startNewTimer(s, 'roundTimer');
       }
-      sg.gameStateTimer = st.timers.roundTimer;
-      if (st.timers.roundTimer >= GLOBALS.roundTimerLength || Object.keys(sg.players).length < 2) {
-        delete st.timers.roundTimer;
+      sg.gameStateTimer = time.getTimer(s, 'roundTimer');
+      if (time.getTimer(s, 'roundTimer') >= GLOBALS.roundTimerLength || Object.keys(sg.players).length < 2) {
+        time.stopTimer(s, 'roundTimer')
         sg.gameState = SERVER_STATES.GAME_OVER;
       }
       break;

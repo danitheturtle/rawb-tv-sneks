@@ -78,6 +78,9 @@ export class PlayerRenderer {
     for (let i = snakeBodyRelativePositions.length - 1; i >= 0; i--) {
       const pos = snakeBodyRelativePositions[i];
       c.save();
+      if (this.parent.invincibleTimer > 0.01) {
+        c.globalAlpha = 0.4;
+      }
       if (i === 0) {
         c.translate(pos.x, pos.y);
         drawTextOutline(

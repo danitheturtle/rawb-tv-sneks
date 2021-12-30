@@ -57,6 +57,10 @@ export class Player extends GameObject {
       } else {
         this.sprintTimer = 0;
       }
+      //Update invincibleTimer
+      if (this.invincibleTimer > 0.01) {
+        this.invincibleTimer -= time.dt(_state);
+      }
       //Reset acceleration
       this.accel = new Vector(0.0, 0.0);
       this.collider?.update();
@@ -77,6 +81,7 @@ export class Player extends GameObject {
       moveHeadingY: this.moveHeading.y,
       sprint: this.sprint,
       sprintTimer: this.sprintTimer,
+      invincibleTimer: this.invincibleTimer,
       score: this.score
     };
   }
@@ -123,15 +128,16 @@ export class Player extends GameObject {
   setData(_data) {
     super.setData(_data);
     this.name = _data.name !== undefined ? _data.name : this.name;
+    this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
     this.dead = _data.dead !== undefined ? _data.dead : this.dead;
     this.moveHeading = new Vector(
       !isNaN(_data.moveHeadingX) ? _data.moveHeadingX : this.moveHeading.x, 
       !isNaN(_data.moveHeadingY) ? _data.moveHeadingY : this.moveHeading.y
     );
     this.sprint = _data.sprint !== undefined ? _data.sprint : this.sprint;
-    this.sprintTimer = _data.sprintTimer !== undefined ? _data.sprintTimer : this.sprintTimer;
-    this.spriteName = _data.spriteName !== undefined ? _data.spriteName : this.spriteName;
-    this.score = _data.score !== undefined ? _data.score : this.score;
+    this.sprintTimer = !isNaN(_data.sprintTimer) ? _data.sprintTimer : this.sprintTimer;
+    this.invincibleTimer = !isNaN(_data.invincibleTimer) ? _data.invincibleTimer : this.invincibleTimer;
+    this.score = !isNaN(_data.score) ? _data.score : this.score;
     if (this.renderer) {
       this.renderer.playerName = this.name;
       this.renderer.spriteName = this.spriteName;
