@@ -177,7 +177,7 @@ const updateStartScreen = (s) => {
   const vpUnit = Math.min(s.viewport.vh, s.viewport.vw);
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 9*s.viewport.vw, `${5*vpUnit}px Arial`, "rgba(100, 100, 100, 1.0)");
+  drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 13*s.viewport.vw, `${5*vpUnit}px Arial`, "rgba(100, 100, 100, 1.0)");
   drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 4*s.viewport.vh, `${2*vpUnit}px Arial`, "rgba(50, 50, 50, 1.0)");
   if (sg.playerNameValue.length >= 3) {
     if (!sgb.joinGameButton) {
