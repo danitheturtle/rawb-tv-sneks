@@ -127,32 +127,34 @@ export const drawGUI = (_state) => {
 export const drawWaitingForPlayersGUI = (_state) => {
   const s = _state;
   const sg = s.game;
+  const vpUnit = Math.min(s.viewport.vw, s.viewport.vh);
   drawTextOutline(
     s,
     "Waiting for Players (min 2)", 
     s.viewport.width / 2, 
-    48, 
-    "36px Arial", 
+    4*vpUnit, 
+    `${3*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
   );
   Object.values(sg.players).forEach((player, i) => {
     if (i > 20) return;
-    drawTextOutline(s, "Sneks in a Lobby", 186, 48, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
-    drawTextOutline(s, player.name, 48, 96+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, "Sneks in a Lobby", 14*vpUnit, 4*vpUnit, `${3*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(s, player.name, 3*vpUnit, 9*vpUnit+i*3*vpUnit, `${2*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
   });
 }
 
 export const drawStartingSoonGUI = (_state) => {
   const s = _state;
   const sg = s.game;
+  const vpUnit = Math.min(s.viewport.vw, s.viewport.vh);
   drawTextOutline(
     s,
     "Starting Soon (unless people leave)", 
     s.viewport.width / 2, 
-    48, 
-    "36px Arial", 
+    4*vpUnit, 
+    `${3*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -160,9 +162,9 @@ export const drawStartingSoonGUI = (_state) => {
   drawProgressBar(
     s,
     s.viewport.width / 3, 
-    72, 
+    7*vpUnit, 
     s.viewport.width / 3, 
-    16, 
+    1.5*vpUnit, 
     'rgba(255, 255, 255, 0.5)', 
     '#7D5BA6', 
     sg.gameStateTimer, 
@@ -174,6 +176,7 @@ export const drawStartingSoonGUI = (_state) => {
 export const drawGameOverGUI = (_state) => {
   const s = _state;
   const sg = s.game;
+  const vpUnit = Math.min(s.viewport.vw, s.viewport.vh);
   let c = s.ctx;
   c.fillStyle = "rgba(0, 0, 0, 0.5)";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
@@ -181,8 +184,8 @@ export const drawGameOverGUI = (_state) => {
     s,
     "Game Over", 
     s.viewport.width / 2, 
-    48, 
-    "42px Arial", 
+    4*vpUnit, 
+    `${4*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -190,9 +193,9 @@ export const drawGameOverGUI = (_state) => {
   drawProgressBar(
     s,
     s.viewport.width / 3, 
-    72, 
+    7*vpUnit, 
     s.viewport.width / 3, 
-    16, 
+    1.5*vpUnit, 
     'rgba(255, 255, 255, 0.5)', 
     '#D81159', 
     sg.gameStateTimer, 
@@ -203,8 +206,8 @@ export const drawGameOverGUI = (_state) => {
     s,
     "Most Dangerous Noodle:", 
     s.viewport.width / 2, 
-    s.viewport.height / 2 - 48, 
-    "52px Arial", 
+    s.viewport.height / 2 - 4*vpUnit, 
+    `${5*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     2
@@ -213,8 +216,8 @@ export const drawGameOverGUI = (_state) => {
     s,
     `${sg.scoreboard?.[0]?.[1]} with ${sg.scoreboard?.[0]?.[2]} points!`, 
     s.viewport.width / 2, 
-    s.viewport.height / 2 + 48, 
-    "64px Arial", 
+    s.viewport.height / 2 + 4*vpUnit, 
+    `${6*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     2
@@ -222,12 +225,13 @@ export const drawGameOverGUI = (_state) => {
 }
 
 export const drawResetGUI = (_state) => {
+  const vpUnit = Math.min(_state.viewport.vw, _state.viewport.vh);
   drawTextOutline(
     _state,
     "Reseting...", 
     _state.viewport.width / 2, 
-    48, 
-    "36px Arial", 
+    4*vpUnit, 
+    `${3*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -237,13 +241,14 @@ export const drawResetGUI = (_state) => {
 export const drawPlayingGUI = (_state) => {
   const s = _state;
   const sg = s.game;
-  drawScoreboard(s, 32, 64);
+  const vpUnit = Math.min(s.viewport.vw, s.viewport.vh);
+  drawScoreboard(s, 3*vpUnit, 6*vpUnit);
   drawTextOutline(
     s,
     "Time Left", 
     s.viewport.width / 2, 
-    48, 
-    "36px Arial", 
+    4*vpUnit, 
+    `${3*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -251,9 +256,9 @@ export const drawPlayingGUI = (_state) => {
   drawProgressBar(
     s,
     s.viewport.width / 3, 
-    72, 
+    6*vpUnit, 
     s.viewport.width / 3, 
-    16, 
+    1.5*vpUnit, 
     'rgba(255, 255, 255, 0.5)', 
     '#55D6BE', 
     sg.gameStateTimer, 
@@ -265,14 +270,15 @@ export const drawPlayingGUI = (_state) => {
 export const drawScoreboard = (_state, x, y) => {
   const s = _state;
   const sg = s.game;
+  const vpUnit = Math.min(s.viewport.vw, s.viewport.vh);
   const scoreboard = sg.scoreboard;
   let c = s.ctx;
   c.save();
   scoreboard.forEach((playerScore, i) => {
     if (i > 9) return;
-    drawTextOutline(s, "Sneakiest Sneks", x+136, y-16, "36px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
-    drawTextOutline(s, playerScore[2], x, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
-    drawTextOutline(s, playerScore[1], x+96, y+32+i*32, "24px Arial", 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, "Sneakiest Sneks", x + 11*vpUnit, y-1.5*vpUnit, `${3*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(s, playerScore[2], x, y+3*vpUnit+i*3*vpUnit, `${2*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, playerScore[1], x+9*vpUnit, y+3*vpUnit+i*3*vpUnit, `${2*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
   });
   c.restore();
 }

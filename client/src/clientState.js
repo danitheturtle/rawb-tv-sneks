@@ -51,7 +51,11 @@ export class ClientState extends State {
       scoreboard: [],
       //Control type the client is using
       controlType: CONTROL_TYPES.MOUSE,
-      touchButtons: []
+      touchButtons: [],
+      buttons: {
+        joinGameButton: undefined,
+        characterSelectButtons: undefined
+      }
     };
     
     this.player = {
@@ -125,6 +129,16 @@ export class ClientState extends State {
     //Resize the canvas to be 100vwX100vh
     this.canvas.setAttribute("width", this.viewport.width);
     this.canvas.setAttribute("height", this.viewport.height);
+    //Resize buttons
+    if (this.game.touchButtons.length > 0) {
+      this.game.touchButtons.forEach(btn => btn.resize(this));
+    }
+    if (this.game.buttons.joinGameButton !== undefined) {
+      this.game.buttons.joinGameButton.resize(this);
+    }
+    if (this.game.buttons.characterSelectButtons !== undefined) {
+      this.game.buttons.characterSelectButtons.forEach(btn => btn.resize(this));
+    }
     //Replace the old context with the newer, resized version
     this.ctx = this.canvas.getContext('2d');
   }

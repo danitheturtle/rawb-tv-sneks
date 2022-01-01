@@ -105,9 +105,10 @@ export const update = (_state) => {
     }
   } else if (sg.controlType === CONTROL_TYPES.TOUCH) {
     if (sg.touchButtons.length < 1) {
+      const vpUnit = Math.min(s.viewport.vw, s.viewport.vh);
       sg.touchButtons.push(
         new CanvasTouchTarget(
-          -128,-128, 96, 96, 
+          3*vpUnit, s.viewport.height-8*vpUnit, 5*vpUnit, 5*vpUnit, 
           undefined, si.sprites[`sprintTouchIcon`], 
           () => { 
             if (!spl.sprint) {
@@ -120,22 +121,61 @@ export const update = (_state) => {
               spl.sprint = false;
               spl.shouldUpdateServer = true;
             }
+          },
+          undefined,
+          (_s, _button) => {
+            const resizeVPUnit = Math.min(_s.viewport.vw, _s.viewport.vh);
+            _button.x = 3*resizeVPUnit;
+            _button.y = _s.viewport.height - 8*resizeVPUnit;
+            _button.width = 5*resizeVPUnit;
+            _button.height = 5*resizeVPUnit;
           }
         )
       );
       sg.touchButtons.push(
         new CanvasTouchTarget(
-          128, -256, 128, 128, 
+          s.viewport.width - 16*vpUnit, s.viewport.height-16*vpUnit, 10*vpUnit, 10*vpUnit, 
           'white', undefined, 
           undefined, 
           undefined,
           (e) => {
-            const newMoveHeading = new Vector(e.clientX, e.clientY).subtract(new Vector(192, s.viewport.height - 192));
+            const newMoveHeading = new Vector(e.clientX, e.clientY).subtract(new Vector(s.viewport.width - 11*vpUnit, s.viewport.height - 11*vpUnit));
             spl.moveHeading = newMoveHeading.normalize();
             spl.shouldUpdateServer = true;
+          },
+          (_s, _button) => {
+            const resizeVPUnit = Math.min(_s.viewport.vw, _s.viewport.vh);
+            _button.x = _s.viewport.width - 16*resizeVPUnit;
+            _button.y = _s.viewport.height - 16*resizeVPUnit;
+            _button.width = 10*resizeVPUnit;
+            _button.height = 10*resizeVPUnit;
           }
         )
       );
+      sg.touchButtons.push(
+        new CanvasTouchTarget(
+          s.viewport.width - 7*vpUnit, 2*vpUnit, 5*vpUnit, 5*vpUnit,
+          undefined, si.sprites['fullscreenTouchIcon'],
+          undefined,
+          () => {
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen();
+            } else {
+              if (document.exitFullscreen) {
+                document.exitFullscreen();
+              }
+            }
+          },
+          undefined,
+          (_s, _button) => {
+            const resizeVPUnit = Math.min(_s.viewport.vw, _s.viewport.vh);
+            _button.x = _s.viewport.width - 7*resizeVPUnit;
+            _button.y = 2*resizeVPUnit;
+            _button.width = 5*resizeVPUnit;
+            _button.height = 5*resizeVPUnit;
+          }
+        )
+      )
     }
     // sg.touchButtons.forEach(touchButton => touchButton.updateAndDraw(s))
   }

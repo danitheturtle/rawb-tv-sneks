@@ -120,9 +120,10 @@ export const update = (_state) => {
 
 const updateLoading = (s) => {
   const c = s.ctx;
+  const vpUnit = Math.min(s.viewport.vh, s.viewport.vw);
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText(s, "Loading...", s.viewport.width / 2, s.viewport.height / 2, "48px Arial", "rgba(100, 100, 100, 1.0)");
+  drawing.drawText(s, "Loading...", s.viewport.width / 2, s.viewport.height / 2, `${4*vpUnit}px Arial`, "rgba(100, 100, 100, 1.0)");
 }
 
 const updateTutorial = (s) => {
@@ -152,46 +153,39 @@ const updateTutorial = (s) => {
   c.drawImage(img.image, dx, dy, dWidth, dHeight);
 
   //If the user clicks, go to the start screen
-  if (keys.pressed('mouseButton') || keys.pressed('touches')) {
+  if (keys.pressed('mouseButton')) {
     s.input.style.display = 'initial';
     s.input.focus();
     sg.clientState = CLIENT_STATES.START_SCREEN;
+  } else if (keys.pressed('touches')) {
+    s.input.style.display = 'none';
+    sg.controlType = CONTROL_TYPES.TOUCH;
+    while (!sg.playerNameValue || sg.playerNameValue?.length < 3) {
+      const chosenName = prompt("Name your snek");
+      sg.playerNameValue = chosenName;
+      s.input.value = chosenName;
+    }
+    sg.clientState = CLIENT_STATES.START_SCREEN;
+    s.input.style.display = 'initial';
   }
 }
 
-let joinGameButton, saveNameButton;
 const updateStartScreen = (s) => {
   const sg = s.game;
+  const sgb = sg.buttons;
   const c = s.ctx;
+  const vpUnit = Math.min(s.viewport.vh, s.viewport.vw);
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 160, "60px Arial", "rgba(100, 100, 100, 1.0)");
-  drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 40, "24px Arial", "rgba(50, 50, 50, 1.0)");
-  if (!saveNameButton) {
-    saveNameButton = new CanvasButton(
-      s.viewport.width / 2 + 176, 
-      s.viewport.height / 2 - 16, 
-      64, 
-      32, 
-      'rgb(100, 100, 100)', 
-      'rgb(240, 100, 100)',
-      () => {
-        sg.playerNameValue = s.input.value;
-        s.input.blur();
-      }, 
-      undefined, 
-      'Save',
-      "14px Arial"
-    );
-  }
-  saveNameButton.updateAndDraw(s);
+  drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 9*s.viewport.vw, `${5*vpUnit}px Arial`, "rgba(100, 100, 100, 1.0)");
+  drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 4*s.viewport.vh, `${2*vpUnit}px Arial`, "rgba(50, 50, 50, 1.0)");
   if (sg.playerNameValue.length >= 3) {
-    if (!joinGameButton) {
-      joinGameButton = new CanvasButton(
-        s.viewport.width / 2 - 200, 
-        s.viewport.height / 2 + 60, 
-        400, 
-        60, 
+    if (!sgb.joinGameButton) {
+      sgb.joinGameButton = new CanvasButton(
+        s.viewport.width / 2 - 10*s.viewport.vw, 
+        s.viewport.height / 2 + 4*s.viewport.vh, 
+        20*s.viewport.vw, 
+        6*s.viewport.vh, 
         'rgb(100, 100, 100)', 
         'rgb(240, 100, 100)',
         () => {
@@ -199,41 +193,53 @@ const updateStartScreen = (s) => {
           sg.clientState = CLIENT_STATES.CHARACTER_SELECT;
         }, 
         undefined, 
-        'Join Game'
+        'Join Game',
+        `${3*s.viewport.vh}px Arial`,
+        undefined,
+        undefined,
+        (_s, _button) => {
+          const vpUnit = Math.min(_s.viewport.vh, _s.viewport.vw);
+          _button.x = _s.viewport.width / 2 - 10*_s.viewport.vw;
+          _button.y = _s.viewport.height / 2 + 4*_s.viewport.vh;
+          _button.width = 20*_s.viewport.vw;
+          _button.height = 6*_s.viewport.vh;
+          _button.font = `${3*vpUnit}px Arial`;
+        }
       );
     }
-    joinGameButton.updateAndDraw(s);
+    sgb.joinGameButton.updateAndDraw(s);
   } else {
-    drawing.drawText(s, "(3 character min, then press enter)", s.viewport.width / 2, s.viewport.height / 2 + 36, "12px Arial", "rgba(160, 160, 160, 1.0)");
+    drawing.drawText(s, "(3 character min, then press enter)", s.viewport.width / 2, s.viewport.height / 2 + 36, `${1.5*vpUnit}px Arial`, "rgba(160, 160, 160, 1.0)");
   }
 }
 
-let characterSelectButtons;
 const updateCharacterSelect = (s) => {
-  if (joinGameButton) {
-    joinGameButton.destroy();
-    joinGameButton = undefined;
-  }
   const si = s.image;
   const sg = s.game;
+  const sgb = sg.buttons;
+  if (sgb.joinGameButton) {
+    sgb.joinGameButton.destroy();
+    sgb.joinGameButton = undefined;
+  }
   const c = s.ctx;
+  const vpUnit = Math.min(s.viewport.vh, s.viewport.vw);
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   drawing.drawText(
     s,
     "Choose Your Snek", 
     s.viewport.width / 2, 
-    48, 
-    "36px Arial",
+    4*s.viewport.vh, 
+    `${3*vpUnit}px Arial`,
     'rgb(50, 50, 50)'
   );
-  const charSelectMargin = 50;
-  if (!characterSelectButtons) {
-    characterSelectButtons = [];
-    const gridSize = 7;
+  const charSelectMargin = 3*vpUnit;
+  if (!sgb.characterSelectButtons) {
+    sgb.characterSelectButtons = [];
+    const gridSize = s.viewport.width > s.viewport.height ? 6 : 4;
     for (let i=0; i<drawing.allPlayerSpriteNames.length; i++) {
       const buttonSize = ((s.viewport.width-charSelectMargin*2) / gridSize) - ((gridSize-1)*charSelectMargin)/gridSize;
-      characterSelectButtons.push(new CanvasButton(
+      sgb.characterSelectButtons.push(new CanvasButton(
         charSelectMargin+(i % gridSize) * (buttonSize + charSelectMargin),
         charSelectMargin*2+(Math.floor(i / gridSize)) * (buttonSize + charSelectMargin),
         buttonSize,
@@ -244,39 +250,56 @@ const updateCharacterSelect = (s) => {
           sg.playerSpriteValue = drawing.allPlayerSpriteNames[i][0];
           sg.clientState = CLIENT_STATES.CONNECTING;
         },
-        si.sprites[`${drawing.allPlayerSpriteNames[i][0]}Head`]
-      ))
+        si.sprites[`${drawing.allPlayerSpriteNames[i][0]}Head`],
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        (_s, _button) => {
+          const resizedButtonSize = ((_s.viewport.width-charSelectMargin*2) / gridSize) - ((gridSize-1)*charSelectMargin)/gridSize;
+          _button.x = charSelectMargin+(i % gridSize) * (resizedButtonSize + charSelectMargin);
+          _button.y = charSelectMargin*2+(Math.floor(i / gridSize)) * (resizedButtonSize + charSelectMargin);
+          _button.width = resizedButtonSize;
+          _button.height = resizedButtonSize;
+        }
+      ));
     }
   }
-  characterSelectButtons.forEach((bt, i) => {
+  sgb.characterSelectButtons.forEach((bt, i) => {
     bt.updateAndDraw(s);
-    drawing.drawText(s, drawing.allPlayerSpriteNames[i][1], bt.x + bt.width / 2, bt.y + bt.height + 16, "20px Arial", 'rgb(50, 50, 50)')
+    drawing.drawText(s, drawing.allPlayerSpriteNames[i][1], bt.x + bt.width / 2, bt.y + bt.height + 16, `${2*vpUnit}px Arial`, 'rgb(50, 50, 50)')
   });
 }
 
 const updateConnecting = (s) => {
-  if (characterSelectButtons) {
-    for (let i=0; i<characterSelectButtons.length; i++) {
-      characterSelectButtons[i].destroy();
-      delete characterSelectButtons[i];
-    }
-    characterSelectButtons = undefined;
-  }
   const sg = s.game;
+  const sgb = sg.buttons;
   const c = s.ctx;
+  const vpUnit = Math.min(s.viewport.vh, s.viewport.vw);
+  if (sgb.characterSelectButtons) {
+    for (let i=0; i<sgb.characterSelectButtons.length; i++) {
+      sgb.characterSelectButtons[i].destroy();
+      delete sgb.characterSelectButtons[i];
+    }
+    sgb.characterSelectButtons = undefined;
+  }
   if (!sg.joinedGame && !sg.joiningGame) {
     //Tell the server to add a new player
     socket.createNewPlayer(s, sg.playerNameValue);
     sg.joiningGame = true;
   }
+  if (sg.controlType === CONTROL_TYPES.TOUCH && !document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  }
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText(s, "Connecting...", s.viewport.width / 2, s.viewport.height / 2, "60px Arial", "rgba(100, 100, 100, 1.0)");
+  drawing.drawText(s, "Connecting...", s.viewport.width / 2, s.viewport.height / 2, `${6*vpUnit}px Arial`, "rgba(100, 100, 100, 1.0)");
 }
 
 const updatePaused = (s) => {
   const c = s.ctx;
+  const vpUnit = Math.min(s.viewport.vh, s.viewport.vw);
   c.fillStyle = "rgba(0, 0, 0, 0.5)";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
-  drawing.drawText(s, "Paused", s.viewport.width / 2, s.viewport.height / 2, "60px Arial", "rgba(200, 200, 200, 1.0)");
+  drawing.drawText(s, "Paused", s.viewport.width / 2, s.viewport.height / 2, `${6*vpUnit}px Arial`, "rgba(200, 200, 200, 1.0)");
 }

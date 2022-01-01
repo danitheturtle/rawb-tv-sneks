@@ -16,7 +16,8 @@ export class CanvasButton {
     _text = undefined, 
     _font = "30px Arial", 
     _textColor = "rgb(120, 120, 120)",
-    _textColorHover = "rgb(255, 255, 255)"
+    _textColorHover = "rgb(255, 255, 255)",
+    _resizeCallback = (_state, _button) => {}
   ) {
     this.x = _x;
     this.y = _y;
@@ -30,6 +31,7 @@ export class CanvasButton {
     this.textColor = _textColor;
     this.textColorHover = _textColorHover;
     this.sprite = _sprite;
+    this.resizeCallback = _resizeCallback;
     this.boundHandleClick = this.handleClick.bind(this);
     keys.keyUp("mouseButton", "touches", this.boundHandleClick);
   }
@@ -71,13 +73,17 @@ export class CanvasButton {
     c.restore();
   }
   
+  resize(_state) {
+    this.resizeCallback(_state, this);
+  }
+  
   destroy() {
     keys.unbindKeyUp("mouseButton", "touches", this.boundHandleClick);
   }
 }
 
 export class CanvasTouchTarget {
-  constructor(_x,_y,_width,_height,_color,_sprite,_touchStartCallback,_touchEndCallback,_touchMoveCallback) {
+  constructor(_x,_y,_width,_height,_color,_sprite,_touchStartCallback,_touchEndCallback,_touchMoveCallback,_resizeCallback) {
     this.x = _x;
     this.y = _y;
     this.width = _width;
@@ -87,6 +93,7 @@ export class CanvasTouchTarget {
     this.touchStartCallback = _touchStartCallback;
     this.touchEndCallback = _touchEndCallback;
     this.touchMoveCallback = _touchMoveCallback;
+    this.resizeCallback = _resizeCallback;
     this.activeTouchIds = [];
   }
   
@@ -122,13 +129,11 @@ export class CanvasTouchTarget {
     } else {
       c.globalAlpha = 0.9;
     }
-    const adjustedX = this.x < 0 ? s.viewport.width + this.x : this.x;
-    const adjustedY = this.y < 0 ? s.viewport.height + this.y : this.y;
     if (this.color) {
       c.strokeStyle = this.color;
       c.lineWidth = 10;
-      const centerX = adjustedX + this.width/2;
-      const centerY = adjustedY + this.height/2;
+      const centerX = this.x + this.width/2;
+      const centerY = this.y + this.height/2;
       const radius = (this.width/2.0 + this.height/2.0)/2.0;
       c.beginPath();
       c.arc(centerX, centerY, radius, 0, 2*Math.PI, false);
@@ -136,13 +141,13 @@ export class CanvasTouchTarget {
       c.closePath();
     }
     if (this.sprite) {
-      this.sprite.draw(s, adjustedX, adjustedY, this.width, this.height);
+      this.sprite.draw(s, this.x, this.y, this.width, this.height);
     }
     if (this.activeTouchIds.length > 0) {
       for (let i=0; i<this.activeTouchIds.length; i++) {
         const touchData = keys.touch(this.activeTouchIds[i]);
-        const clampedX = utils.clamp(touchData.clientX, adjustedX, adjustedX + this.width);
-        const clampedY = utils.clamp(touchData.clientY, adjustedY, adjustedY + this.height);
+        const clampedX = utils.clamp(touchData.clientX, this.x, this.x + this.width);
+        const clampedY = utils.clamp(touchData.clientY, this.y, this.y + this.height);
         c.fillStyle = this.color;
         c.beginPath();
         c.arc(clampedX, clampedY, 16, 0, 2*Math.PI, false);
@@ -151,5 +156,9 @@ export class CanvasTouchTarget {
       }
     }
     c.restore();
+  }
+  
+  resize(s) {
+    this.resizeCallback(s, this);
   }
 }
