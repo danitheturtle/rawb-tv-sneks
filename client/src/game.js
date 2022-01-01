@@ -178,7 +178,7 @@ const updateStartScreen = (s) => {
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 9*s.viewport.vw, `${5*vpUnit}px Arial`, "rgba(100, 100, 100, 1.0)");
-  drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 6*s.viewport.vh, `${2*vpUnit}px Arial`, "rgba(50, 50, 50, 1.0)");
+  drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 4*s.viewport.vh, `${2*vpUnit}px Arial`, "rgba(50, 50, 50, 1.0)");
   if (sg.playerNameValue.length >= 3) {
     if (!sgb.joinGameButton) {
       sgb.joinGameButton = new CanvasButton(
@@ -287,9 +287,6 @@ const updateConnecting = (s) => {
     //Tell the server to add a new player
     socket.createNewPlayer(s, sg.playerNameValue);
     sg.joiningGame = true;
-  }
-  if (sg.controlType === CONTROL_TYPES.TOUCH && !document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
   }
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);

@@ -133,15 +133,15 @@ export const drawWaitingForPlayersGUI = (_state) => {
     "Waiting for Players (min 2)", 
     s.viewport.width / 2, 
     4*vpUnit, 
-    `${3*vpUnit}px Arial`, 
+    `${4*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
   );
   Object.values(sg.players).forEach((player, i) => {
     if (i > 20) return;
-    drawTextOutline(s, "Sneks in a Lobby", 14*vpUnit, 4*vpUnit, `${3*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
-    drawTextOutline(s, player.name, 3*vpUnit, 9*vpUnit+i*3*vpUnit, `${2*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, "Sneks in a Lobby", 18*vpUnit, 4*vpUnit, `${4*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(s, player.name, 3*vpUnit, 9*vpUnit+i*3*vpUnit, `${3*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
   });
 }
 
@@ -154,7 +154,7 @@ export const drawStartingSoonGUI = (_state) => {
     "Starting Soon (unless people leave)", 
     s.viewport.width / 2, 
     4*vpUnit, 
-    `${3*vpUnit}px Arial`, 
+    `${4*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -185,7 +185,7 @@ export const drawGameOverGUI = (_state) => {
     "Game Over", 
     s.viewport.width / 2, 
     4*vpUnit, 
-    `${4*vpUnit}px Arial`, 
+    `${5*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -207,7 +207,7 @@ export const drawGameOverGUI = (_state) => {
     "Most Dangerous Noodle:", 
     s.viewport.width / 2, 
     s.viewport.height / 2 - 4*vpUnit, 
-    `${5*vpUnit}px Arial`, 
+    `${6*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     2
@@ -217,7 +217,7 @@ export const drawGameOverGUI = (_state) => {
     `${sg.scoreboard?.[0]?.[1]} with ${sg.scoreboard?.[0]?.[2]} points!`, 
     s.viewport.width / 2, 
     s.viewport.height / 2 + 4*vpUnit, 
-    `${6*vpUnit}px Arial`, 
+    `${7*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     2
@@ -231,7 +231,7 @@ export const drawResetGUI = (_state) => {
     "Reseting...", 
     _state.viewport.width / 2, 
     4*vpUnit, 
-    `${3*vpUnit}px Arial`, 
+    `${4*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -248,7 +248,7 @@ export const drawPlayingGUI = (_state) => {
     "Time Left", 
     s.viewport.width / 2, 
     4*vpUnit, 
-    `${3*vpUnit}px Arial`, 
+    `${4*vpUnit}px Arial`, 
     'rgb(255, 255, 255)', 
     'rgb(50, 50, 50)', 
     1
@@ -276,9 +276,9 @@ export const drawScoreboard = (_state, x, y) => {
   c.save();
   scoreboard.forEach((playerScore, i) => {
     if (i > 9) return;
-    drawTextOutline(s, "Sneakiest Sneks", x + 11*vpUnit, y-1.5*vpUnit, `${3*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
-    drawTextOutline(s, playerScore[2], x, y+3*vpUnit+i*3*vpUnit, `${2*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
-    drawTextOutline(s, playerScore[1], x+9*vpUnit, y+3*vpUnit+i*3*vpUnit, `${2*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, "Sneakiest Sneks", x + 15*vpUnit, y-1.5*vpUnit, `${4*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 1)
+    drawTextOutline(s, playerScore[2], x, y+3*vpUnit+i*3*vpUnit, `${3*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
+    drawTextOutline(s, playerScore[1], x+9*vpUnit, y+3*vpUnit+i*3*vpUnit, `${3*vpUnit}px Arial`, 'rgb(255, 255, 255)', 'rgb(50, 50, 50)', 0.5, 'left');
   });
   c.restore();
 }
