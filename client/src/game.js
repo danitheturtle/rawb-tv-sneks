@@ -178,12 +178,12 @@ const updateStartScreen = (s) => {
   c.fillStyle = "white";
   c.fillRect(0, 0, s.viewport.width, s.viewport.height);
   drawing.drawText(s, "Snakey Mouse", s.viewport.width / 2, s.viewport.height / 2 - 9*s.viewport.vw, `${5*vpUnit}px Arial`, "rgba(100, 100, 100, 1.0)");
-  drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 4*s.viewport.vh, `${2*vpUnit}px Arial`, "rgba(50, 50, 50, 1.0)");
+  drawing.drawText(s, "Name Your Snek", s.viewport.width / 2, s.viewport.height / 2 - 6*s.viewport.vh, `${2*vpUnit}px Arial`, "rgba(50, 50, 50, 1.0)");
   if (sg.playerNameValue.length >= 3) {
     if (!sgb.joinGameButton) {
       sgb.joinGameButton = new CanvasButton(
         s.viewport.width / 2 - 10*s.viewport.vw, 
-        s.viewport.height / 2 + 4*s.viewport.vh, 
+        s.viewport.height / 2 + 6*s.viewport.vh, 
         20*s.viewport.vw, 
         6*s.viewport.vh, 
         'rgb(100, 100, 100)', 
@@ -200,7 +200,7 @@ const updateStartScreen = (s) => {
         (_s, _button) => {
           const vpUnit = Math.min(_s.viewport.vh, _s.viewport.vw);
           _button.x = _s.viewport.width / 2 - 10*_s.viewport.vw;
-          _button.y = _s.viewport.height / 2 + 4*_s.viewport.vh;
+          _button.y = _s.viewport.height / 2 + 6*_s.viewport.vh;
           _button.width = 20*_s.viewport.vw;
           _button.height = 6*_s.viewport.vh;
           _button.font = `${3*vpUnit}px Arial`;
