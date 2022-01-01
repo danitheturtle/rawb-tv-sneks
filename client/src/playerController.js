@@ -108,7 +108,7 @@ export const update = (_state) => {
       const vpUnit = Math.min(s.viewport.vw, s.viewport.vh);
       sg.touchButtons.push(
         new CanvasTouchTarget(
-          3*vpUnit, s.viewport.height-8*vpUnit, 5*vpUnit, 5*vpUnit, 
+          3*vpUnit, s.viewport.height-10*vpUnit, 7*vpUnit, 7*vpUnit, 
           undefined, si.sprites[`sprintTouchIcon`], 
           () => { 
             if (!spl.sprint) {
@@ -126,15 +126,15 @@ export const update = (_state) => {
           (_s, _button) => {
             const resizeVPUnit = Math.min(_s.viewport.vw, _s.viewport.vh);
             _button.x = 3*resizeVPUnit;
-            _button.y = _s.viewport.height - 8*resizeVPUnit;
-            _button.width = 5*resizeVPUnit;
-            _button.height = 5*resizeVPUnit;
+            _button.y = _s.viewport.height - 10*resizeVPUnit;
+            _button.width = 7*resizeVPUnit;
+            _button.height = 7*resizeVPUnit;
           }
         )
       );
       sg.touchButtons.push(
         new CanvasTouchTarget(
-          s.viewport.width - 16*vpUnit, s.viewport.height-16*vpUnit, 10*vpUnit, 10*vpUnit, 
+          s.viewport.width - 24*vpUnit, s.viewport.height-24*vpUnit, 15*vpUnit, 15*vpUnit, 
           'white', undefined, 
           undefined, 
           undefined,
@@ -145,16 +145,16 @@ export const update = (_state) => {
           },
           (_s, _button) => {
             const resizeVPUnit = Math.min(_s.viewport.vw, _s.viewport.vh);
-            _button.x = _s.viewport.width - 16*resizeVPUnit;
-            _button.y = _s.viewport.height - 16*resizeVPUnit;
-            _button.width = 10*resizeVPUnit;
-            _button.height = 10*resizeVPUnit;
+            _button.x = _s.viewport.width - 24*resizeVPUnit;
+            _button.y = _s.viewport.height - 24*resizeVPUnit;
+            _button.width = 15*resizeVPUnit;
+            _button.height = 15*resizeVPUnit;
           }
         )
       );
       sg.touchButtons.push(
         new CanvasTouchTarget(
-          s.viewport.width - 7*vpUnit, 2*vpUnit, 5*vpUnit, 5*vpUnit,
+          s.viewport.width - 10*vpUnit, 3*vpUnit, 7*vpUnit, 7*vpUnit,
           undefined, si.sprites['fullscreenTouchIcon'],
           undefined,
           () => {
@@ -169,10 +169,10 @@ export const update = (_state) => {
           undefined,
           (_s, _button) => {
             const resizeVPUnit = Math.min(_s.viewport.vw, _s.viewport.vh);
-            _button.x = _s.viewport.width - 7*resizeVPUnit;
-            _button.y = 2*resizeVPUnit;
-            _button.width = 5*resizeVPUnit;
-            _button.height = 5*resizeVPUnit;
+            _button.x = _s.viewport.width - 10*resizeVPUnit;
+            _button.y = 3*resizeVPUnit;
+            _button.width = 7*resizeVPUnit;
+            _button.height = 7*resizeVPUnit;
           }
         )
       )
