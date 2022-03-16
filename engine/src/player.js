@@ -34,7 +34,7 @@ export class Player extends GameObject {
       const angleDiff = (180+this.moveHeading.angleDeg()) - (180+this.accel.angleDeg());
       const angleDir = angleDiff > 0 ? 1 : -1;
       const clampedDegToRotate = clamp(Math.abs(angleDiff), 0, 90)*(Math.abs(angleDiff) > 180 ? -angleDir : angleDir);
-      this.accel.rotateDeg(clampedDegToRotate).multiplyScalar(GLOBALS.baseAccelSpeed);
+      this.accel.rotateDeg(clampedDegToRotate).multiplyScalar(GLOBALS.baseAccelSpeed*(this.sprint ? GLOBALS.sprintMult : 1));
       //Add acceleration to the velocity scaled by dt.  Limit the velocity so collisions don't break
       this.vel.add(this.accel.multiplyScalar(time.dt(_state)));
       //limit velocity with current max speed (squared since its cheaper)

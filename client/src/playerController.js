@@ -98,8 +98,8 @@ export const update = (_state) => {
     const mouseCoords = keys.mouse();
     const mouseCoordsVec = new Vector(mouseCoords[0], mouseCoords[1]);
     const newMoveHeading = mouseCoordsVec.clone().subtract(playerPos);
-    //to prevent jitter, make sure mouse dist is at least 2 GU away
-    if (newMoveHeading.lengthSq() > 4*sg.gu*sg.gu) {
+    //to prevent jitter, make sure mouse dist is at least 3 GU away
+    if (newMoveHeading.lengthSq() > 9*sg.gu*sg.gu) {
       spl.moveHeading = newMoveHeading.normalize();
       spl.shouldUpdateServer = true;
     }

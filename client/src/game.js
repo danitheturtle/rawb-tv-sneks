@@ -236,7 +236,7 @@ const updateCharacterSelect = (s) => {
   const charSelectMargin = 3*vpUnit;
   if (!sgb.characterSelectButtons) {
     sgb.characterSelectButtons = [];
-    const gridSize = s.viewport.width > s.viewport.height ? 6 : 4;
+    const gridSize = s.viewport.width > s.viewport.height ? 7 : 4;
     for (let i=0; i<drawing.allPlayerSpriteNames.length; i++) {
       const buttonSize = ((s.viewport.width-charSelectMargin*2) / gridSize) - ((gridSize-1)*charSelectMargin)/gridSize;
       sgb.characterSelectButtons.push(new CanvasButton(
